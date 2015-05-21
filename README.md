@@ -30,7 +30,11 @@ feature with a simple file cache managing.
 An `index.php` file enables you to use this tool as a standalone app. You can
 adjust your configuration to set your native images folder or enable/disable cache.
 
-## Using a library
+Setup it on your webserver root, in a `intervention-request` folder
+and call this url (for example using MAMP/LAMP on your computer with included test images):
+`http://localhost:8888/intervention-request/?image=images/testPNG.png&fit=100x100`
+
+## Using as a library inside your projects
 
 `InterventionRequest` class works seamlessly with *Symfony* `Request` and `Response`. It’s
 very easy to integrate it in your *Symfony* controller scheme:
@@ -60,3 +64,9 @@ $intRequest->handle();
 // with image mime-type and data. All you need is to send it!
 return $intRequest->getResponse();
 ```
+
+## License
+
+*Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
+
+Have fun!
