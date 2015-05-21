@@ -25,17 +25,17 @@
  */
 namespace AM\InterventionRequest;
 
+use AM\InterventionRequest\Cache\FileCache;
+use AM\InterventionRequest\Configuration;
+use AM\InterventionRequest\Processor as Processor;
+use Intervention\Image\ImageManager;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\File;
-use AM\InterventionRequest\Configuration;
-use Intervention\Image\ImageManager;
-use AM\InterventionRequest\Processor as Processor;
-use AM\InterventionRequest\Cache\FileCache;
 
 /**
-*
-*/
+ *
+ */
 class InterventionRequest
 {
     protected $request;
@@ -46,7 +46,7 @@ class InterventionRequest
     protected $processors;
     protected $quality;
 
-    function __construct(Configuration $configuration, Request $request = null)
+    public function __construct(Configuration $configuration, Request $request = null)
     {
         if (null !== $request) {
             $this->request = $request;
@@ -72,8 +72,8 @@ class InterventionRequest
             throw new \RuntimeException("No valid image path found in URI", 1);
         }
 
-        $nativePath = $this->configuration->getImagesPath().
-                        '/'.$this->request->query->get('image');
+        $nativePath = $this->configuration->getImagesPath() .
+        '/' . $this->request->query->get('image');
         $this->nativeImage = new File($nativePath);
         $this->parseQuality();
 
@@ -90,7 +90,7 @@ class InterventionRequest
                 Response::HTTP_OK,
                 [
                     'Content-Type' => $this->image->mime(),
-                    'Content-Disposition' => 'filename="'.$this->nativeImage->getFilename().'"',
+                    'Content-Disposition' => 'filename="' . $this->nativeImage->getFilename() . '"',
                     'X-Generator-First-Render' => true,
                 ]
             );

@@ -25,16 +25,17 @@
  */
 namespace AM\InterventionRequest\Cache;
 
-use Closure;
 use AM\InterventionRequest\InterventionRequest;
+use Closure;
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+
 /**
-*
-*/
+ *
+ */
 class FileCache
 {
     protected $interventionRequest;
@@ -45,7 +46,7 @@ class FileCache
     protected $cachePath;
     protected $quality = 90;
 
-    function __construct(InterventionRequest $interventionRequest)
+    public function __construct(InterventionRequest $interventionRequest)
     {
         $this->interventionRequest = $interventionRequest;
         $this->request = $interventionRequest->getRequest();
@@ -54,8 +55,8 @@ class FileCache
 
         $cacheHash = hash('crc32b', serialize($this->request->query->all()));
         $this->cachePath = $this->interventionRequest->getConfiguration()->getCachePath() .
-                                '/' . implode('/', str_split($cacheHash, 2)) .
-                                '.' . $this->realImage->getExtension();
+        '/' . implode('/', str_split($cacheHash, 2)) .
+        '.' . $this->realImage->getExtension();
     }
 
     public function saveImage(Image $image)
@@ -77,7 +78,7 @@ class FileCache
                 Response::HTTP_OK,
                 [
                     'Content-Type' => $this->cacheFile->getMimeType(),
-                    'Content-Disposition' => 'filename="'.$this->realImage->getFilename().'"',
+                    'Content-Disposition' => 'filename="' . $this->realImage->getFilename() . '"',
                     'X-Generator-Cached' => true,
                 ]
             );
@@ -92,7 +93,7 @@ class FileCache
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $image->mime(),
-                        'Content-Disposition' => 'filename="'.$this->realImage->getFilename().'"',
+                        'Content-Disposition' => 'filename="' . $this->realImage->getFilename() . '"',
                         'X-Generator-First-Render' => true,
                     ]
                 );

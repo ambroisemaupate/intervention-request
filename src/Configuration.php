@@ -26,8 +26,8 @@
 namespace AM\InterventionRequest;
 
 /**
-*
-*/
+ *
+ */
 class Configuration
 {
     protected $caching = true;
