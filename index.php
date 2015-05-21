@@ -31,36 +31,114 @@ require 'vendor/autoload.php';
 use Intervention\Image\ImageManager;
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 $request = Request::createFromGlobals();
-/*$cacheHash = md5(serialize($request->query->all()));
-$cachePath = 'cache/' . implode('/', str_split($cacheHash, 8));
-$cacheFile = new \SplFileInfo($cachePath);*/
-
-// create an image manager instance with favored driver
-$manager = new ImageManager([
-    'driver' => 'gd',
-    'cache' => [
-        'path' => 'cache/'
-    ]
-]);
 
 if (!$request->query->has('image') || !file_exists($request->query->get('image'))) {
     throw new \RuntimeException("No valid image file found", 1);
 }
 
-$image = $manager->cache(function($manager) use ($request) {
-    // to finally create image instances
-    return $manager->make($request->query->get('image'))->fit(960, 350);
-}, 7*24*60*60, true);
+$realImage = new File($request->query->get('image'));
 
-/*$path = $cacheFile->getPath();
-if (!file_exists($path)) {
-    mkdir($path, 0777, true);
+$cacheHash = hash('crc32b', serialize($request->query->all()));
+$cachePath = 'cache/' . implode('/', str_split($cacheHash, 2)) . '.' . $realImage->getExtension();
+
+
+try {
+    $cacheFile = new File($cachePath);
+    $response = new Response(
+        file_get_contents($cachePath),
+        Response::HTTP_OK,
+        [
+            'Content-Type' => $cacheFile->getMimeType(),
+            'Content-Disposition' => 'filename="'.$realImage->getFilename().'"',
+            'X-Generator-Cached' => true,
+        ]
+    );
+
+} catch (FileNotFoundException $e) {
+
+    // create an image manager instance with favored driver
+    $manager = new ImageManager([
+        'driver' => 'gd',
+        'cache' => [
+            'path' => 'cache/'
+        ]
+    ]);
+
+    $image = $manager->make($request->query->get('image'));
+
+    if ($request->query->has('crop') &&
+        1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop'), $crop)) {
+        $image->crop($crop[1], $crop[2], function ($constraint) {
+            $constraint->upsize();
+        });
+    }
+    if ($request->query->has('fit') &&
+        1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('fit'), $fit)) {
+        $image->fit($fit[1], $fit[2], function ($constraint) {
+            $constraint->upsize();
+        });
+    }
+    if ($request->query->has('width') &&
+        1 === preg_match('#^([0-9]+)$#', $request->query->get('width'), $width)) {
+        $image->widen($width[1], function ($constraint) {
+            $constraint->upsize();
+        });
+    }
+    if ($request->query->has('height') &&
+        1 === preg_match('#^([0-9]+)$#', $request->query->get('height'), $height)) {
+        $image->heighten($height[1], function ($constraint) {
+            $constraint->upsize();
+        });
+    }
+    if ($request->query->has('quality') &&
+        1 === preg_match('#^([0-9]+)$#', $request->query->get('quality'), $quality)) {
+
+        $quality[1] = (int) $quality[1];
+
+        if ($quality[1] <= 100 &&
+            $quality[1] > 0) {
+            $quality = $quality[1];
+        } else {
+            $quality = 90;
+        }
+    } else {
+        $quality = 90;
+    }
+
+    if ($request->query->has('greyscale')) {
+        $image->greyscale();
+    }
+
+
+    $path = dirname($cachePath);
+    if (!file_exists($path)) {
+        mkdir($path, 0777, true);
+    }
+    $image->save($cachePath, $quality);
+
+    // send HTTP header and output image data
+    $response = new Response(
+        (string) $image->encode(null, $quality),
+        Response::HTTP_OK,
+        [
+            'Content-Type' => $image->mime(),
+            'Content-Disposition' => 'filename="'.$realImage->getFilename().'"',
+            'X-Generator-First-Render' => true,
+        ]
+    );
+    $response->setLastModified(new \DateTime('now'));
 }
-if (false === file_put_contents($cachePath, $image->response())) {
-    throw new \RuntimeException("Impossible to write cache file (".$cachePath.")", 1);
-}*/
 
-// send HTTP header and output image data
-echo $image->response();
+$response->setMaxAge(7*24*60*60);
+$response->setPublic(true);
+$response->setCharset('UTF-8');
+$response->prepare($request);
+$response->send();
+
+
+
