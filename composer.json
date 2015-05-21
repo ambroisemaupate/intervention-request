@@ -1,0 +1,7 @@
+{
+    "require": {
+        "intervention/image": "^2.2",
+        "symfony/http-foundation": "^2.6",
+        "intervention/imagecache": "^2.2"
+    }
+}
