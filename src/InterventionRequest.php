@@ -57,6 +57,7 @@ class InterventionRequest
         $this->configuration = $configuration;
 
         $this->processors = [
+            new Processor\RotateProcessor($this->request),
             new Processor\CropResizedProcessor($this->request),
             new Processor\FitProcessor($this->request),
             new Processor\CropProcessor($this->request),
@@ -130,6 +131,8 @@ class InterventionRequest
         } else {
             $this->quality = 90;
         }
+
+        return $this->quality;
     }
 
     /**
