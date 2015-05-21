@@ -20,29 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file index.php
+ * @file CropProcessor.php
  * @author Ambroise Maupate
  */
+namespace AM\InterventionRequest\Processor;
 
-define('APP_ROOT', dirname(__FILE__));
+use Intervention\Image\Image;
 
-// include composer autoload
-require 'vendor/autoload.php';
-
-// import the Intervention Image Manager Class
-use AM\InterventionRequest\Configuration;
-use AM\InterventionRequest\InterventionRequest;
-use Symfony\Component\HttpFoundation\Request;
-
-$request = Request::createFromGlobals();
-
-/*
- * A test configuration
+/**
+ *
  */
-$conf = new Configuration();
-$conf->setCachePath(APP_ROOT.'/cache');
-$conf->setImagesPath(APP_ROOT.'/test');
-
-$iRequest = new InterventionRequest($conf, $request);
-$iRequest->handle();
-$iRequest->getResponse()->send();
+class CropProcessor extends AbstractProcessor
+{
+    public function process(Image $image)
+    {
+        if ($this->request->query->has('crop') &&
+            !$this->request->query->has('width') &&
+            !$this->request->query->has('height') &&
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $this->request->query->get('crop'), $crop)) {
+            $image->crop($crop[1], $crop[2]);
+        }
+    }
+}

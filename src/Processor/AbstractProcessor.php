@@ -20,29 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file index.php
+ * @file AbstractProcessor.php
  * @author Ambroise Maupate
  */
+namespace AM\InterventionRequest\Processor;
 
-define('APP_ROOT', dirname(__FILE__));
-
-// include composer autoload
-require 'vendor/autoload.php';
-
-// import the Intervention Image Manager Class
-use AM\InterventionRequest\Configuration;
-use AM\InterventionRequest\InterventionRequest;
+use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-$request = Request::createFromGlobals();
-
-/*
- * A test configuration
+/**
+ *
  */
-$conf = new Configuration();
-$conf->setCachePath(APP_ROOT.'/cache');
-$conf->setImagesPath(APP_ROOT.'/test');
+abstract class AbstractProcessor
+{
+    protected $request;
 
-$iRequest = new InterventionRequest($conf, $request);
-$iRequest->handle();
-$iRequest->getResponse()->send();
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
+
+    public function process(Image $image)
+    {
+        // do some process stuff to your intervention image
+    }
+}
