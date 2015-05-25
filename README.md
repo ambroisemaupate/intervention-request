@@ -85,7 +85,7 @@ RewriteRule . index.php [L]
 ```
 
 Then add these lines to your application before handling `InterventionRequest`.
-`ShortUrlExpander` will work on your exiisting `$request` object.
+`ShortUrlExpander` will work on your existing `$request` object.
 
 ```php
 use AM\InterventionRequest\ShortUrlExpander;
