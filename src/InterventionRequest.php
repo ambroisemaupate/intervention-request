@@ -29,6 +29,7 @@ use AM\InterventionRequest\Cache\FileCache;
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\Processor as Processor;
 use Intervention\Image\ImageManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,14 +41,20 @@ class InterventionRequest
 {
     protected $request;
     protected $response;
+    protected $logger;
     protected $configuration;
     protected $nativeImage;
     protected $image;
     protected $processors;
     protected $quality;
 
-    public function __construct(Configuration $configuration, Request $request = null)
-    {
+    public function __construct(
+        Configuration $configuration,
+        Request $request = null,
+        LoggerInterface $logger = null
+    ) {
+        $this->logger = $logger;
+
         if (null !== $request) {
             $this->request = $request;
         } else {
@@ -179,5 +186,15 @@ class InterventionRequest
     public function getConfiguration()
     {
         return $this->configuration;
+    }
+
+    /**
+     * Gets the value of logger.
+     *
+     * @return mixed
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 }

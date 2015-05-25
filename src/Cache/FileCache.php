@@ -32,6 +32,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -45,6 +46,8 @@ class FileCache
     protected $cacheFile;
     protected $cachePath;
     protected $quality = 90;
+    protected $garbageCollectProbability = 1;
+    protected $garbageCollectDivisor = 200;
 
     public function __construct(InterventionRequest $interventionRequest)
     {
@@ -104,6 +107,50 @@ class FileCache
             }
         }
 
+        $this->initializeGarbageCollection();
+
         return $response;
+    }
+    /**
+     * Determines if the garbage collector should run for this request.
+     *
+     * @since 2.0
+     * @return boolean
+     */
+    private function garbageCollectionShouldRun()
+    {
+        if ($this->request->query->get('force_gc') == true) {
+            return true;
+        }
+
+        if (rand(1, $this->garbageCollectDivisor) <= $this->garbageCollectProbability) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * Checks to see if the garbage collector should be initialized, and if it should, initializes it.
+     *
+     * @since 2.0
+     * @return void
+     */
+    private function initializeGarbageCollection()
+    {
+        if ($this->garbageCollectionShouldRun()) {
+            $this->collectGarbage(
+                $this->interventionRequest->getConfiguration()->getCachePath(),
+                $this->interventionRequest->getLogger()
+            );
+        }
+    }
+    /**
+     * @return void
+     * @since 2.0
+     */
+    public function collectGarbage($cachePath, LoggerInterface $logger)
+    {
+        $garbageCollector = new GarbageCollector($cachePath, $logger);
+        $garbageCollector->launch();
     }
 }

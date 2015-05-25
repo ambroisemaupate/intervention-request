@@ -24,29 +24,15 @@
  * @author Ambroise Maupate
  */
 
-define('APP_ROOT', dirname(__FILE__));
+define('APP_ROOT', dirname(__DIR__));
 
-// include composer autoload
-require 'vendor/autoload.php';
+use AM\InterventionRequest\Command\GarbageCollectorCommand;
+use AM\InterventionRequest\Command\UnlockGarbageCollectorCommand;
+use Symfony\Component\Console\Application;
 
-// import the Intervention Image Manager Class
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use AM\InterventionRequest\Configuration;
-use AM\InterventionRequest\InterventionRequest;
-use Symfony\Component\HttpFoundation\Request;
+include 'vendor/autoload.php';
 
-$request = Request::createFromGlobals();
-$log = new Logger('InterventionRequest');
-$log->pushHandler(new StreamHandler('interventionRequest.log', Logger::INFO));
-
-/*
- * A test configuration
- */
-$conf = new Configuration();
-$conf->setCachePath(APP_ROOT.'/cache');
-$conf->setImagesPath(APP_ROOT.'/test');
-
-$iRequest = new InterventionRequest($conf, $request, $log);
-$iRequest->handle();
-$iRequest->getResponse()->send();
+$application = new Application();
+$application->add(new GarbageCollectorCommand());
+$application->add(new UnlockGarbageCollectorCommand());
+$application->run();

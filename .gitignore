@@ -1,5 +1,3 @@
-# Created by https://www.gitignore.io
-
 ### Composer ###
 composer.phar
 vendor/
@@ -42,3 +40,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Logs
+*.log
