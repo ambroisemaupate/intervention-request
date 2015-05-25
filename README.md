@@ -65,6 +65,14 @@ $intRequest->handle();
 return $intRequest->getResponse();
 ```
 
+## Force garbage collection
+
+### Using command-line
+
+```shell
+bin/intervention gc:launch /path/to/my/cache/folder --log /path/to/my/log/file.log
+```
+
 ## License
 
 *Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.

@@ -4,8 +4,8 @@
         "symfony/http-foundation": "~2.6",
         "monolog/monolog":"~1.13",
         "symfony/console": "~2.6",
-        "symfony/finder": "^2.6",
-        "symfony/filesystem": "^2.6"
+        "symfony/finder": "~2.6",
+        "symfony/filesystem": "~2.6"
     },
     "autoload": {
         "psr-0": {

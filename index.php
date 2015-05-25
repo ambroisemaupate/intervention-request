@@ -34,6 +34,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\InterventionRequest;
+use AM\InterventionRequest\ShortUrlExpander;
 use Symfony\Component\HttpFoundation\Request;
 
 $request = Request::createFromGlobals();
@@ -47,6 +48,19 @@ $conf = new Configuration();
 $conf->setCachePath(APP_ROOT.'/cache');
 $conf->setImagesPath(APP_ROOT.'/test');
 
+/*
+ * Handle short url with Url rewriting
+ */
+$expander = new ShortUrlExpander($request);
+$params = $expander->parsePathInfo();
+if (null !== $params) {
+    // this will convert rewritten path to request with query params
+    $expander->injectParamsToRequest($params['queryString'], $params['filename']);
+}
+
+/*
+ * Handle main image request
+ */
 $iRequest = new InterventionRequest($conf, $request, $log);
 $iRequest->handle();
 $iRequest->getResponse()->send();
