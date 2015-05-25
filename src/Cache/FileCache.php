@@ -47,7 +47,16 @@ class FileCache
     protected $cachePath;
     protected $quality = 90;
     protected $garbageCollectProbability = 1;
-    protected $garbageCollectDivisor = 200;
+    protected $garbageCollectDivisor = 300;
+
+    protected static $allowedExtensions = array(
+        'jpeg',
+        'jpg',
+        'gif',
+        'tiff',
+        'png',
+        'psd',
+    );
 
     public function __construct(InterventionRequest $interventionRequest)
     {
@@ -57,9 +66,20 @@ class FileCache
         $this->quality = $interventionRequest->parseQuality();
 
         $cacheHash = hash('crc32b', serialize($this->request->query->all()));
+
         $this->cachePath = $this->interventionRequest->getConfiguration()->getCachePath() .
         '/' . implode('/', str_split($cacheHash, 2)) .
-        '.' . $this->realImage->getExtension();
+        '.' . $this->getExtension();
+    }
+
+    protected function getExtension()
+    {
+        $extension = 'jpg';
+        if (in_array(strtolower($this->realImage->getExtension()), static::$allowedExtensions)) {
+            $extension = strtolower($this->realImage->getExtension());
+        }
+
+        return $extension;
     }
 
     public function saveImage(Image $image)

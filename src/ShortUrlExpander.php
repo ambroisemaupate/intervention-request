@@ -41,6 +41,7 @@ class ShortUrlExpander
         'g' => 'greyscale',
         'q' => 'quality',
         'f' => 'fit',
+        'r' => 'rotate',
     );
 
     public function __construct(Request $request)
