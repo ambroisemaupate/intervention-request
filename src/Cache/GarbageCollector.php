@@ -23,7 +23,6 @@
  * Based on SLIR garbage collector class
  *
  * @file GarbageCollector.php
- * @author Joe Lencioni <joe@shiftingpixel.com>
  * @author Ambroise Maupate
  */
 namespace AM\InterventionRequest\Cache;
@@ -38,7 +37,7 @@ class GarbageCollector
     protected $lockPath;
     protected $logger;
     protected $fs;
-    protected $fileCacheMaxLifetime = 604800;
+    protected $ttl = 604800;
 
     /**
      * Garbage collector
@@ -75,7 +74,7 @@ class GarbageCollector
         $finder = new Finder();
         $finder->files()
                ->in($path)
-               ->date('< now - ' . $this->fileCacheMaxLifetime . ' seconds')
+               ->date('< now - ' . $this->ttl . ' seconds')
             ->notName('garbageCollector.tmp');
 
         foreach ($finder as $file) {
@@ -179,30 +178,6 @@ class GarbageCollector
     }
 
     /**
-     * Gets the value of fileCacheMaxLifetime.
-     *
-     * @return mixed
-     */
-    public function getFileCacheMaxLifetime()
-    {
-        return $this->fileCacheMaxLifetime;
-    }
-
-    /**
-     * Sets the value of fileCacheMaxLifetime.
-     *
-     * @param mixed $fileCacheMaxLifetime the file cache max lifetime
-     *
-     * @return self
-     */
-    public function setFileCacheMaxLifetime($fileCacheMaxLifetime)
-    {
-        $this->fileCacheMaxLifetime = $fileCacheMaxLifetime;
-
-        return $this;
-    }
-
-    /**
      * Gets the value of lockPath.
      *
      * @return mixed
@@ -210,5 +185,29 @@ class GarbageCollector
     public function getLockPath()
     {
         return $this->lockPath;
+    }
+
+    /**
+     * Gets the value of ttl.
+     *
+     * @return mixed
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
+
+    /**
+     * Sets the value of ttl.
+     *
+     * @param mixed $ttl the ttl
+     *
+     * @return self
+     */
+    public function setTtl($ttl)
+    {
+        $this->ttl = $ttl;
+
+        return $this;
     }
 }

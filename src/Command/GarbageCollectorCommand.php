@@ -76,7 +76,7 @@ class GarbageCollectorCommand extends Command
             $text .= "<info>Garbage collection started.</info>" . PHP_EOL;
             $gc = new GarbageCollector($cacheDir, $log);
             if ($input->getOption('ttl')) {
-                $gc->setFileCacheMaxLifetime($input->getOption('ttl'));
+                $gc->setTtl($input->getOption('ttl'));
             }
             $gc->launch();
             $text .= "<info>Garbage collection finished.</info>" . PHP_EOL;

@@ -87,10 +87,17 @@ class InterventionRequest
 
         if ($this->configuration->hasCaching()) {
 
-            $cache = new FileCache($this);
+            $cache = new FileCache(
+                $this->request,
+                $this->nativeImage,
+                $this->configuration->getCachePath(),
+                $this->logger,
+                $this->quality,
+                $this->configuration->getTtl()
+            );
             $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
                 return $interventionRequest->processImage();
-            });
+            }, $this);
         } else {
             $this->processImage();
             $this->response = new Response(
@@ -148,7 +155,10 @@ class InterventionRequest
     public function getResponse()
     {
         if (null !== $this->response) {
-            $this->response->setPublic(true);
+            $this->response->setPublic();
+            $this->response->setPrivate();
+            $this->response->setMaxAge($this->configuration->getTtl());
+            $this->response->setSharedMaxAge($this->configuration->getTtl());
             $this->response->setCharset('UTF-8');
             $this->response->prepare($this->request);
 

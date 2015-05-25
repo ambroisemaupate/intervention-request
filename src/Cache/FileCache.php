@@ -28,24 +28,26 @@ namespace AM\InterventionRequest\Cache;
 use AM\InterventionRequest\InterventionRequest;
 use Closure;
 use Intervention\Image\Image;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Psr\Log\LoggerInterface;
 
 /**
  *
  */
 class FileCache
 {
-    protected $interventionRequest;
     protected $request;
     protected $response;
     protected $realImage;
+    protected $cacheFilePath;
     protected $cacheFile;
     protected $cachePath;
-    protected $quality = 90;
+    protected $logger;
+    protected $quality;
+    protected $ttl;
     protected $garbageCollectProbability = 1;
     protected $garbageCollectDivisor = 300;
 
@@ -58,16 +60,32 @@ class FileCache
         'psd',
     );
 
-    public function __construct(InterventionRequest $interventionRequest)
-    {
-        $this->interventionRequest = $interventionRequest;
-        $this->request = $interventionRequest->getRequest();
-        $this->realImage = $interventionRequest->getNativeImage();
-        $this->quality = $interventionRequest->parseQuality();
+    /**
+     * @param Symfony\Component\HttpFoundation\Request $request
+     * @param Symfony\Component\HttpFoundation\File\File $realImage
+     * @param string $cachePath
+     * @param Psr\Log\LoggerInterface|null $logger
+     * @param integer $quality
+     * @param integer $ttl
+     */
+    public function __construct(
+        Request $request,
+        File $realImage,
+        $cachePath,
+        LoggerInterface $logger = null,
+        $quality = 90,
+        $ttl = 604800
+    ) {
+        $this->request = $request;
+        $this->cachePath = $cachePath;
+        $this->logger = $logger;
+        $this->realImage = $realImage;
+        $this->quality = $quality;
+        $this->ttl = $ttl;
 
         $cacheHash = hash('crc32b', serialize($this->request->query->all()));
 
-        $this->cachePath = $this->interventionRequest->getConfiguration()->getCachePath() .
+        $this->cacheFilePath = $cachePath .
         '/' . implode('/', str_split($cacheHash, 2)) .
         '.' . $this->getExtension();
     }
@@ -82,19 +100,22 @@ class FileCache
         return $extension;
     }
 
+    /**
+     * @param Intervention\Image\Image $image
+     */
     public function saveImage(Image $image)
     {
-        $path = dirname($this->cachePath);
+        $path = dirname($this->cacheFilePath);
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
-        $image->save($this->cachePath, $this->quality);
+        $image->save($this->cacheFilePath, $this->quality);
     }
 
-    public function getResponse(Closure $callback)
+    public function getResponse(Closure $callback, InterventionRequest $interventionRequest)
     {
         try {
-            $this->cacheFile = new File($this->cachePath);
+            $this->cacheFile = new File($this->cacheFilePath);
 
             $response = new Response(
                 file_get_contents($this->cacheFile->getPathname()),
@@ -107,7 +128,7 @@ class FileCache
             );
         } catch (FileNotFoundException $e) {
             if (is_callable($callback)) {
-                $image = $callback($this->interventionRequest);
+                $image = $callback($interventionRequest);
                 $this->saveImage($image);
 
                 // send HTTP header and output image data
@@ -134,7 +155,6 @@ class FileCache
     /**
      * Determines if the garbage collector should run for this request.
      *
-     * @since 2.0
      * @return boolean
      */
     private function garbageCollectionShouldRun()
@@ -152,25 +172,14 @@ class FileCache
     /**
      * Checks to see if the garbage collector should be initialized, and if it should, initializes it.
      *
-     * @since 2.0
      * @return void
      */
     private function initializeGarbageCollection()
     {
         if ($this->garbageCollectionShouldRun()) {
-            $this->collectGarbage(
-                $this->interventionRequest->getConfiguration()->getCachePath(),
-                $this->interventionRequest->getLogger()
-            );
+            $garbageCollector = new GarbageCollector($this->cachePath, $this->logger);
+            $garbageCollector->setTtl($this->ttl);
+            $garbageCollector->launch();
         }
-    }
-    /**
-     * @return void
-     * @since 2.0
-     */
-    public function collectGarbage($cachePath, LoggerInterface $logger)
-    {
-        $garbageCollector = new GarbageCollector($cachePath, $logger);
-        $garbageCollector->launch();
     }
 }

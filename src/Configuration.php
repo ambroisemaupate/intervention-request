@@ -34,6 +34,7 @@ class Configuration
     protected $cachePath;
     protected $imagesPath;
     protected $driver = 'gd';
+    protected $ttl = 604800; // 7*24*60*60
 
     /**
      * Gets the value of caching.
@@ -127,6 +128,30 @@ class Configuration
     public function setImagesPath($imagesPath)
     {
         $this->imagesPath = $imagesPath;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of ttl.
+     *
+     * @return mixed
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
+
+    /**
+     * Sets the value of ttl.
+     *
+     * @param mixed $ttl the ttl
+     *
+     * @return self
+     */
+    public function setTtl($ttl)
+    {
+        $this->ttl = $ttl;
 
         return $this;
     }
