@@ -65,6 +65,41 @@ $intRequest->handle();
 return $intRequest->getResponse();
 ```
 
+## Use URL rewriting
+
+If you want to use clean URL. You can add `ShortUrlExpander` class to listen
+to shorten URL like: `http://localhost:8888/intervention-request/f100x100/images/testPNG.png`.
+
+First, add a .htaccess file to activate rewriting.
+
+```apache
+# .htaccess
+# Pretty URLs
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [S=40]
+RewriteRule . index.php [L]
+</IfModule>
+```
+
+Then add these lines to your application before handling `InterventionRequest`.
+`ShortUrlExpander` will work on your exiisting `$request` object.
+
+```php
+use AM\InterventionRequest\ShortUrlExpander;
+/*
+ * Handle short url with Url rewriting
+ */
+$expander = new ShortUrlExpander($request);
+$params = $expander->parsePathInfo();
+if (null !== $params) {
+    // this will convert rewritten path to request with query params
+    $expander->injectParamsToRequest($params['queryString'], $params['filename']);
+}
+```
+
 ## Force garbage collection
 
 ### Using command-line
