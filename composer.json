@@ -1,4 +1,19 @@
 {
+    "name": "ambroisemaupate/intervention-request",
+    "description":"A Intervention Image wrapper to use simple resample features over urls.",
+    "license":"MIT",
+    "type": "project",
+    "keywords": [
+        "image manipulation"
+    ],
+    "authors": [
+        {
+            "name": "Ambroise Maupate",
+            "email": "ambroise@rezo-zero.com",
+            "homepage": "http://www.rezo-zero.com",
+            "role": "Lead developer"
+        }
+    ],
     "require": {
         "intervention/image": "~2.2",
         "symfony/http-foundation": "~2.6",
