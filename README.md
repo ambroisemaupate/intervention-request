@@ -27,6 +27,8 @@ feature with a simple file cache managing.
 | background | [Matte a png file with a background color](http://image.intervention.io/api/limitColors) | `…&background=ff0000` |
 | greyscale/grayscale | [Turn an image into a greyscale version](http://image.intervention.io/api/greyscale) | `…&greyscale=1` |
 | quality | Set the exporting quality (1 - 100), default to 90 | `…&quality=95` |
+| progressive | [Toggle progressive mode](http://image.intervention.io/api/interlace) | `…&progressive=1` |
+| interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
 
 ## Using standalone entry point
 
@@ -105,7 +107,8 @@ if (null !== $params) {
 
 ### Shortcuts
 
-URL shortcuts can be combined using `-` (dash) character. For example `f100x100-q50-g`.
+URL shortcuts can be combined using `-` (dash) character.
+For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&progressive=0`.
 
 |  Query attribute  |  Shortcut letter  |
 | ----------------- | ------------- |
@@ -116,6 +119,8 @@ URL shortcuts can be combined using `-` (dash) character. For example `f100x100-
 | background | b |
 | greyscale | g |
 | quality | q |
+| progressive | p |
+| interlace | i |
 
 ## Force garbage collection
 

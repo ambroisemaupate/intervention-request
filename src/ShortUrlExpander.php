@@ -43,6 +43,8 @@ class ShortUrlExpander
         'f' => 'fit',
         'r' => 'rotate',
         'b' => 'background',
+        'i' => 'interlace',
+        'p' => 'progressive',
     );
 
     public function __construct(Request $request)
