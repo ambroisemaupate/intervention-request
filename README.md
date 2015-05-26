@@ -24,6 +24,7 @@ feature with a simple file cache managing.
 | width | [Resize image proportionally to given width](http://image.intervention.io/api/widen) It needs a `width` in pixels | `…&width=300` |
 | height | [Resize image proportionally to given height](http://image.intervention.io/api/heighten) It needs a `height` in pixels | `…&height=300` |
 | crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
+| background | [Matte a png file with a background color](http://image.intervention.io/api/limitColors) | `…&background=ff0000` |
 | greyscale/grayscale | [Turn an image into a greyscale version](http://image.intervention.io/api/greyscale) | `…&greyscale=1` |
 | quality | Set the exporting quality (1 - 100), default to 90 | `…&quality=95` |
 
@@ -70,7 +71,7 @@ return $intRequest->getResponse();
 ## Use URL rewriting
 
 If you want to use clean URL. You can add `ShortUrlExpander` class to listen
-to shorten URL like: `http://localhost:8888/intervention-request/f100x100/images/testPNG.png`.
+to shorten URL like: `http://localhost:8888/intervention-request/f100x100-g/images/testPNG.png`.
 
 First, add an `.htaccess` file (or its *Nginx* equivalent) to activate rewriting:
 
@@ -101,6 +102,20 @@ if (null !== $params) {
     $expander->injectParamsToRequest($params['queryString'], $params['filename']);
 }
 ```
+
+### Shortcuts
+
+URL shortcuts can be combined using `-` (dash) character. For example `f100x100-q50-g`.
+
+|  Query attribute  |  Shortcut letter  |
+| ----------------- | ------------- |
+| fit | f |
+| crop | c |
+| width | w |
+| height | h |
+| background | b |
+| greyscale | g |
+| quality | q |
 
 ## Force garbage collection
 
