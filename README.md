@@ -29,6 +29,7 @@ feature with a simple file cache managing.
 | quality | Set the exporting quality (1 - 100), default to 90 | `…&quality=95` |
 | progressive | [Toggle progressive mode](http://image.intervention.io/api/interlace) | `…&progressive=1` |
 | interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
+| sharpen | [Sharpen image](http://image.intervention.io/api/sharpen) (1 - 100) | `…&sharpen=10` |
 
 ## Using standalone entry point
 
@@ -121,6 +122,7 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | quality | q |
 | progressive | p |
 | interlace | i |
+| sharpen | s |
 
 ## Force garbage collection
 
