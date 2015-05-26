@@ -23,8 +23,8 @@
         "symfony/filesystem": "~2.6"
     },
     "autoload": {
-        "psr-0": {
-            "": "src/"
+        "psr-4": {
+            "AM\\InterventionRequest\\": "src/"
         }
     },
     "bin": ["bin/intervention", "bin/intervention.php"]
