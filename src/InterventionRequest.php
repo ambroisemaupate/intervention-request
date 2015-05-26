@@ -97,7 +97,8 @@ class InterventionRequest
                 $this->configuration->getCachePath(),
                 $this->logger,
                 $this->quality,
-                $this->configuration->getTtl()
+                $this->configuration->getTtl(),
+                $this->configuration->getGcProbability()
             );
             $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
                 return $interventionRequest->processImage();
