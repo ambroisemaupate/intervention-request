@@ -30,6 +30,7 @@ feature with a simple file cache managing.
 | progressive | [Toggle progressive mode](http://image.intervention.io/api/interlace) | `…&progressive=1` |
 | interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
 | sharpen | [Sharpen image](http://image.intervention.io/api/sharpen) (1 - 100) | `…&sharpen=10` |
+| contrast | [Change image contrast](http://image.intervention.io/api/contrast) (-100 to 100, 0 means no changes) | `…&contrast=10` |
 
 ## Using standalone entry point
 
@@ -123,6 +124,7 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | progressive | p |
 | interlace | i |
 | sharpen | s |
+| contrast *(only from 0 to 100)* | k |
 
 ## Force garbage collection
 

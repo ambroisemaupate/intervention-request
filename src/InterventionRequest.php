@@ -72,6 +72,7 @@ class InterventionRequest
             new Processor\HeightenProcessor($this->request),
             new Processor\LimitColorsProcessor($this->request),
             new Processor\GreyscaleProcessor($this->request),
+            new Processor\ContrastProcessor($this->request),
             new Processor\SharpenProcessor($this->request),
             new Processor\ProgressiveProcessor($this->request),
         ];
