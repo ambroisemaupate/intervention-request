@@ -159,7 +159,7 @@ class FileCache
      */
     private function garbageCollectionShouldRun()
     {
-        if ($this->request->query->get('force_gc') == true) {
+        if (true === (boolean) $this->request->query->get('force_gc')) {
             return true;
         }
 

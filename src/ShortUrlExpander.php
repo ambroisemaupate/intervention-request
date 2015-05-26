@@ -75,7 +75,7 @@ class ShortUrlExpander
         $params = explode('-', $queryString);
 
         foreach ($params as $param) {
-            $keywords = preg_match("/(?P<operation>[a-z]{1})(?P<value>[\S]*)/", $param, $matches);
+            preg_match("/(?P<operation>[a-z]{1})(?P<value>[\S]*)/", $param, $matches);
             if (isset(static::$operations[$matches['operation']])) {
                 $this->request->query->set(
                     static::$operations[$matches['operation']],

@@ -26,6 +26,7 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Intervention\Image\Constraint;
 
 /**
  *
@@ -38,7 +39,7 @@ class FitProcessor extends AbstractProcessor
             !$this->request->query->has('width') &&
             !$this->request->query->has('height') &&
             1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $this->request->query->get('fit'), $fit)) {
-            $image->fit($fit[1], $fit[2], function ($constraint) {
+            $image->fit($fit[1], $fit[2], function (Constraint $constraint) {
                 $constraint->upsize();
             });
         }

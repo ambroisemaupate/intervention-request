@@ -15,7 +15,6 @@ composer.lock
 
 
 ### OSX ###
-.DS_Store
 .AppleDouble
 .LSOverride
 
@@ -43,3 +42,4 @@ Temporary Items
 
 # Logs
 *.log
+.htaccess

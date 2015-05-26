@@ -26,6 +26,7 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Intervention\Image\Constraint;
 
 /**
  *
@@ -36,7 +37,7 @@ class HeightenProcessor extends AbstractProcessor
     {
         if ($this->request->query->has('height') &&
             1 === preg_match('#^([0-9]+)$#', $this->request->query->get('height'), $height)) {
-            $image->heighten($height[1], function ($constraint) {
+            $image->heighten($height[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });
         }

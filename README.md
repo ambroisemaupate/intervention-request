@@ -2,6 +2,8 @@
 
 **A *Intervention Image* wrapper to use simple resample features over urls.**
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
+
 ## Install
 
 ```shell
@@ -70,7 +72,7 @@ return $intRequest->getResponse();
 If you want to use clean URL. You can add `ShortUrlExpander` class to listen
 to shorten URL like: `http://localhost:8888/intervention-request/f100x100/images/testPNG.png`.
 
-First, add a .htaccess file to activate rewriting.
+First, add an `.htaccess` file (or its *Nginx* equivalent) to activate rewriting:
 
 ```apache
 # .htaccess

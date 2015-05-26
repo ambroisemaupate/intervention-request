@@ -26,6 +26,7 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Intervention\Image\Constraint;
 
 /**
  *
@@ -52,7 +53,7 @@ class CropResizedProcessor extends AbstractProcessor
                 ];
             }
 
-            $image->fit($realFitSize[0], $realFitSize[1], function ($constraint) {
+            $image->fit($realFitSize[0], $realFitSize[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });
         }

@@ -26,6 +26,7 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Intervention\Image\Constraint;
 
 /**
  *
@@ -36,7 +37,7 @@ class WidenProcessor extends AbstractProcessor
     {
         if ($this->request->query->has('width') &&
             1 === preg_match('#^([0-9]+)$#', $this->request->query->get('width'), $width)) {
-            $image->widen($width[1], function ($constraint) {
+            $image->widen($width[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });
         }
