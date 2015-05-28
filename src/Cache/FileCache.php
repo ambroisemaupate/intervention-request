@@ -48,8 +48,7 @@ class FileCache
     protected $logger;
     protected $quality;
     protected $ttl;
-    protected $garbageCollectProbability = 1;
-    protected $garbageCollectDivisor = 300;
+    protected $gcProbability;
 
     protected static $allowedExtensions = array(
         'jpeg',
@@ -74,7 +73,8 @@ class FileCache
         $cachePath,
         LoggerInterface $logger = null,
         $quality = 90,
-        $ttl = 604800
+        $ttl = 604800,
+        $gcProbability = 300
     ) {
         $this->request = $request;
         $this->cachePath = $cachePath;
@@ -82,6 +82,7 @@ class FileCache
         $this->realImage = $realImage;
         $this->quality = $quality;
         $this->ttl = $ttl;
+        $this->gcProbability = $gcProbability;
 
         $cacheHash = hash('crc32b', serialize($this->request->query->all()));
 
@@ -163,7 +164,7 @@ class FileCache
             return true;
         }
 
-        if (rand(1, $this->garbageCollectDivisor) <= $this->garbageCollectProbability) {
+        if (mt_rand(1, $this->gcProbability) <= 1) {
             return true;
         } else {
             return false;

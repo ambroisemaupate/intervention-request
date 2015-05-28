@@ -42,6 +42,11 @@ class ShortUrlExpander
         'q' => 'quality',
         'f' => 'fit',
         'r' => 'rotate',
+        'b' => 'background',
+        'i' => 'interlace',
+        'p' => 'progressive',
+        's' => 'sharpen',
+        'k' => 'contrast',
     );
 
     public function __construct(Request $request)
@@ -76,7 +81,8 @@ class ShortUrlExpander
 
         foreach ($params as $param) {
             preg_match("/(?P<operation>[a-z]{1})(?P<value>[\S]*)/", $param, $matches);
-            if (isset(static::$operations[$matches['operation']])) {
+            if (isset($matches['operation']) &&
+                isset(static::$operations[$matches['operation']])) {
                 $this->request->query->set(
                     static::$operations[$matches['operation']],
                     $matches['value']

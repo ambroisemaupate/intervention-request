@@ -35,6 +35,8 @@ class Configuration
     protected $imagesPath;
     protected $driver = 'gd';
     protected $ttl = 604800; // 7*24*60*60
+    protected $gcProbability = 400;
+    protected $timezone = "UTC";
 
     /**
      * Gets the value of caching.
@@ -55,7 +57,7 @@ class Configuration
      */
     protected function setCaching($caching)
     {
-        $this->caching = $caching;
+        $this->caching = (boolean) $caching;
 
         return $this;
     }
@@ -151,7 +153,60 @@ class Configuration
      */
     public function setTtl($ttl)
     {
-        $this->ttl = $ttl;
+        $this->ttl = (int) $ttl;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of gcProbability.
+     *
+     * @return mixed
+     */
+    public function getGcProbability()
+    {
+        return $this->gcProbability;
+    }
+
+    /**
+     * Sets the value of gcProbability.
+     *
+     * Garbage collection launch probability is 1/$gcProbability where
+     * probability of 1/1 will launch GC at every request.
+     *
+     * @param mixed $gcProbability the gc probability
+     *
+     * @return self
+     */
+    public function setGcProbability($gcProbability)
+    {
+        if ($gcProbability >= 1) {
+            $this->gcProbability = (int) $gcProbability;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of timezone.
+     *
+     * @return mixed
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * Sets the value of timezone.
+     *
+     * @param mixed $timezone the timezone
+     *
+     * @return self
+     */
+    protected function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
 
         return $this;
     }

@@ -62,6 +62,7 @@ class InterventionRequest
         }
 
         $this->configuration = $configuration;
+        $this->defineTimezone();
 
         $this->processors = [
             new Processor\RotateProcessor($this->request),
@@ -70,8 +71,20 @@ class InterventionRequest
             new Processor\CropProcessor($this->request),
             new Processor\WidenProcessor($this->request),
             new Processor\HeightenProcessor($this->request),
+            new Processor\LimitColorsProcessor($this->request),
             new Processor\GreyscaleProcessor($this->request),
+            new Processor\ContrastProcessor($this->request),
+            new Processor\SharpenProcessor($this->request),
+            new Processor\ProgressiveProcessor($this->request),
         ];
+    }
+
+    private function defineTimezone()
+    {
+        /*
+         * Define a request wide timezone
+         */
+        date_default_timezone_set($this->configuration->getTimezone());
     }
 
     public function handle()
@@ -93,7 +106,8 @@ class InterventionRequest
                 $this->configuration->getCachePath(),
                 $this->logger,
                 $this->quality,
-                $this->configuration->getTtl()
+                $this->configuration->getTtl(),
+                $this->configuration->getGcProbability()
             );
             $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
                 return $interventionRequest->processImage();
