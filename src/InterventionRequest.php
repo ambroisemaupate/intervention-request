@@ -62,6 +62,7 @@ class InterventionRequest
         }
 
         $this->configuration = $configuration;
+        $this->defineTimezone();
 
         $this->processors = [
             new Processor\RotateProcessor($this->request),
@@ -76,6 +77,14 @@ class InterventionRequest
             new Processor\SharpenProcessor($this->request),
             new Processor\ProgressiveProcessor($this->request),
         ];
+    }
+
+    private function defineTimezone()
+    {
+        /*
+         * Define a request wide timezone
+         */
+        date_default_timezone_set($this->configuration->getTimezone());
     }
 
     public function handle()

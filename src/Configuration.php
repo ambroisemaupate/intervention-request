@@ -36,6 +36,7 @@ class Configuration
     protected $driver = 'gd';
     protected $ttl = 604800; // 7*24*60*60
     protected $gcProbability = 400;
+    protected $timezone = "UTC";
 
     /**
      * Gets the value of caching.
@@ -182,6 +183,30 @@ class Configuration
         if ($gcProbability >= 1) {
             $this->gcProbability = (int) $gcProbability;
         }
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of timezone.
+     *
+     * @return mixed
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * Sets the value of timezone.
+     *
+     * @param mixed $timezone the timezone
+     *
+     * @return self
+     */
+    protected function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
 
         return $this;
     }
