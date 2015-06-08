@@ -26,6 +26,7 @@ feature with a simple file cache managing.
 | crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
 | background | [Matte a png file with a background color](http://image.intervention.io/api/limitColors) | `…&background=ff0000` |
 | greyscale/grayscale | [Turn an image into a greyscale version](http://image.intervention.io/api/greyscale) | `…&greyscale=1` |
+| blur | [Blurs an image](http://image.intervention.io/api/blur) | `…&blur=20` |
 | quality | Set the exporting quality (1 - 100), default to 90 | `…&quality=95` |
 | progressive | [Toggle progressive mode](http://image.intervention.io/api/interlace) | `…&progressive=1` |
 | interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
@@ -120,6 +121,7 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | height | h |
 | background | b |
 | greyscale | g |
+| blur | l |
 | quality | q |
 | progressive | p |
 | interlace | i |
