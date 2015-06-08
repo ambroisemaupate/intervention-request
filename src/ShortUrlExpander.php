@@ -39,6 +39,7 @@ class ShortUrlExpander
         'w' => 'width',
         'h' => 'height',
         'g' => 'greyscale',
+        'l' => 'blur',
         'q' => 'quality',
         'f' => 'fit',
         'r' => 'rotate',
