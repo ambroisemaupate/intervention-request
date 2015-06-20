@@ -29,7 +29,11 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Define an abstract image processor class.
  *
+ * Extend this class if you want to create your own
+ * image processor. All your process should be contained in
+ * `process` method.
  */
 abstract class AbstractProcessor
 {
@@ -40,6 +44,11 @@ abstract class AbstractProcessor
         $this->request = $request;
     }
 
+    /**
+     * Execute image intervention operations.
+     *
+     * @param  Image  $image
+     */
     public function process(Image $image)
     {
         // do some process stuff to your intervention image

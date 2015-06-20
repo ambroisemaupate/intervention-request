@@ -30,11 +30,11 @@ define('APP_ROOT', dirname(__FILE__));
 require 'vendor/autoload.php';
 
 // import the Intervention Image Manager Class
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\InterventionRequest;
 use AM\InterventionRequest\ShortUrlExpander;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 
 $request = Request::createFromGlobals();
@@ -45,8 +45,8 @@ $log->pushHandler(new StreamHandler('interventionRequest.log', Logger::INFO));
  * A test configuration
  */
 $conf = new Configuration();
-$conf->setCachePath(APP_ROOT.'/cache');
-$conf->setImagesPath(APP_ROOT.'/test');
+$conf->setCachePath(APP_ROOT . '/cache');
+$conf->setImagesPath(APP_ROOT . '/test');
 
 /*
  * Handle short url with Url rewriting
@@ -61,6 +61,10 @@ if (null !== $params) {
 /*
  * Handle main image request
  */
-$iRequest = new InterventionRequest($conf, $request, $log);
+$iRequest = new InterventionRequest(
+    $conf,
+    $request,
+    $log
+);
 $iRequest->handle();
 $iRequest->getResponse()->send();

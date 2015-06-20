@@ -48,10 +48,19 @@ class InterventionRequest
     protected $processors;
     protected $quality;
 
+    /**
+     * Create a new InterventionRequest object.
+     *
+     * @param Configuration        $configuration
+     * @param Request|null         $request
+     * @param LoggerInterface|null $logger
+     * @param array|null           $processors
+     */
     public function __construct(
         Configuration $configuration,
         Request $request = null,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        array $processors = null
     ) {
         $this->logger = $logger;
 
@@ -64,20 +73,24 @@ class InterventionRequest
         $this->configuration = $configuration;
         $this->defineTimezone();
 
-        $this->processors = [
-            new Processor\RotateProcessor($this->request),
-            new Processor\CropResizedProcessor($this->request),
-            new Processor\FitProcessor($this->request),
-            new Processor\CropProcessor($this->request),
-            new Processor\WidenProcessor($this->request),
-            new Processor\HeightenProcessor($this->request),
-            new Processor\LimitColorsProcessor($this->request),
-            new Processor\GreyscaleProcessor($this->request),
-            new Processor\ContrastProcessor($this->request),
-            new Processor\BlurProcessor($this->request),
-            new Processor\SharpenProcessor($this->request),
-            new Processor\ProgressiveProcessor($this->request),
-        ];
+        if (null === $processors) {
+            $this->processors = [
+                new Processor\RotateProcessor($this->request),
+                new Processor\CropResizedProcessor($this->request),
+                new Processor\FitProcessor($this->request),
+                new Processor\CropProcessor($this->request),
+                new Processor\WidenProcessor($this->request),
+                new Processor\HeightenProcessor($this->request),
+                new Processor\LimitColorsProcessor($this->request),
+                new Processor\GreyscaleProcessor($this->request),
+                new Processor\ContrastProcessor($this->request),
+                new Processor\BlurProcessor($this->request),
+                new Processor\SharpenProcessor($this->request),
+                new Processor\ProgressiveProcessor($this->request),
+            ];
+        } elseif (is_array($processors)) {
+            $this->processors = $processors;
+        }
     }
 
     private function defineTimezone()
@@ -88,6 +101,9 @@ class InterventionRequest
         date_default_timezone_set($this->configuration->getTimezone());
     }
 
+    /**
+     * Handle request to convert it to a Response object.
+     */
     public function handle()
     {
         if (!$this->request->query->has('image')) {

@@ -14,6 +14,31 @@ Intervention Request is based on *symfony/http-foundation* component for handlin
 HTTP request, response and basic file operations. It wraps [*Intervention/image*](https://github.com/Intervention/image)
 feature with a simple file cache managing.
 
+## Configuration
+
+Intervention request use a dedicated class to configure your image request
+parameters. Before creating `InterventionRequest` object, you must instanciate
+a new `AM\InterventionRequest\Configuration` object and set cache and images paths.
+
+```php
+$conf->setCachePath(APP_ROOT.'/cache');
+$conf->setImagesPath(APP_ROOT.'/images');
+```
+
+This code will create a configuration with *cache* and *images* folders in the
+same folder as your PHP script (`APP_ROOT`). **Notice that in the default `index.php` file, *images* path is defined to `/test` folder in order to use the testing images**. You should always set this path against your website images folder to prevent processing other files. 
+
+You can edit each configuration parameters using their corresponding *setters*:
+
+- `setCaching(true|false)`: use or not request cache to store generated images on filesystem (default: `true`);
+- `setCachePath(string)`: image cache folder path;
+- `setImagesPath(string)`: requested images root path; 
+- `setTtl(integer)`: cache images time to live;
+- `setDriver('gd'|'imagick')`: choose an available *Image Intervention* driver;
+- `setTimezone(string)`: PHP timezone to build \DateTime object used for caching. Set it here if you have not set it in your `php.ini` file;
+- `setGcProbability(integer)`: Garbage collector probability divisor. Garbage collection launch probability is 1/$gcProbability where a probability of 1/1 will launch GC at every request.
+
+
 ## Available operations
 
 |  Query attribute  |  Description  |  Usage  |
@@ -135,6 +160,37 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 ```shell
 bin/intervention gc:launch /path/to/my/cache/folder --log /path/to/my/log/file.log
 ```
+
+## Extend Intervention Request
+
+Intervention Request uses *Processors* to alter original images. By default, each
+available operation is handled by one `AbstractProcessor` inheriting class (look at
+the `src/Processor` folder).
+
+You can create your own *Processors* and override default ones by injecting an array
+to your `InterventionRequest` object.
+
+```php
+/*
+ * Handle main image request with a
+ * custom list of Processors.
+ */
+$iRequest = new InterventionRequest(
+    $conf,
+    $request,
+    $log,
+    [
+        new Processor\WidenProcessor($request),
+        // add or replace with your own Processors
+    ]
+);
+```
+
+Be careful, *Processors* position in this array is very important, please look at
+the default one in `InterventionRequest.php` class. Resizing processors should be
+the first, and quality processors should be the last as image operations will be done
+following your processors ordering.
+
 
 ## License
 
