@@ -26,10 +26,18 @@ $conf->setImagesPath(APP_ROOT.'/images');
 ```
 
 This code will create a configuration with *cache* and *images* folders in the
-same folder as your PHP script (`APP_ROOT`). **Notice that in the default `index.php` file,
-*images* path is defined to `/test` folder in order to use the testing images**. You
-should always set this path against your website images folder to prevent processing
-other files.
+same folder as your PHP script (`APP_ROOT`). **Notice that in the default `index.php` file, *images* path is defined to `/test` folder in order to use the testing images**. You should always set this path against your website images folder to prevent processing other files. 
+
+You can edit each configuration parameters using their corresponding *setters*:
+
+- `setCaching(true|false)`: use or not request cache to store generated images on filesystem (default: `true`);
+- `setCachePath(string)`: image cache folder path;
+- `setImagesPath(string)`: requested images root path; 
+- `setTtl(integer)`: cache images time to live;
+- `setDriver('gd'|'imagick')`: choose an available *Image Intervention* driver;
+- `setTimezone(string)`: PHP timezone to build \DateTime object used for caching. Set it here if you have not set it in your `php.ini` file;
+- `setGcProbability(integer)`: Garbage collector probability divisor. Garbage collection launch probability is 1/$gcProbability where a probability of 1/1 will launch GC at every request.
+
 
 ## Available operations
 
