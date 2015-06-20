@@ -55,7 +55,7 @@ class Configuration
      *
      * @return self
      */
-    protected function setCaching($caching)
+    public function setCaching($caching)
     {
         $this->caching = (boolean) $caching;
 
@@ -79,7 +79,7 @@ class Configuration
      *
      * @return self
      */
-    protected function setDriver($driver)
+    public function setDriver($driver)
     {
         $this->driver = $driver;
 
@@ -204,7 +204,7 @@ class Configuration
      *
      * @return self
      */
-    protected function setTimezone($timezone)
+    public function setTimezone($timezone)
     {
         $this->timezone = $timezone;
 
