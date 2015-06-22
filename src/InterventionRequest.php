@@ -171,10 +171,10 @@ class InterventionRequest
                 $quality[1] > 0) {
                 $this->quality = $quality[1];
             } else {
-                $this->quality = 90;
+                $this->quality = $this->configuration->getDefaultQuality();
             }
         } else {
-            $this->quality = 90;
+            $this->quality = $this->configuration->getDefaultQuality();
         }
 
         return $this->quality;

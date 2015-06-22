@@ -32,6 +32,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 
 - `setCaching(true|false)`: use or not request cache to store generated images on filesystem (default: `true`);
 - `setCachePath(string)`: image cache folder path;
+- `setDefaultQuality(int)`: default 90, set the quality amount when user does not specify it;
 - `setImagesPath(string)`: requested images root path; 
 - `setTtl(integer)`: cache images time to live;
 - `setDriver('gd'|'imagick')`: choose an available *Image Intervention* driver;
