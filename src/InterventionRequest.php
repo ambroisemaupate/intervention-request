@@ -30,6 +30,7 @@ use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\Processor as Processor;
 use Intervention\Image\ImageManager;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -106,42 +107,85 @@ class InterventionRequest
      */
     public function handle()
     {
-        if (!$this->request->query->has('image')) {
-            throw new \RuntimeException("No valid image path found in URI", 1);
+        try {
+            if (!$this->request->query->has('image')) {
+                throw new \RuntimeException("No valid image path found in URI", 1);
+            }
+
+            $nativePath = $this->configuration->getImagesPath() .
+            '/' . $this->request->query->get('image');
+            $this->nativeImage = new File($nativePath);
+            $this->parseQuality();
+
+            if ($this->configuration->hasCaching()) {
+
+                $cache = new FileCache(
+                    $this->request,
+                    $this->nativeImage,
+                    $this->configuration->getCachePath(),
+                    $this->logger,
+                    $this->quality,
+                    $this->configuration->getTtl(),
+                    $this->configuration->getGcProbability()
+                );
+                $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
+                    return $interventionRequest->processImage();
+                }, $this);
+            } else {
+                $this->processImage();
+                $this->response = new Response(
+                    (string) $this->image->encode(null, $this->quality),
+                    Response::HTTP_OK,
+                    [
+                        'Content-Type' => $this->image->mime(),
+                        'Content-Disposition' => 'filename="' . $this->nativeImage->getFilename() . '"',
+                        'X-Generator-First-Render' => true,
+                    ]
+                );
+                $this->response->setLastModified(new \DateTime('now'));
+            }
+        } catch (\RuntimeException $e) {
+            $this->response = $this->getBadRequestResponse($e->getMessage());
+        } catch (FileNotFoundException $e) {
+            $this->response = $this->getNotFoundResponse($e->getMessage());
         }
+    }
 
-        $nativePath = $this->configuration->getImagesPath() .
-        '/' . $this->request->query->get('image');
-        $this->nativeImage = new File($nativePath);
-        $this->parseQuality();
-
-        if ($this->configuration->hasCaching()) {
-
-            $cache = new FileCache(
-                $this->request,
-                $this->nativeImage,
-                $this->configuration->getCachePath(),
-                $this->logger,
-                $this->quality,
-                $this->configuration->getTtl(),
-                $this->configuration->getGcProbability()
-            );
-            $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
-                return $interventionRequest->processImage();
-            }, $this);
-        } else {
-            $this->processImage();
-            $this->response = new Response(
-                (string) $this->image->encode(null, $this->quality),
-                Response::HTTP_OK,
-                [
-                    'Content-Type' => $this->image->mime(),
-                    'Content-Disposition' => 'filename="' . $this->nativeImage->getFilename() . '"',
-                    'X-Generator-First-Render' => true,
-                ]
-            );
-            $this->response->setLastModified(new \DateTime('now'));
+    /**
+     *
+     * @param  string $message
+     * @return Response
+     */
+    protected function getNotFoundResponse($message = "")
+    {
+        $body = '<h1>404 Error: File not found</h1>';
+        if ($message != '') {
+            $body .= '<p>' . $message . '</p>';
         }
+        $body = '<!DOCTYPE html><html><body>' . $body . '</body></html>';
+
+        return new Response(
+            $body,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    /**
+     * @param  string $message
+     * @return Response
+     */
+    protected function getBadRequestResponse($message = "")
+    {
+        $body = '<h1>400 Error: Bad Request</h1>';
+        if ($message != '') {
+            $body .= '<p>' . $message . '</p>';
+        }
+        $body = '<!DOCTYPE html><html><body>' . $body . '</body></html>';
+
+        return new Response(
+            $body,
+            Response::HTTP_BAD_REQUEST
+        );
     }
 
     public function processImage()
