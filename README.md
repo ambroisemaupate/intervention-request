@@ -26,17 +26,19 @@ $conf->setImagesPath(APP_ROOT.'/images');
 ```
 
 This code will create a configuration with *cache* and *images* folders in the
-same folder as your PHP script (`APP_ROOT`). **Notice that in the default `index.php` file, *images* path is defined to `/test` folder in order to use the testing images**. You should always set this path against your website images folder to prevent processing other files. 
+same folder as your PHP script (`APP_ROOT`). **Notice that in the default `index.php` file, *images* path is defined to `/test` folder in order to use the testing images**. You should always set this path against your website images folder to prevent processing other files.
 
 You can edit each configuration parameters using their corresponding *setters*:
 
 - `setCaching(true|false)`: use or not request cache to store generated images on filesystem (default: `true`);
 - `setCachePath(string)`: image cache folder path;
-- `setImagesPath(string)`: requested images root path; 
+- `setDefaultQuality(int)`: default 90, set the quality amount when user does not specify it;
+- `setImagesPath(string)`: requested images root path;
 - `setTtl(integer)`: cache images time to live;
 - `setDriver('gd'|'imagick')`: choose an available *Image Intervention* driver;
 - `setTimezone(string)`: PHP timezone to build \DateTime object used for caching. Set it here if you have not set it in your `php.ini` file;
 - `setGcProbability(integer)`: Garbage collector probability divisor. Garbage collection launch probability is 1/$gcProbability where a probability of 1/1 will launch GC at every request.
+- `setUseFileChecksum(true|false)`: Use file checksum to test if file is different even if its name does not change. This option can be greedy on large files. (default: `false`).
 
 
 ## Available operations
@@ -191,9 +193,28 @@ the default one in `InterventionRequest.php` class. Resizing processors should b
 the first, and quality processors should be the last as image operations will be done
 following your processors ordering.
 
+## Performances
+
+If your *Intervention-request* throws errors like that one:
+
+```
+Fatal error: Allowed memory size of 134217728 bytes exhausted (tried to allocate 5184 bytes).
+```
+
+It’s because you are trying to process a too large image. The solution is too increase your `memory_limit`
+PHP setting over `256M`. You can edit this file in your server `php.ini` file.
+
+You can use `ini_set('memory_limit', '256M');` in your `index.php` file if your hosting plan
+allows you to dynamically change PHP configuration.
+
+In general, we encourage to always downscale your native images before using them with
+*Intervention-request*. Raw jpeg images coming from your DSLR camera will give your
+PHP server a very hard time to process.
 
 ## License
 
 *Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
 
 Have fun!
+
+

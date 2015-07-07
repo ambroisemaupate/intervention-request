@@ -37,6 +37,8 @@ class Configuration
     protected $ttl = 604800; // 7*24*60*60
     protected $gcProbability = 400;
     protected $timezone = "UTC";
+    protected $defaultQuality = 90;
+    protected $useFileChecksum = false;
 
     /**
      * Gets the value of caching.
@@ -207,6 +209,58 @@ class Configuration
     public function setTimezone($timezone)
     {
         $this->timezone = $timezone;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of defaultQuality.
+     *
+     * @return mixed
+     */
+    public function getDefaultQuality()
+    {
+        return $this->defaultQuality;
+    }
+
+    /**
+     * Sets the value of defaultQuality.
+     *
+     * @param integer $defaultQuality the default quality
+     *
+     * @return self
+     */
+    public function setDefaultQuality($defaultQuality)
+    {
+        $this->defaultQuality = (int) $defaultQuality;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of useFileChecksum.
+     *
+     * @return boolean
+     */
+    public function getUseFileChecksum()
+    {
+        return $this->useFileChecksum;
+    }
+
+    /**
+     * Sets the value of useFileChecksum.
+     *
+     * This will enable/disable file checksum, be careful, this
+     * can slow down your php process a lot if you are process large images
+     * (> 1 Mo).
+     *
+     * @param boolean $useFileChecksum the use file md5
+     *
+     * @return self
+     */
+    public function setUseFileChecksum($useFileChecksum)
+    {
+        $this->useFileChecksum = (boolean) $useFileChecksum;
 
         return $this;
     }
