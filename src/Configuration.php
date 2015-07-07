@@ -38,6 +38,7 @@ class Configuration
     protected $gcProbability = 400;
     protected $timezone = "UTC";
     protected $defaultQuality = 90;
+    protected $useFileMd5 = false;
 
     /**
      * Gets the value of caching.
@@ -232,6 +233,34 @@ class Configuration
     public function setDefaultQuality($defaultQuality)
     {
         $this->defaultQuality = (int) $defaultQuality;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of useFileMd5.
+     *
+     * @return boolean
+     */
+    public function getUseFileMd5()
+    {
+        return $this->useFileMd5;
+    }
+
+    /**
+     * Sets the value of useFileMd5.
+     *
+     * This will enable/disable md5 file checking, be careful, this
+     * can slow down your php process a lot if you are process large images
+     * (> 1 Mo).
+     *
+     * @param boolean $useFileMd5 the use file md5
+     *
+     * @return self
+     */
+    public function setUseFileMd5($useFileMd5)
+    {
+        $this->useFileMd5 = (boolean) $useFileMd5;
 
         return $this;
     }

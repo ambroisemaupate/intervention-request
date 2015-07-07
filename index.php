@@ -47,6 +47,7 @@ $log->pushHandler(new StreamHandler('interventionRequest.log', Logger::INFO));
 $conf = new Configuration();
 $conf->setCachePath(APP_ROOT . '/cache');
 $conf->setImagesPath(APP_ROOT . '/test');
+$conf->setUseFileMd5(true);
 
 /*
  * Handle short url with Url rewriting
