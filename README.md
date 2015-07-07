@@ -193,9 +193,28 @@ the default one in `InterventionRequest.php` class. Resizing processors should b
 the first, and quality processors should be the last as image operations will be done
 following your processors ordering.
 
+## Performances
+
+If your *Intervention-request* throws errors like that one:
+
+```
+Fatal error: Allowed memory size of 134217728 bytes exhausted (tried to allocate 5184 bytes).
+```
+
+It’s because you are trying to process a too large image. The solution is too increase your `memory_limit`
+PHP setting over `256M`. You can edit this file in your server `php.ini` file.
+
+You can use `ini_set('memory_limit', '256M');` in your `index.php` file if your hosting plan
+allows you to dynamically change PHP configuration.
+
+In general, we encourage to always downscale your native images before using them with
+*Intervention-request*. Raw jpeg images coming from your DSLR camera will give your
+PHP server a very hard time to process.
 
 ## License
 
 *Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
 
 Have fun!
+
+

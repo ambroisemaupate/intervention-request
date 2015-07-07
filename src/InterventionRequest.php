@@ -60,8 +60,6 @@ class InterventionRequest
         LoggerInterface $logger = null,
         array $processors = null
     ) {
-        // Try to increase memory limit for large image processing.
-        @ini_set('memory_limit', '256M');
 
         $this->logger = $logger;
 
