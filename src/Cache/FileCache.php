@@ -34,9 +34,6 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- *
- */
 class FileCache
 {
     protected $request;
@@ -66,6 +63,7 @@ class FileCache
      * @param Psr\Log\LoggerInterface|null $logger
      * @param integer $quality
      * @param integer $ttl
+     * @param boolean $useFileMd5
      */
     public function __construct(
         Request $request,
@@ -74,7 +72,8 @@ class FileCache
         LoggerInterface $logger = null,
         $quality = 90,
         $ttl = 604800,
-        $gcProbability = 300
+        $gcProbability = 300,
+        $useFileChecksum = false
     ) {
         $this->request = $request;
         $this->cachePath = $cachePath;
@@ -84,7 +83,23 @@ class FileCache
         $this->ttl = $ttl;
         $this->gcProbability = $gcProbability;
 
-        $cacheHash = hash('crc32b', serialize($this->request->query->all()));
+        /*
+         * Get file MD5 to check real image integrity
+         */
+        if ($useFileChecksum === true) {
+            $fileMd5 = hash_file('adler32', $this->realImage->getPathname());
+        } else {
+            $fileMd5 = '';
+        }
+
+        /*
+         * Generate a unique cache hash key
+         * which will be used as image path
+         *
+         * The key vary on request param and file md5
+         * if enabled.
+         */
+        $cacheHash = hash('crc32b', serialize($this->request->query->all()) . $fileMd5);
 
         $this->cacheFilePath = $cachePath .
         '/' . implode('/', str_split($cacheHash, 2)) .

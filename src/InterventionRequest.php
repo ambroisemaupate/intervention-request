@@ -35,9 +35,6 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- *
- */
 class InterventionRequest
 {
     protected $request;
@@ -63,6 +60,9 @@ class InterventionRequest
         LoggerInterface $logger = null,
         array $processors = null
     ) {
+        // Try to increase memory limit for large image processing.
+        @ini_set('memory_limit', '256M');
+
         $this->logger = $logger;
 
         if (null !== $request) {
@@ -126,7 +126,8 @@ class InterventionRequest
                     $this->logger,
                     $this->quality,
                     $this->configuration->getTtl(),
-                    $this->configuration->getGcProbability()
+                    $this->configuration->getGcProbability(),
+                    $this->configuration->getUseFileChecksum()
                 );
                 $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
                     return $interventionRequest->processImage();
