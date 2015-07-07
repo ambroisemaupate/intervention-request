@@ -38,7 +38,7 @@ class Configuration
     protected $gcProbability = 400;
     protected $timezone = "UTC";
     protected $defaultQuality = 90;
-    protected $useFileMd5 = false;
+    protected $useFileChecksum = false;
 
     /**
      * Gets the value of caching.
@@ -238,29 +238,29 @@ class Configuration
     }
 
     /**
-     * Gets the value of useFileMd5.
+     * Gets the value of useFileChecksum.
      *
      * @return boolean
      */
-    public function getUseFileMd5()
+    public function getUseFileChecksum()
     {
-        return $this->useFileMd5;
+        return $this->useFileChecksum;
     }
 
     /**
-     * Sets the value of useFileMd5.
+     * Sets the value of useFileChecksum.
      *
-     * This will enable/disable md5 file checking, be careful, this
+     * This will enable/disable file checksum, be careful, this
      * can slow down your php process a lot if you are process large images
      * (> 1 Mo).
      *
-     * @param boolean $useFileMd5 the use file md5
+     * @param boolean $useFileChecksum the use file md5
      *
      * @return self
      */
-    public function setUseFileMd5($useFileMd5)
+    public function setUseFileChecksum($useFileChecksum)
     {
-        $this->useFileMd5 = (boolean) $useFileMd5;
+        $this->useFileChecksum = (boolean) $useFileChecksum;
 
         return $this;
     }

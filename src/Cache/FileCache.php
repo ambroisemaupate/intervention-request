@@ -73,7 +73,7 @@ class FileCache
         $quality = 90,
         $ttl = 604800,
         $gcProbability = 300,
-        $useFileMd5 = true
+        $useFileChecksum = false
     ) {
         $this->request = $request;
         $this->cachePath = $cachePath;
@@ -86,7 +86,7 @@ class FileCache
         /*
          * Get file MD5 to check real image integrity
          */
-        if ($useFileMd5 === true) {
+        if ($useFileChecksum === true) {
             $fileMd5 = hash_file('adler32', $this->realImage->getPathname());
         } else {
             $fileMd5 = '';

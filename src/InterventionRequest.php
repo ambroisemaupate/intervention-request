@@ -127,7 +127,7 @@ class InterventionRequest
                     $this->quality,
                     $this->configuration->getTtl(),
                     $this->configuration->getGcProbability(),
-                    $this->configuration->getUseFileMd5()
+                    $this->configuration->getUseFileChecksum()
                 );
                 $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
                     return $interventionRequest->processImage();
