@@ -15,12 +15,12 @@
         }
     ],
     "require": {
-        "intervention/image": "~2.2",
-        "symfony/http-foundation": "~2.7",
-        "monolog/monolog":"~1.13",
-        "symfony/console": "~2.7",
-        "symfony/finder": "~2.7",
-        "symfony/filesystem": "~2.7"
+        "intervention/image": "~2.3",
+        "symfony/http-foundation": "~2.8",
+        "monolog/monolog":"~1.17",
+        "symfony/console": "~2.8",
+        "symfony/finder": "~2.8",
+        "symfony/filesystem": "~2.8"
     },
     "autoload": {
         "psr-4": {

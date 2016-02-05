@@ -107,7 +107,7 @@ class InterventionRequest
     {
         try {
             if (!$this->request->query->has('image')) {
-                throw new \RuntimeException("No valid image path found in URI", 1);
+                throw new FileNotFoundException("No valid image path found in URI", 1);
             }
 
             $nativePath = $this->configuration->getImagesPath() .
@@ -143,10 +143,10 @@ class InterventionRequest
                 );
                 $this->response->setLastModified(new \DateTime('now'));
             }
-        } catch (\RuntimeException $e) {
-            $this->response = $this->getBadRequestResponse($e->getMessage());
         } catch (FileNotFoundException $e) {
             $this->response = $this->getNotFoundResponse($e->getMessage());
+        } catch (\RuntimeException $e) {
+            $this->response = $this->getBadRequestResponse($e->getMessage());
         }
     }
 
