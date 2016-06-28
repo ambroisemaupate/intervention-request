@@ -30,15 +30,86 @@ namespace AM\InterventionRequest;
  */
 class Configuration
 {
+    /**
+     * @var bool
+     */
     protected $caching = true;
+    /**
+     * @var string
+     */
     protected $cachePath;
+    /**
+     * @var string
+     */
     protected $imagesPath;
+    /**
+     * @var string [gd or imagick]
+     */
     protected $driver = 'gd';
+    /**
+     * @var int
+     */
     protected $ttl = 604800; // 7*24*60*60
+    /**
+     * @var int
+     */
     protected $gcProbability = 400;
+    /**
+     * @var string
+     */
     protected $timezone = "UTC";
+    /**
+     * @var int
+     */
     protected $defaultQuality = 90;
+    /**
+     * @var bool
+     */
     protected $useFileChecksum = false;
+    /**
+     * @var string
+     */
+    protected $pngquantPath;
+    /**
+     * @var string
+     */
+    protected $jpegoptimPath;
+
+    /**
+     * @return string
+     */
+    public function getPngquantPath()
+    {
+        return $this->pngquantPath;
+    }
+
+    /**
+     * @param string $pngquantPath
+     * @return Configuration
+     */
+    public function setPngquantPath($pngquantPath)
+    {
+        $this->pngquantPath = $pngquantPath;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getJpegoptimPath()
+    {
+        return $this->jpegoptimPath;
+    }
+
+    /**
+     * @param string $jpegoptimPath
+     * @return Configuration
+     */
+    public function setJpegoptimPath($jpegoptimPath)
+    {
+        $this->jpegoptimPath = $jpegoptimPath;
+        return $this;
+    }
 
     /**
      * Gets the value of caching.
@@ -54,8 +125,7 @@ class Configuration
      * Sets the value of caching.
      *
      * @param boolean $caching the caching
-     *
-     * @return self
+     * @return Configuration
      */
     public function setCaching($caching)
     {
@@ -78,8 +148,7 @@ class Configuration
      * Sets the value of driver.
      *
      * @param string $driver the driver
-     *
-     * @return self
+     * @return Configuration
      */
     public function setDriver($driver)
     {
@@ -102,8 +171,7 @@ class Configuration
      * Sets the value of cachePath.
      *
      * @param string $cachePath the cache path
-     *
-     * @return self
+     * @return Configuration
      */
     public function setCachePath($cachePath)
     {
@@ -126,8 +194,7 @@ class Configuration
      * Sets the value of imagesPath.
      *
      * @param mixed $imagesPath the images path
-     *
-     * @return self
+     * @return Configuration
      */
     public function setImagesPath($imagesPath)
     {
@@ -150,8 +217,7 @@ class Configuration
      * Sets the value of ttl.
      *
      * @param mixed $ttl the ttl
-     *
-     * @return self
+     * @return Configuration
      */
     public function setTtl($ttl)
     {
@@ -177,8 +243,7 @@ class Configuration
      * probability of 1/1 will launch GC at every request.
      *
      * @param mixed $gcProbability the gc probability
-     *
-     * @return self
+     * @return Configuration
      */
     public function setGcProbability($gcProbability)
     {
@@ -203,8 +268,7 @@ class Configuration
      * Sets the value of timezone.
      *
      * @param mixed $timezone the timezone
-     *
-     * @return self
+     * @return Configuration
      */
     public function setTimezone($timezone)
     {
@@ -227,8 +291,7 @@ class Configuration
      * Sets the value of defaultQuality.
      *
      * @param integer $defaultQuality the default quality
-     *
-     * @return self
+     * @return Configuration
      */
     public function setDefaultQuality($defaultQuality)
     {
@@ -255,8 +318,7 @@ class Configuration
      * (> 1 Mo).
      *
      * @param boolean $useFileChecksum the use file md5
-     *
-     * @return self
+     * @return Configuration
      */
     public function setUseFileChecksum($useFileChecksum)
     {

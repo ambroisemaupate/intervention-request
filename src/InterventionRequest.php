@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2015, Ambroise Maupate
+ * Copyright © 2016, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,13 @@
 namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
-use AM\InterventionRequest\Configuration;
+use AM\InterventionRequest\Listener\JpegFileListener;
+use AM\InterventionRequest\Listener\PngFileListener;
 use AM\InterventionRequest\Processor as Processor;
+use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,14 +40,42 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InterventionRequest
 {
+    /**
+     * @var Request
+     */
     protected $request;
+    /**
+     * @var Response
+     */
     protected $response;
+    /**
+     * @var null|LoggerInterface
+     */
     protected $logger;
+    /**
+     * @var Configuration
+     */
     protected $configuration;
+    /**
+     * @var File
+     */
     protected $nativeImage;
+    /**
+     * @var Image
+     */
     protected $image;
+    /**
+     * @var array|null
+     */
     protected $processors;
+    /**
+     * @var integer
+     */
     protected $quality;
+    /**
+     * @var EventDispatcher
+     */
+    protected $dispatcher;
 
     /**
      * Create a new InterventionRequest object.
@@ -60,8 +91,8 @@ class InterventionRequest
         LoggerInterface $logger = null,
         array $processors = null
     ) {
-
         $this->logger = $logger;
+        $this->dispatcher = new EventDispatcher();
 
         if (null !== $request) {
             $this->request = $request;
@@ -70,6 +101,8 @@ class InterventionRequest
         }
 
         $this->configuration = $configuration;
+        $this->dispatcher->addSubscriber(new JpegFileListener($this->configuration->getJpegoptimPath()));
+        $this->dispatcher->addSubscriber(new PngFileListener($this->configuration->getPngquantPath()));
         $this->defineTimezone();
 
         if (null === $processors) {
@@ -92,6 +125,7 @@ class InterventionRequest
         }
     }
 
+
     private function defineTimezone()
     {
         /*
@@ -111,12 +145,11 @@ class InterventionRequest
             }
 
             $nativePath = $this->configuration->getImagesPath() .
-            '/' . $this->request->query->get('image');
+                '/' . $this->request->query->get('image');
             $this->nativeImage = new File($nativePath);
             $this->parseQuality();
 
             if ($this->configuration->hasCaching()) {
-
                 $cache = new FileCache(
                     $this->request,
                     $this->nativeImage,
@@ -127,6 +160,9 @@ class InterventionRequest
                     $this->configuration->getGcProbability(),
                     $this->configuration->getUseFileChecksum()
                 );
+                $cache->setDispatcher($this->dispatcher);
+
+                /** @var Response response */
                 $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
                     return $interventionRequest->processImage();
                 }, $this);
@@ -151,8 +187,7 @@ class InterventionRequest
     }
 
     /**
-     *
-     * @param  string $message
+     * @param string $message
      * @return Response
      */
     protected function getNotFoundResponse($message = "")
@@ -170,7 +205,7 @@ class InterventionRequest
     }
 
     /**
-     * @param  string $message
+     * @param string $message
      * @return Response
      */
     protected function getBadRequestResponse($message = "")
@@ -187,6 +222,9 @@ class InterventionRequest
         );
     }
 
+    /**
+     * @return Image
+     */
     public function processImage()
     {
         // create an image manager instance with favored driver
@@ -203,16 +241,17 @@ class InterventionRequest
         return $this->image;
     }
 
+    /**
+     * @return int|mixed
+     */
     public function parseQuality()
     {
-        if ($this->request->query->has('quality') &&
-            1 === preg_match('#^([0-9]+)$#', $this->request->query->get('quality'), $quality)) {
+        if ($this->request->query->has('quality')) {
+            $quality = (int) $this->request->query->get('quality');
 
-            $quality[1] = (int) $quality[1];
-
-            if ($quality[1] <= 100 &&
-                $quality[1] > 0) {
-                $this->quality = $quality[1];
+            if ($quality <= 100 &&
+                $quality > 0) {
+                $this->quality = $quality;
             } else {
                 $this->quality = $this->configuration->getDefaultQuality();
             }
@@ -224,7 +263,7 @@ class InterventionRequest
     }
 
     /**
-     * @return Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getResponse()
     {
@@ -243,9 +282,7 @@ class InterventionRequest
     }
 
     /**
-     * Gets the value of request.
-     *
-     * @return mixed
+     * @return Request
      */
     public function getRequest()
     {
@@ -253,9 +290,7 @@ class InterventionRequest
     }
 
     /**
-     * Gets the value of nativeImage.
-     *
-     * @return mixed
+     * @return File
      */
     public function getNativeImage()
     {
@@ -263,9 +298,7 @@ class InterventionRequest
     }
 
     /**
-     * Gets the value of configuration.
-     *
-     * @return mixed
+     * @return Configuration
      */
     public function getConfiguration()
     {
@@ -273,9 +306,7 @@ class InterventionRequest
     }
 
     /**
-     * Gets the value of logger.
-     *
-     * @return mixed
+     * @return null|LoggerInterface
      */
     public function getLogger()
     {

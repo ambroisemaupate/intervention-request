@@ -20,7 +20,9 @@
         "monolog/monolog":"~1.17",
         "symfony/console": "~2.8",
         "symfony/finder": "~2.8",
-        "symfony/filesystem": "~2.8"
+        "symfony/filesystem": "~2.8",
+        "symfony/event-dispatcher": "~2.8",
+        "symfony/process": "~2.8"
     },
     "autoload": {
         "psr-4": {

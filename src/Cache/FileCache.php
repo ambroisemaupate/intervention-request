@@ -25,10 +25,12 @@
  */
 namespace AM\InterventionRequest\Cache;
 
+use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\InterventionRequest;
 use Closure;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,16 +38,50 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileCache
 {
+    /**
+     * @var Request
+     */
     protected $request;
+    /**
+     * @var Response
+     */
     protected $response;
+    /**
+     * @var File
+     */
     protected $realImage;
+    /**
+     * @var string
+     */
     protected $cacheFilePath;
+    /**
+     * @var File
+     */
     protected $cacheFile;
+    /**
+     * @var string
+     */
     protected $cachePath;
+    /**
+     * @var null|LoggerInterface
+     */
     protected $logger;
+    /**
+     * @var int
+     */
     protected $quality;
+    /**
+     * @var int
+     */
     protected $ttl;
+    /**
+     * @var int
+     */
     protected $gcProbability;
+    /**
+     * @var EventDispatcher
+     */
+    protected $dispatcher;
 
     protected static $allowedExtensions = array(
         'jpeg',
@@ -57,13 +93,15 @@ class FileCache
     );
 
     /**
-     * @param Symfony\Component\HttpFoundation\Request $request
-     * @param Symfony\Component\HttpFoundation\File\File $realImage
-     * @param string $cachePath
-     * @param Psr\Log\LoggerInterface|null $logger
-     * @param integer $quality
-     * @param integer $ttl
-     * @param boolean $useFileMd5
+     * FileCache constructor.
+     * @param Request $request
+     * @param File $realImage
+     * @param $cachePath
+     * @param LoggerInterface|null $logger
+     * @param int $quality
+     * @param int $ttl
+     * @param int $gcProbability
+     * @param bool $useFileChecksum
      */
     public function __construct(
         Request $request,
@@ -117,7 +155,7 @@ class FileCache
     }
 
     /**
-     * @param Intervention\Image\Image $image
+     * @param Image $image
      */
     public function saveImage(Image $image)
     {
@@ -128,11 +166,15 @@ class FileCache
         $image->save($this->cacheFilePath, $this->quality);
     }
 
+    /**
+     * @param Closure $callback
+     * @param InterventionRequest $interventionRequest
+     * @return Response
+     */
     public function getResponse(Closure $callback, InterventionRequest $interventionRequest)
     {
         try {
             $this->cacheFile = new File($this->cacheFilePath);
-
             $response = new Response(
                 file_get_contents($this->cacheFile->getPathname()),
                 Response::HTTP_OK,
@@ -145,20 +187,30 @@ class FileCache
         } catch (FileNotFoundException $e) {
             if (is_callable($callback)) {
                 $image = $callback($interventionRequest);
-                $this->saveImage($image);
+                if ($image instanceof Image) {
+                    $this->saveImage($image);
+                    $this->cacheFile = new File($this->cacheFilePath);
 
-                // send HTTP header and output image data
-                $response = new Response(
-                    (string) $image->encode(null, $this->quality),
-                    Response::HTTP_OK,
-                    [
-                        'Content-Type' => $image->mime(),
-                        'Content-Disposition' => 'filename="' . $this->realImage->getFilename() . '"',
-                        'X-Generator-First-Render' => true,
-                    ]
-                );
-                $response->setLastModified(new \DateTime('now'));
+                    if (null !== $this->dispatcher) {
+                        // create the ImageSavedEvent and dispatch it
+                        $event = new ImageSavedEvent($image, $this->cacheFile);
+                        $this->dispatcher->dispatch(ImageSavedEvent::NAME, $event);
+                    }
 
+                    // send HTTP header and output image data
+                    $response = new Response(
+                        file_get_contents($this->cacheFile->getPathname()),
+                        Response::HTTP_OK,
+                        [
+                            'Content-Type' => $image->mime(),
+                            'Content-Disposition' => 'filename="' . $this->realImage->getFilename() . '"',
+                            'X-Generator-First-Render' => true,
+                        ]
+                    );
+                    $response->setLastModified(new \DateTime('now'));
+                } else {
+                    throw new \RuntimeException("Image is not a valid InterventionImage instance.", 1);
+                }
             } else {
                 throw new \RuntimeException("No image handle closure defined", 1);
             }
@@ -197,5 +249,23 @@ class FileCache
             $garbageCollector->setTtl($this->ttl);
             $garbageCollector->launch();
         }
+    }
+
+    /**
+     * @return EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
+    /**
+     * @param EventDispatcher $dispatcher
+     * @return FileCache
+     */
+    public function setDispatcher(EventDispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+        return $this;
     }
 }
