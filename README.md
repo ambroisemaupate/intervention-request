@@ -39,6 +39,8 @@ You can edit each configuration parameters using their corresponding *setters*:
 - `setTimezone(string)`: PHP timezone to build \DateTime object used for caching. Set it here if you have not set it in your `php.ini` file;
 - `setGcProbability(integer)`: Garbage collector probability divisor. Garbage collection launch probability is 1/$gcProbability where a probability of 1/1 will launch GC at every request.
 - `setUseFileChecksum(true|false)`: Use file checksum to test if file is different even if its name does not change. This option can be greedy on large files. (default: `false`).
+- `setJpegoptimPath(string)`: *Optional* — Tells where `jpegoptim` binary is for JPEG post-processing (not useful unless you need to stick to 100 quality).
+- `setPngquantPath(string)`: *Optional* — Tells where `pngquant` binary is for PNG post-processing. **This post-processing tool is highly recommended** as PNG won’t be optimized without it.
 
 
 ## Available operations
@@ -84,6 +86,10 @@ use AM\InterventionRequest\InterventionRequest;
 $conf = new Configuration();
 $conf->setCachePath(APP_ROOT.'/cache');
 $conf->setImagesPath(APP_ROOT.'/files');
+// Comment this line if jpegoptim is not available on your server
+$conf->setJpegoptimPath('/usr/local/bin/jpegoptim');
+// Comment this line if pngquant is not available on your server
+$conf->setPngquantPath('/usr/local/bin/pngquant');
 
 /*
  * InterventionRequest constructor asks 2 objects:
