@@ -184,6 +184,7 @@ class FileCache
                     'X-Generator-Cached' => true,
                 ]
             );
+            $response->setLastModified(new \DateTime(date("Y-m-d H:i:s", $this->cacheFile->getMTime())));
         } catch (FileNotFoundException $e) {
             if (is_callable($callback)) {
                 $image = $callback($interventionRequest);
