@@ -38,6 +38,10 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class InterventionRequest
+ * @package AM\InterventionRequest
+ */
 class InterventionRequest
 {
     /**
