@@ -15,14 +15,14 @@
         }
     ],
     "require": {
-        "intervention/image": "~2",
-        "symfony/http-foundation": "~3",
-        "symfony/console": "~3",
-        "symfony/finder": "~3",
-        "symfony/filesystem": "~3",
-        "symfony/event-dispatcher": "~3",
-        "symfony/process": "~3",
-        "monolog/monolog": "~1"
+        "intervention/image": "~2.3",
+        "symfony/http-foundation": "~2.8 || ~3.2",
+        "symfony/console": "~2.8 || ~3.2",
+        "symfony/finder": "~2.8 || ~3.2",
+        "symfony/filesystem": "~2.8 || ~3.2",
+        "symfony/event-dispatcher": "~2.8 || ~3.2",
+        "symfony/process": "~2.8 || ~3.2",
+        "monolog/monolog": "~1.22"
     },
     "autoload": {
         "psr-4": {
