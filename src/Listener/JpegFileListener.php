@@ -66,6 +66,7 @@ class JpegFileListener implements EventSubscriberInterface
                 $this->jpegoptimPath,
                 '-s',
                 '-f',
+                '--all-progressive',
                 '-m90',
                 $event->getImageFile()->getPathname(),
             ));

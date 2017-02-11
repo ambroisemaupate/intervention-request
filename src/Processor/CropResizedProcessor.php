@@ -29,10 +29,14 @@ use Intervention\Image\Image;
 use Intervention\Image\Constraint;
 
 /**
- *
+ * Class CropResizedProcessor
+ * @package AM\InterventionRequest\Processor
  */
 class CropResizedProcessor extends AbstractProcessor
 {
+    /**
+     * @param Image $image
+     */
     public function process(Image $image)
     {
         if ($this->request->query->has('crop') &&
@@ -53,9 +57,11 @@ class CropResizedProcessor extends AbstractProcessor
                 ];
             }
 
-            $image->fit($realFitSize[0], $realFitSize[1], function (Constraint $constraint) {
-                $constraint->upsize();
-            });
+            if (isset($realFitSize)) {
+                $image->fit($realFitSize[0], $realFitSize[1], function (Constraint $constraint) {
+                    $constraint->upsize();
+                });
+            }
         }
     }
 }

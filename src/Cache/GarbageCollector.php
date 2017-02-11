@@ -40,9 +40,12 @@ class GarbageCollector
     protected $ttl = 604800;
 
     /**
-     * Garbage collector
+     * Garbage collector.
      *
      * Clears out old files from the cache
+     *
+     * @param string $cacheDirectory
+     * @param LoggerInterface $logger
      */
     public function __construct($cacheDirectory, LoggerInterface $logger = null)
     {
@@ -102,6 +105,10 @@ class GarbageCollector
         $finder = new Finder();
         $dirs = iterator_to_array($finder->directories()->in($path), true);
 
+        /**
+         * @var string $pathname
+         * @var \SplFileInfo $dir
+         */
         foreach ($dirs as $pathname => $dir) {
             if ($this->fs->exists($pathname)) {
                 $fileFinder = new Finder();
@@ -110,7 +117,7 @@ class GarbageCollector
                            ->notName('.*');
 
                 if (iterator_count($fileFinder) === 0) {
-                    $this->fs->remove($dir->getPathName());
+                    $this->fs->remove($dir->getPathname());
                     if (null !== $this->logger) {
                         $this->logger->info('GC delete empty folder.', ['folder' => $dir->getPathname()]);
                     }

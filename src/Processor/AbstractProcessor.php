@@ -49,8 +49,5 @@ abstract class AbstractProcessor
      *
      * @param  Image  $image
      */
-    public function process(Image $image)
-    {
-        // do some process stuff to your intervention image
-    }
+    public abstract function process(Image $image);
 }

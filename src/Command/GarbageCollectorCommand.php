@@ -48,15 +48,17 @@ class GarbageCollectorCommand extends Command
             )
             ->addOption(
                 'log',
-                null,
+                'l',
                 InputOption::VALUE_REQUIRED,
-                'Log file path'
+                'Log file path',
+                './interventionRequest.log'
             )
             ->addOption(
                 'ttl',
-                604800,
+                't',
                 InputOption::VALUE_REQUIRED,
-                'Time to live to set to the garbage collector.'
+                'Time to live to set to the garbage collector.',
+                604800
             )
         ;
     }
