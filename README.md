@@ -217,6 +217,64 @@ In general, we encourage to always downscale your native images before using the
 *Intervention-request*. Raw jpeg images coming from your DSLR camera will give your
 PHP server a very hard time to process.
 
+## Optimization
+
+### jpegoptim
+
+If you have `jpegoptim` installed on your server, you can add it to your configuration
+
+```php
+$conf->setJpegoptimPath('/usr/local/bin/jpegoptim');
+```
+
+### pngquant
+
+If you have `pngquant` installed on your server, you can add it to your configuration
+
+```php
+$conf->setPngquantPath('/usr/local/bin/pngquant');
+```
+
+### kraken.io
+
+If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated 
+`KrakenListener` to send your resized images over the external service.
+
+Make sure that you have loaded *suggested* Composer package `kraken-io/kraken-php`. It is not available by default.
+
+```php
+$iRequest->addSubscriber(new \AM\InterventionRequest\Listener\KrakenListener(
+    'your-api-key', 
+    'your-api-secret', 
+    true,
+    $log
+));
+```
+
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+
+### jpegtran
+
+If you want to use your system `jpegtran` or the *Mozjpeg* one, you can use the `JpegTranListener`.
+
+```php
+$iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
+    '/usr/local/opt/mozjpeg/bin/jpegtran',
+    $log
+));
+```
+
+### Optimization benchmark
+
+With default quality to 90%
+
+| Url | PHP raw | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) |
+| --- | ------- | ----------------- | --------- | ------------------ | 
+| /?image=/images/testUHD.jpg&width=2300 | 405 kB | 187 kB | 395 kB | 390 kB |
+| /?image=/images/testUHD.jpg&width=1920 | 294 kB | 134 kB | 285 kB | 282 kB |
+| /?image=/images/rhino.jpg&width=1920 | 642 kB | 534 kB | 598 kB | 596 kB |
+| /?image=/images/rhino.jpg&width=1280 | 325 kB | 278 kB | 303 kB | 301 kB |
+
 ## License
 
 *Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
