@@ -26,6 +26,7 @@
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
+use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -52,7 +53,15 @@ class PngFileListener implements EventSubscriberInterface
     {
         return array(
             ImageSavedEvent::NAME => 'onPngImageSaved',
+            ResponseEvent::NAME => 'onResponse',
         );
+    }
+
+    public function onResponse(ResponseEvent $event)
+    {
+        $response = $event->getResponse();
+        $response->headers->set('X-IR-PngQuant', true);
+        $event->setResponse($response);
     }
 
     /**
@@ -60,9 +69,7 @@ class PngFileListener implements EventSubscriberInterface
      */
     public function onPngImageSaved(ImageSavedEvent $event)
     {
-        if ($event->getImage()->mime() == "image/png"&&
-            $this->pngquantPath != "") {
-
+        if ($event->getImage()->mime() == "image/png") {
             $builder = new ProcessBuilder(array(
                 $this->pngquantPath,
                 '-f',

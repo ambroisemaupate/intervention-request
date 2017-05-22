@@ -26,7 +26,7 @@
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
-use Psr\Log\LoggerInterface;
+use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -36,20 +36,14 @@ class JpegTranListener implements EventSubscriberInterface
      * @var string
      */
     protected $jpegtranPath;
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * JpegFileListener constructor.
      * @param string $jpegtranPath
-     * @param LoggerInterface $logger
      */
-    public function __construct($jpegtranPath, LoggerInterface $logger = null)
+    public function __construct($jpegtranPath)
     {
         $this->jpegtranPath = $jpegtranPath;
-        $this->logger = $logger;
     }
 
     /**
@@ -59,7 +53,15 @@ class JpegTranListener implements EventSubscriberInterface
     {
         return array(
             ImageSavedEvent::NAME => 'onJpegImageSaved',
+            ResponseEvent::NAME => 'onResponse',
         );
+    }
+
+    public function onResponse(ResponseEvent $event)
+    {
+        $response = $event->getResponse();
+        $response->headers->set('X-IR-JpegTran', true);
+        $event->setResponse($response);
     }
 
     /**
@@ -78,10 +80,6 @@ class JpegTranListener implements EventSubscriberInterface
                 $event->getImageFile()->getPathname(),
             ));
             $builder->getProcess()->run();
-
-            if (null !== $this->logger) {
-                $this->logger->info("Used jpegtran to minify file.", ['cmd' => $builder->getProcess()->getCommandLine()]);
-            }
         }
     }
 }

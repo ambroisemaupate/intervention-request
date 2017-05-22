@@ -204,7 +204,7 @@ following your processors ordering.
 You can create custom actions if you need to optimize/alter your images before they get served
 using `ImageSavedEvent` and *Symfony* event system :
 
-Create a class implementing Symfony’s `EventSubscriberInterface` and listen to `ImageSavedEvent::NAME`
+Create a class implementing Symfony’s `EventSubscriberInterface` and, for example, listen to `ImageSavedEvent::NAME`
 
 ```php
 public static function getSubscribedEvents()
@@ -215,11 +215,25 @@ public static function getSubscribedEvents()
 }
 ```
 
-This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it. Get a look to our `KrakenListener` which send your image over an external service.
-
-That’s a good idea to pass a *logger* to each of your subscribers to know what’s going inside.
-
+This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it. 
 Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to register it.
+
+#### Available events
+
+| Event name | Description |
+| ---------- | ----------- |
+| `ImageProcessEvent::BEFORE_PROCESS` | Before `Image` is being processed. |
+| `ImageProcessEvent::AFTER_PROCESS` | After `Image` has been processed. |
+| `ImageSavedEvent::NAME` | After `Image` has been saved to filesystem with a physical file-path. |
+| `ResponseEvent::NAME` | After Symfony’s response has been built with image data. (Useful to alter headers) |
+
+#### Listener examples
+
+- `WatermarkListener` will print text on your image
+- `KrakenListener` will optimize your image file using *kraken.io* external service
+- `JpegTranListener` will optimize your image file using local `jpegtran` binary
+
+Of course you can build your own listeners and share them with us!
 
 ## Performances
 

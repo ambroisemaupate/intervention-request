@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2016, Ambroise Maupate
+ * Copyright © 2017, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,52 +20,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file ImageSavedEvent.php
+ * @file ResponseEvent.php
  * @author Ambroise Maupate
  */
 namespace AM\InterventionRequest\Event;
 
-use Intervention\Image\Image;
+
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Event dispatched AFTER an image has been saved to filesystem.
- *
- * @package AM\InterventionRequest\Event
- */
-class ImageSavedEvent extends Event
+class ResponseEvent extends Event
 {
-    const NAME = 'image.saved';
+    const NAME = 'image.response';
 
     /**
-     * @var File
+     * @var Response
      */
-    protected $imageFile;
-    /**
-     * @var Image
-     */
-    protected $image;
+    private $response;
 
-    public function __construct(Image $image, File $imageFile)
+    /**
+     * ResponseEvent constructor.
+     * @param Response $response
+     */
+    public function __construct(Response $response)
     {
-        $this->imageFile = $imageFile;
-        $this->image = $image;
+        $this->response = $response;
     }
 
     /**
-     * @return File
+     * @return Response
      */
-    public function getImageFile()
+    public function getResponse()
     {
-        return $this->imageFile;
+        return $this->response;
     }
 
     /**
-     * @return Image
+     * @param Response $response
+     * @return ResponseEvent
      */
-    public function getImage()
+    public function setResponse($response)
     {
-        return $this->image;
+        $this->response = $response;
+        return $this;
     }
 }

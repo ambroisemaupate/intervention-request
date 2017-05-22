@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2016, Ambroise Maupate
+ * Copyright © 2017, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,45 +20,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file ImageSavedEvent.php
+ * @file ImageProcessEvent.php
  * @author Ambroise Maupate
  */
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\File\File;
 
-/**
- * Event dispatched AFTER an image has been saved to filesystem.
- *
- * @package AM\InterventionRequest\Event
- */
-class ImageSavedEvent extends Event
+class ImageProcessEvent extends Event
 {
-    const NAME = 'image.saved';
+    const BEFORE_PROCESS = 'image.before_process';
+    const AFTER_PROCESS = 'image.after_process';
 
-    /**
-     * @var File
-     */
-    protected $imageFile;
     /**
      * @var Image
      */
-    protected $image;
-
-    public function __construct(Image $image, File $imageFile)
-    {
-        $this->imageFile = $imageFile;
-        $this->image = $image;
-    }
+    private $image;
 
     /**
-     * @return File
+     * ImageProcessEvent constructor.
+     * @param Image $image
      */
-    public function getImageFile()
+    public function __construct(Image $image)
     {
-        return $this->imageFile;
+        $this->image = $image;
     }
 
     /**
@@ -67,5 +53,15 @@ class ImageSavedEvent extends Event
     public function getImage()
     {
         return $this->image;
+    }
+
+    /**
+     * @param Image $image
+     * @return ImageProcessEvent
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+        return $this;
     }
 }

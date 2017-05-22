@@ -26,6 +26,8 @@
 namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
+use AM\InterventionRequest\Event\ImageProcessEvent;
+use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
 use AM\InterventionRequest\Listener\PngFileListener;
 use AM\InterventionRequest\Processor as Processor;
@@ -106,8 +108,15 @@ class InterventionRequest
         }
 
         $this->configuration = $configuration;
-        $this->dispatcher->addSubscriber(new JpegFileListener($this->configuration->getJpegoptimPath()));
-        $this->dispatcher->addSubscriber(new PngFileListener($this->configuration->getPngquantPath()));
+
+        if ($this->configuration->getJpegoptimPath() != '') {
+            $this->dispatcher->addSubscriber(new JpegFileListener($this->configuration->getJpegoptimPath()));
+        }
+
+        if ($this->configuration->getPngquantPath() != '') {
+            $this->dispatcher->addSubscriber(new PngFileListener($this->configuration->getPngquantPath()));
+        }
+
         $this->defineTimezone();
 
         if (null === $processors) {
@@ -245,13 +254,25 @@ class InterventionRequest
             'driver' => $this->configuration->getDriver(),
         ]);
 
-        $this->image = $manager->make($this->nativeImage->getPathname());
+        $beforeProcessEvent = new ImageProcessEvent($manager->make($this->nativeImage->getPathname()));
+        $this->dispatcher->dispatch(ImageProcessEvent::BEFORE_PROCESS, $beforeProcessEvent);
+
+        /*
+         * Get image altered by BEFORE subscribers
+         */
+        $this->image = $beforeProcessEvent->getImage();
 
         foreach ($this->processors as $processor) {
             $processor->process($this->image);
         }
 
-        return $this->image;
+        $afterProcessEvent = new ImageProcessEvent($this->image);
+        $this->dispatcher->dispatch(ImageProcessEvent::AFTER_PROCESS, $afterProcessEvent);
+
+        /*
+         * Get image altered by AFTER subscribers
+         */
+        return $afterProcessEvent->getImage();
     }
 
     /**
@@ -286,6 +307,11 @@ class InterventionRequest
             $this->response->setMaxAge($this->configuration->getTtl());
             $this->response->setSharedMaxAge($this->configuration->getTtl());
             $this->response->setCharset('UTF-8');
+
+            $responseEvent = new ResponseEvent($this->response);
+            $this->dispatcher->dispatch(ResponseEvent::NAME, $responseEvent);
+            $this->response = $responseEvent->getResponse();
+
             $this->response->prepare($this->request);
 
             return $this->response;

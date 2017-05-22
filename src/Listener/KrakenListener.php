@@ -26,6 +26,7 @@
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
+use AM\InterventionRequest\Event\ResponseEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -75,7 +76,15 @@ class KrakenListener implements EventSubscriberInterface
     {
         return array(
             ImageSavedEvent::NAME => 'onImageSaved',
+            ResponseEvent::NAME => 'onResponse',
         );
+    }
+
+    public function onResponse(ResponseEvent $event)
+    {
+        $response = $event->getResponse();
+        $response->headers->set('X-IR-Kraken', true);
+        $event->setResponse($response);
     }
 
     public function onImageSaved(ImageSavedEvent $event)
@@ -92,7 +101,7 @@ class KrakenListener implements EventSubscriberInterface
 
             if ($data["success"] && !empty($data['kraked_url'])) {
                 if (null !== $this->logger) {
-                    $this->logger->info("Used kraken.io to minify file.", $data);
+                    $this->logger->debug("Used kraken.io to minify file.", $data);
                 }
                 $this->overrideImageFile($event->getImageFile()->getPathname(), $data['kraked_url']);
             } else {
