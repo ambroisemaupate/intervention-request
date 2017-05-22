@@ -161,9 +161,9 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | sharpen | s |
 | contrast *(only from 0 to 100)* | k |
 
-## Force garbage collection
+## Force garbage collection
 
-### Using command-line
+### Using command-line
 
 ```shell
 bin/intervention gc:launch /path/to/my/cache/folder --log /path/to/my/log/file.log
