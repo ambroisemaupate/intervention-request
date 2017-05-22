@@ -199,6 +199,28 @@ the default one in `InterventionRequest.php` class. Resizing processors should b
 the first, and quality processors should be the last as image operations will be done
 following your processors ordering.
 
+### Add custom event subscribers
+
+You can create custom actions if you need to optimize/alter your images before they get served
+using `ImageSavedEvent` and *Symfony* event system :
+
+Create a class implementing Symfony’s `EventSubscriberInterface` and listen to `ImageSavedEvent::NAME`
+
+```php
+public static function getSubscribedEvents()
+{
+    return array(
+        ImageSavedEvent::NAME => 'onImageSaved',
+    );
+}
+```
+
+This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it. Get a look to our `KrakenListener` which send your image over an external service.
+
+That’s a good idea to pass a *logger* to each of your subscribers to know what’s going inside.
+
+Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to register it.
+
 ## Performances
 
 If your *Intervention-request* throws errors like that one:
@@ -275,7 +297,7 @@ With default quality to 90%
 | /?image=/images/rhino.jpg&width=1920 | 642 kB | 534 kB | 598 kB | 596 kB |
 | /?image=/images/rhino.jpg&width=1280 | 325 kB | 278 kB | 303 kB | 301 kB |
 
-## License
+## License
 
 *Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
 
