@@ -29,6 +29,11 @@ use Intervention\Image\Image;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\File\File;
 
+/**
+ * Event dispatched AFTER an image has been saved to filesystem.
+ *
+ * @package AM\InterventionRequest\Event
+ */
 class ImageSavedEvent extends Event
 {
     const NAME = 'image.saved';

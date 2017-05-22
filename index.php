@@ -47,8 +47,6 @@ $log->pushHandler(new StreamHandler('interventionRequest.log', Logger::INFO));
 $conf = new Configuration();
 $conf->setCachePath(APP_ROOT . '/cache');
 $conf->setImagesPath(APP_ROOT . '/test');
-$conf->setJpegoptimPath('/usr/local/bin/jpegoptim');
-$conf->setPngquantPath('/usr/local/bin/pngquant');
 $conf->setUseFileChecksum(false);
 
 /*
@@ -69,5 +67,6 @@ $iRequest = new InterventionRequest(
     $request,
     $log
 );
+
 $iRequest->handle();
 $iRequest->getResponse()->send();

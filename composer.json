@@ -24,6 +24,12 @@
         "symfony/process": "~2.8 || ~3.2",
         "monolog/monolog": "~1.22"
     },
+    "require-dev": {
+        "kraken-io/kraken-php": "^1.6"
+    },
+    "suggest": {
+        "kraken-io/kraken-php": "Needed if you want to use the Kraken subscriber to send image to the kraken.io service."
+    },
     "autoload": {
         "psr-4": {
             "AM\\InterventionRequest\\": "src/"

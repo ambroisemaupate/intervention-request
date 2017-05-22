@@ -161,9 +161,9 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | sharpen | s |
 | contrast *(only from 0 to 100)* | k |
 
-## Force garbage collection
+## Force garbage collection
 
-### Using command-line
+### Using command-line
 
 ```shell
 bin/intervention gc:launch /path/to/my/cache/folder --log /path/to/my/log/file.log
@@ -199,6 +199,42 @@ the default one in `InterventionRequest.php` class. Resizing processors should b
 the first, and quality processors should be the last as image operations will be done
 following your processors ordering.
 
+### Add custom event subscribers
+
+You can create custom actions if you need to optimize/alter your images before they get served
+using `ImageSavedEvent` and *Symfony* event system :
+
+Create a class implementing Symfony’s `EventSubscriberInterface` and, for example, listen to `ImageSavedEvent::NAME`
+
+```php
+public static function getSubscribedEvents()
+{
+    return array(
+        ImageSavedEvent::NAME => 'onImageSaved',
+    );
+}
+```
+
+This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it. 
+Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to register it.
+
+#### Available events
+
+| Event name | Description |
+| ---------- | ----------- |
+| `ImageProcessEvent::BEFORE_PROCESS` | Before `Image` is being processed. |
+| `ImageProcessEvent::AFTER_PROCESS` | After `Image` has been processed. |
+| `ImageSavedEvent::NAME` | After `Image` has been saved to filesystem with a physical file-path. |
+| `ResponseEvent::NAME` | After Symfony’s response has been built with image data. (Useful to alter headers) |
+
+#### Listener examples
+
+- `WatermarkListener` will print text on your image
+- `KrakenListener` will optimize your image file using *kraken.io* external service
+- `JpegTranListener` will optimize your image file using local `jpegtran` binary
+
+Of course you can build your own listeners and share them with us!
+
 ## Performances
 
 If your *Intervention-request* throws errors like that one:
@@ -217,7 +253,65 @@ In general, we encourage to always downscale your native images before using the
 *Intervention-request*. Raw jpeg images coming from your DSLR camera will give your
 PHP server a very hard time to process.
 
-## License
+## Optimization
+
+### jpegoptim
+
+If you have `jpegoptim` installed on your server, you can add it to your configuration
+
+```php
+$conf->setJpegoptimPath('/usr/local/bin/jpegoptim');
+```
+
+### pngquant
+
+If you have `pngquant` installed on your server, you can add it to your configuration
+
+```php
+$conf->setPngquantPath('/usr/local/bin/pngquant');
+```
+
+### kraken.io
+
+If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated 
+`KrakenListener` to send your resized images over the external service.
+
+Make sure that you have loaded *suggested* Composer package `kraken-io/kraken-php`. It is not available by default.
+
+```php
+$iRequest->addSubscriber(new \AM\InterventionRequest\Listener\KrakenListener(
+    'your-api-key', 
+    'your-api-secret', 
+    true,
+    $log
+));
+```
+
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+
+### jpegtran
+
+If you want to use your system `jpegtran` or the *Mozjpeg* one, you can use the `JpegTranListener`.
+
+```php
+$iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
+    '/usr/local/opt/mozjpeg/bin/jpegtran',
+    $log
+));
+```
+
+### Optimization benchmark
+
+With default quality to 90%
+
+| Url | PHP raw | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) |
+| --- | ------- | ----------------- | --------- | ------------------ | 
+| /?image=/images/testUHD.jpg&width=2300 | 405 kB | 187 kB | 395 kB | 390 kB |
+| /?image=/images/testUHD.jpg&width=1920 | 294 kB | 134 kB | 285 kB | 282 kB |
+| /?image=/images/rhino.jpg&width=1920 | 642 kB | 534 kB | 598 kB | 596 kB |
+| /?image=/images/rhino.jpg&width=1280 | 325 kB | 278 kB | 303 kB | 301 kB |
+
+## License
 
 *Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
 
