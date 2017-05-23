@@ -1,6 +1,6 @@
 # Intervention Request
 
-**A *Intervention Image* wrapper to use simple resample features over urls.**
+**A customizable *Intervention Image* wrapper to use simple resample features over urls.**
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
 
