@@ -20,49 +20,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file ResponseEvent.php
+ * @file ImageEvent.php
  * @author Ambroise Maupate
  */
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\EventDispatcher\Event;
 
-class ResponseEvent extends ImageEvent
+abstract class ImageEvent extends Event
 {
-    const NAME = 'image.response';
+    /**
+     * @var Image|null
+     */
+    protected $image;
 
     /**
-     * @var Response
+     * ImageEvent constructor.
+     * @param Image $image
      */
-    private $response;
-
-    /**
-     * ResponseEvent constructor.
-     * @param Response $response
-     * @param Image $image Read-only image
-     */
-    public function __construct(Response $response, Image $image = null)
+    public function __construct(Image $image = null)
     {
-        parent::__construct($image);
-        $this->response = $response;
+        $this->image = $image;
+    }
+
+
+    /**
+     * @return Image
+     */
+    public function getImage()
+    {
+        return $this->image;
     }
 
     /**
-     * @return Response
+     * @param Image $image
+     * @return ImageEvent
      */
-    public function getResponse()
+    public function setImage($image)
     {
-        return $this->response;
-    }
-
-    /**
-     * @param Response $response
-     * @return ResponseEvent
-     */
-    public function setResponse($response)
-    {
-        $this->response = $response;
+        $this->image = $image;
         return $this;
     }
 }

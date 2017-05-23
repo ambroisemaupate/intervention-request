@@ -27,14 +27,14 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
+use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class KrakenListener
  * @package AM\InterventionRequest\Listener
  */
-class KrakenListener implements EventSubscriberInterface
+class KrakenListener implements ImageEventSubscriberInterface
 {
     /**
      * @var string
@@ -55,6 +55,11 @@ class KrakenListener implements EventSubscriberInterface
     private $lossy;
 
     /**
+     * @var \Kraken
+     */
+    private $kraken;
+
+    /**
      * KrakenListener constructor.
      * @param $apiKey
      * @param $apiSecret
@@ -67,6 +72,8 @@ class KrakenListener implements EventSubscriberInterface
         $this->apiSecret = $apiSecret;
         $this->logger = $logger;
         $this->lossy = $lossy;
+
+        $this->kraken = new \Kraken($this->apiKey, $this->apiSecret);
     }
 
     /**
@@ -82,22 +89,23 @@ class KrakenListener implements EventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        $response = $event->getResponse();
-        $response->headers->set('X-IR-Kraken', true);
-        $event->setResponse($response);
+        if ($this->supports()) {
+            $response = $event->getResponse();
+            $response->headers->set('X-IR-Kraken', true);
+            $event->setResponse($response);
+        }
     }
 
     public function onImageSaved(ImageSavedEvent $event)
     {
-        if ($event->getImageFile()->getPathname()) {
-            $kraken = new \Kraken($this->apiKey, $this->apiSecret);
+        if ($this->supports() && $event->getImageFile()->getPathname()) {
             $params = array(
                 "file" => $event->getImageFile()->getPathname(),
                 "wait" => true,
                 "lossy" => $this->lossy,
             );
 
-            $data = $kraken->upload($params);
+            $data = $this->kraken->upload($params);
 
             if ($data["success"] && !empty($data['kraked_url'])) {
                 if (null !== $this->logger) {
@@ -108,6 +116,15 @@ class KrakenListener implements EventSubscriberInterface
                 return;
             }
         }
+    }
+
+    /**
+     * @param Image $image
+     * @return bool
+     */
+    public function supports(Image $image = null)
+    {
+        return (null !== $this->kraken && '' !== $this->apiKey && '' !== $this->apiSecret);
     }
 
     /**

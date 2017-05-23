@@ -308,7 +308,7 @@ class InterventionRequest
             $this->response->setSharedMaxAge($this->configuration->getTtl());
             $this->response->setCharset('UTF-8');
 
-            $responseEvent = new ResponseEvent($this->response);
+            $responseEvent = new ResponseEvent($this->response, $this->image);
             $this->dispatcher->dispatch(ResponseEvent::NAME, $responseEvent);
             $this->response = $responseEvent->getResponse();
 
