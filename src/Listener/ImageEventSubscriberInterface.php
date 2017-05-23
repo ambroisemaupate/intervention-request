@@ -20,49 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file ResponseEvent.php
+ * @file ImageEventSubscriberInterface.php
  * @author Ambroise Maupate
  */
-namespace AM\InterventionRequest\Event;
+namespace AM\InterventionRequest\Listener;
 
 use Intervention\Image\Image;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ResponseEvent extends ImageEvent
+interface ImageEventSubscriberInterface extends EventSubscriberInterface
 {
-    const NAME = 'image.response';
-
     /**
-     * @var Response
+     * Return true if current subscriber can be used for current image.
+     *
+     * @param Image|null $image
+     * @return bool
      */
-    private $response;
-
-    /**
-     * ResponseEvent constructor.
-     * @param Response $response
-     * @param Image $image Read-only image
-     */
-    public function __construct(Response $response, Image $image = null)
-    {
-        parent::__construct($image);
-        $this->response = $response;
-    }
-
-    /**
-     * @return Response
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param Response $response
-     * @return ResponseEvent
-     */
-    public function setResponse($response)
-    {
-        $this->response = $response;
-        return $this;
-    }
+    public function supports(Image $image = null);
 }

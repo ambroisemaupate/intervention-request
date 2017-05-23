@@ -63,6 +63,7 @@ Temporary Items
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+.idea/intervention-request.iml
 
 # Gradle:
 .idea/gradle.xml

@@ -25,43 +25,10 @@
  */
 namespace AM\InterventionRequest\Event;
 
-use Intervention\Image\Image;
-use Symfony\Component\EventDispatcher\Event;
 
-class ImageProcessEvent extends Event
+class ImageProcessEvent extends ImageEvent
 {
     const BEFORE_PROCESS = 'image.before_process';
     const AFTER_PROCESS = 'image.after_process';
 
-    /**
-     * @var Image
-     */
-    private $image;
-
-    /**
-     * ImageProcessEvent constructor.
-     * @param Image $image
-     */
-    public function __construct(Image $image)
-    {
-        $this->image = $image;
-    }
-
-    /**
-     * @return Image
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * @param Image $image
-     * @return ImageProcessEvent
-     */
-    public function setImage($image)
-    {
-        $this->image = $image;
-        return $this;
-    }
 }

@@ -1,6 +1,6 @@
 # Intervention Request
 
-**A *Intervention Image* wrapper to use simple resample features over urls.**
+**A customizable *Intervention Image* wrapper to use simple resample features over urls.**
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
 
@@ -204,7 +204,7 @@ following your processors ordering.
 You can create custom actions if you need to optimize/alter your images before they get served
 using `ImageSavedEvent` and *Symfony* event system :
 
-Create a class implementing Symfony’s `EventSubscriberInterface` and, for example, listen to `ImageSavedEvent::NAME`
+Create a class implementing `ImageEventSubscriberInterface` and, for example, listen to `ImageSavedEvent::NAME`
 
 ```php
 public static function getSubscribedEvents()
@@ -224,7 +224,7 @@ Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to regis
 | ---------- | ----------- |
 | `ImageProcessEvent::BEFORE_PROCESS` | Before `Image` is being processed. |
 | `ImageProcessEvent::AFTER_PROCESS` | After `Image` has been processed. |
-| `ImageSavedEvent::NAME` | After `Image` has been saved to filesystem with a physical file-path. |
+| `ImageSavedEvent::NAME` | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
 | `ResponseEvent::NAME` | After Symfony’s response has been built with image data. (Useful to alter headers) |
 
 #### Listener examples

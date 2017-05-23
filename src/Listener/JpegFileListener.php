@@ -27,10 +27,10 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Intervention\Image\Image;
 use Symfony\Component\Process\ProcessBuilder;
 
-class JpegFileListener implements EventSubscriberInterface
+class JpegFileListener implements ImageEventSubscriberInterface
 {
     /**
      * @var string
@@ -59,9 +59,20 @@ class JpegFileListener implements EventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        $response = $event->getResponse();
-        $response->headers->set('X-IR-JpegOptim', true);
-        $event->setResponse($response);
+        if ($this->supports($event->getImage())) {
+            $response = $event->getResponse();
+            $response->headers->set('X-IR-JpegOptim', true);
+            $event->setResponse($response);
+        }
+    }
+
+    /**
+     * @param Image $image
+     * @return bool
+     */
+    public function supports(Image $image = null)
+    {
+        return null !== $image && $image->mime() == "image/jpeg";
     }
 
     /**
@@ -69,7 +80,7 @@ class JpegFileListener implements EventSubscriberInterface
      */
     public function onJpegImageSaved(ImageSavedEvent $event)
     {
-        if ($event->getImage()->mime() == "image/jpeg") {
+        if ($this->supports($event->getImage())) {
             $builder = new ProcessBuilder(array(
                 $this->jpegoptimPath,
                 '-s',

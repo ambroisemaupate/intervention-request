@@ -26,7 +26,6 @@
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -34,7 +33,7 @@ use Symfony\Component\HttpFoundation\File\File;
  *
  * @package AM\InterventionRequest\Event
  */
-class ImageSavedEvent extends Event
+class ImageSavedEvent extends ImageEvent
 {
     const NAME = 'image.saved';
 
@@ -42,15 +41,16 @@ class ImageSavedEvent extends Event
      * @var File
      */
     protected $imageFile;
-    /**
-     * @var Image
-     */
-    protected $image;
 
+    /**
+     * ImageSavedEvent constructor.
+     * @param Image $image
+     * @param File $imageFile
+     */
     public function __construct(Image $image, File $imageFile)
     {
+        parent::__construct($image);
         $this->imageFile = $imageFile;
-        $this->image = $image;
     }
 
     /**
@@ -59,13 +59,5 @@ class ImageSavedEvent extends Event
     public function getImageFile()
     {
         return $this->imageFile;
-    }
-
-    /**
-     * @return Image
-     */
-    public function getImage()
-    {
-        return $this->image;
     }
 }

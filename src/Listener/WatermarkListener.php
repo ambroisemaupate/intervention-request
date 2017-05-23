@@ -27,9 +27,9 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Intervention\Image\Image;
 
-class WatermarkListener implements EventSubscriberInterface
+class WatermarkListener implements ImageEventSubscriberInterface
 {
     private $watermarkText;
     private $size;
@@ -84,24 +84,37 @@ class WatermarkListener implements EventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        $response = $event->getResponse();
-        $response->headers->set('X-IR-Watermarked', true);
-        $event->setResponse($response);
+        if ($this->supports($event->getImage())) {
+            $response = $event->getResponse();
+            $response->headers->set('X-IR-Watermarked', true);
+            $event->setResponse($response);
+        }
     }
 
     public function watermarkImage(ImageProcessEvent $event)
     {
         $image = $event->getImage();
-        // use callback to define details
-        $image->text($this->watermarkText, $image->getWidth()/2, $image->getHeight()/2, function($font) {
-            $font->file($this->fontFile);
-            $font->size($this->size);
-            $font->color($this->color);
-            $font->align($this->align);
-            $font->valign($this->valign);
-            $font->angle($this->angle);
-        });
+        if ($this->supports($image)) {
+            // use callback to define details
+            $image->text($this->watermarkText, $image->getWidth()/2, $image->getHeight()/2, function($font) {
+                $font->file($this->fontFile);
+                $font->size($this->size);
+                $font->color($this->color);
+                $font->align($this->align);
+                $font->valign($this->valign);
+                $font->angle($this->angle);
+            });
 
-        $event->setImage($image);
+            $event->setImage($image);
+        }
+    }
+
+    /**
+     * @param Image $image
+     * @return bool
+     */
+    public function supports(Image $image = null)
+    {
+        return null !== $image;
     }
 }
