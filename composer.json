@@ -1,6 +1,6 @@
 {
     "name": "ambroisemaupate/intervention-request",
-    "description":"An Intervention-Image wrapper to use simple resample features over urls.",
+    "description":"A customizable Intervention-Image wrapper to use simple resample features over urls.",
     "license":"MIT",
     "type": "project",
     "keywords": [
