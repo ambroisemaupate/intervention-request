@@ -26,16 +26,21 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class RotateProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('rotate')) {
-            $image->rotate((float) $this->request->query->get('rotate'));
+        if ($request->query->has('rotate')) {
+            $image->rotate((float) $request->query->get('rotate'));
         }
     }
 }

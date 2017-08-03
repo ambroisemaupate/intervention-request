@@ -37,17 +37,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class AbstractProcessor
 {
-    protected $request;
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
     /**
      * Execute image intervention operations.
      *
-     * @param  Image  $image
+     * @param  Image $image
+     * @param Request $request
+     * @return
      */
-    public abstract function process(Image $image);
+    public abstract function process(Image $image, Request $request);
 }

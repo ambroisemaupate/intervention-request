@@ -26,18 +26,23 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class SharpenProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('sharpen') &&
-            $this->request->query->get('sharpen') >= 0 &&
-            $this->request->query->get('sharpen') <= 100) {
-            $image->sharpen((int) $this->request->query->get('sharpen'));
+        if ($request->query->has('sharpen') &&
+            $request->query->get('sharpen') >= 0 &&
+            $request->query->get('sharpen') <= 100) {
+            $image->sharpen((int) $request->query->get('sharpen'));
         }
     }
 }
