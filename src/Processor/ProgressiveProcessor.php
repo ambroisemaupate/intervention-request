@@ -26,20 +26,25 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class ProgressiveProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('progressive') ||
-            $this->request->query->has('interlace')) {
+        if ($request->query->has('progressive') ||
+            $request->query->has('interlace')) {
 
-            $process = $this->request->query->has('progressive') ?
-                                        $this->request->query->get('progressive') :
-                                        $this->request->query->get('interlace');
+            $process = $request->query->has('progressive') ?
+                                        $request->query->get('progressive') :
+                                        $request->query->get('interlace');
 
             $image->interlace((boolean) $process);
         }

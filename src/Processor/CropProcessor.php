@@ -26,18 +26,23 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class CropProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('crop') &&
-            !$this->request->query->has('width') &&
-            !$this->request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $this->request->query->get('crop'), $crop)) {
+        if ($request->query->has('crop') &&
+            !$request->query->has('width') &&
+            !$request->query->has('height') &&
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop'), $crop)) {
             $image->crop($crop[1], $crop[2]);
         }
     }

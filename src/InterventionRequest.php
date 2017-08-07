@@ -48,10 +48,6 @@ use Symfony\Component\HttpFoundation\Response;
 class InterventionRequest
 {
     /**
-     * @var Request
-     */
-    protected $request;
-    /**
      * @var Response
      */
     protected $response;
@@ -88,25 +84,16 @@ class InterventionRequest
      * Create a new InterventionRequest object.
      *
      * @param Configuration        $configuration
-     * @param Request|null         $request
      * @param LoggerInterface|null $logger
      * @param array|null           $processors
      */
     public function __construct(
         Configuration $configuration,
-        Request $request = null,
         LoggerInterface $logger = null,
         array $processors = null
     ) {
         $this->logger = $logger;
         $this->dispatcher = new EventDispatcher();
-
-        if (null !== $request) {
-            $this->request = $request;
-        } else {
-            $this->request = Request::createFromGlobals();
-        }
-
         $this->configuration = $configuration;
 
         if ($this->configuration->getJpegoptimPath() != '') {
@@ -121,18 +108,18 @@ class InterventionRequest
 
         if (null === $processors) {
             $this->processors = [
-                new Processor\RotateProcessor($this->request),
-                new Processor\CropResizedProcessor($this->request),
-                new Processor\FitProcessor($this->request),
-                new Processor\CropProcessor($this->request),
-                new Processor\WidenProcessor($this->request),
-                new Processor\HeightenProcessor($this->request),
-                new Processor\LimitColorsProcessor($this->request),
-                new Processor\GreyscaleProcessor($this->request),
-                new Processor\ContrastProcessor($this->request),
-                new Processor\BlurProcessor($this->request),
-                new Processor\SharpenProcessor($this->request),
-                new Processor\ProgressiveProcessor($this->request),
+                new Processor\RotateProcessor(),
+                new Processor\CropResizedProcessor(),
+                new Processor\FitProcessor(),
+                new Processor\CropProcessor(),
+                new Processor\WidenProcessor(),
+                new Processor\HeightenProcessor(),
+                new Processor\LimitColorsProcessor(),
+                new Processor\GreyscaleProcessor(),
+                new Processor\ContrastProcessor(),
+                new Processor\BlurProcessor(),
+                new Processor\SharpenProcessor(),
+                new Processor\ProgressiveProcessor(),
             ];
         } elseif (is_array($processors)) {
             $this->processors = $processors;
@@ -158,22 +145,22 @@ class InterventionRequest
 
     /**
      * Handle request to convert it to a Response object.
+     * @param Request $request
      */
-    public function handle()
+    public function handleRequest(Request $request)
     {
         try {
-            if (!$this->request->query->has('image')) {
-                throw new FileNotFoundException("No valid image path found in URI", 1);
+            if (!$request->query->has('image')) {
+                throw new FileNotFoundException("No valid image path found in URI");
             }
 
-            $nativePath = $this->configuration->getImagesPath() .
-                '/' . $this->request->query->get('image');
+            $nativePath = $this->configuration->getImagesPath() . '/' . $request->query->get('image');
             $this->nativeImage = new File($nativePath);
-            $this->parseQuality();
+            $this->parseQuality($request);
 
             if ($this->configuration->hasCaching()) {
                 $cache = new FileCache(
-                    $this->request,
+                    $request,
                     $this->nativeImage,
                     $this->configuration->getCachePath(),
                     $this->logger,
@@ -185,11 +172,11 @@ class InterventionRequest
                 $cache->setDispatcher($this->dispatcher);
 
                 /** @var Response response */
-                $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) {
-                    return $interventionRequest->processImage();
+                $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) use ($request) {
+                    return $interventionRequest->processImage($request);
                 }, $this);
             } else {
-                $this->processImage();
+                $this->processImage($request);
                 $this->response = new Response(
                     (string) $this->image->encode(null, $this->quality),
                     Response::HTTP_OK,
@@ -245,9 +232,10 @@ class InterventionRequest
     }
 
     /**
+     * @param Request $request
      * @return Image
      */
-    public function processImage()
+    public function processImage(Request $request)
     {
         // create an image manager instance with favored driver
         $manager = new ImageManager([
@@ -263,7 +251,7 @@ class InterventionRequest
         $this->image = $beforeProcessEvent->getImage();
 
         foreach ($this->processors as $processor) {
-            $processor->process($this->image);
+            $processor->process($this->image, $request);
         }
 
         $afterProcessEvent = new ImageProcessEvent($this->image);
@@ -276,12 +264,13 @@ class InterventionRequest
     }
 
     /**
+     * @param Request $request
      * @return int|mixed
      */
-    public function parseQuality()
+    public function parseQuality(Request $request)
     {
-        if ($this->request->query->has('quality')) {
-            $quality = (int) $this->request->query->get('quality');
+        if ($request->query->has('quality')) {
+            $quality = (int) $request->query->get('quality');
 
             if ($quality <= 100 &&
                 $quality > 0) {
@@ -297,9 +286,10 @@ class InterventionRequest
     }
 
     /**
+     * @param Request $request
      * @return Response
      */
-    public function getResponse()
+    public function getResponse(Request $request)
     {
         if (null !== $this->response) {
             $this->response->setPublic();
@@ -312,20 +302,12 @@ class InterventionRequest
             $this->dispatcher->dispatch(ResponseEvent::NAME, $responseEvent);
             $this->response = $responseEvent->getResponse();
 
-            $this->response->prepare($this->request);
+            $this->response->prepare($request);
 
             return $this->response;
         } else {
             throw new \RuntimeException("Request had not been handled. Use handle() method before getResponse()", 1);
         }
-    }
-
-    /**
-     * @return Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
     }
 
     /**

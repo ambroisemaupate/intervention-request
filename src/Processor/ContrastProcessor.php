@@ -26,18 +26,23 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class ContrastProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('contrast') &&
-            $this->request->query->get('contrast') >= -100 &&
-            $this->request->query->get('contrast') <= 100) {
-            $image->contrast((int) $this->request->query->get('contrast'));
+        if ($request->query->has('contrast') &&
+            $request->query->get('contrast') >= -100 &&
+            $request->query->get('contrast') <= 100) {
+            $image->contrast((int) $request->query->get('contrast'));
         }
     }
 }

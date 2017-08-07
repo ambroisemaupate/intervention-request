@@ -64,9 +64,8 @@ if (null !== $params) {
  */
 $iRequest = new InterventionRequest(
     $conf,
-    $request,
     $log
 );
 
-$iRequest->handle();
-$iRequest->getResponse()->send();
+$iRequest->handleRequest($request);
+$iRequest->getResponse($request)->send();

@@ -27,6 +27,7 @@ namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Intervention\Image\Constraint;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class CropResizedProcessor
@@ -36,24 +37,25 @@ class CropResizedProcessor extends AbstractProcessor
 {
     /**
      * @param Image $image
+     * @param Request $request
      */
-    public function process(Image $image)
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('crop') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $this->request->query->get('crop'), $crop) &&
-            ($this->request->query->has('width') || $this->request->query->has('height'))) {
+        if ($request->query->has('crop') &&
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop'), $crop) &&
+            ($request->query->has('width') || $request->query->has('height'))) {
 
             $fitRatio = (float) $crop[1] / (float) $crop[2];
 
-            if ($this->request->query->has('width')) {
+            if ($request->query->has('width')) {
                 $realFitSize = [
-                    (int) $this->request->query->get('width'),
-                    round($this->request->query->get('width') / $fitRatio),
+                    (int) $request->query->get('width'),
+                    round($request->query->get('width') / $fitRatio),
                 ];
-            } elseif ($this->request->query->has('height')) {
+            } elseif ($request->query->has('height')) {
                 $realFitSize = [
-                    round($this->request->query->get('height') * $fitRatio),
-                    (int) $this->request->query->get('height'),
+                    round($request->query->get('height') * $fitRatio),
+                    (int) $request->query->get('height'),
                 ];
             }
 

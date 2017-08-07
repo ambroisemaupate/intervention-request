@@ -97,13 +97,13 @@ $conf->setPngquantPath('/usr/local/bin/pngquant');
  * - AM\InterventionRequest\Configuration
  * - Symfony\Component\HttpFoundation\Request
  */
-$intRequest = new InterventionRequest($conf, $request);
+$intRequest = new InterventionRequest($conf);
 // Handle request and process image
-$intRequest->handle();
+$intRequest->handleRequest($request);
 
 // getResponse returns a Symfony\Component\HttpFoundation\Response object
 // with image mime-type and data. All you need is to send it!
-return $intRequest->getResponse();
+return $intRequest->getResponse($request);
 ```
 
 ## Use URL rewriting
@@ -185,10 +185,9 @@ to your `InterventionRequest` object.
  */
 $iRequest = new InterventionRequest(
     $conf,
-    $request,
     $log,
     [
-        new Processor\WidenProcessor($request),
+        new Processor\WidenProcessor(),
         // add or replace with your own Processors
     ]
 );

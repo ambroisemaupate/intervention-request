@@ -26,16 +26,21 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class GreyscaleProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('greyscale') ||
-            $this->request->query->has('grayscale')) {
+        if ($request->query->has('greyscale') ||
+            $request->query->has('grayscale')) {
             $image->greyscale();
         }
     }

@@ -27,18 +27,23 @@ namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Intervention\Image\Constraint;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class FitProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('fit') &&
-            !$this->request->query->has('width') &&
-            !$this->request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $this->request->query->get('fit'), $fit)) {
+        if ($request->query->has('fit') &&
+            !$request->query->has('width') &&
+            !$request->query->has('height') &&
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('fit'), $fit)) {
             $image->fit($fit[1], $fit[2], function (Constraint $constraint) {
                 $constraint->upsize();
             });

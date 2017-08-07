@@ -27,16 +27,21 @@ namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Intervention\Image\Constraint;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class HeightenProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)$#', $this->request->query->get('height'), $height)) {
+        if ($request->query->has('height') &&
+            1 === preg_match('#^([0-9]+)$#', $request->query->get('height'), $height)) {
             $image->heighten($height[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });

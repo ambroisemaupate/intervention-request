@@ -26,16 +26,21 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class BlurProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('blur')) {
-            $image->blur((int) $this->request->query->get('blur'));
+        if ($request->query->has('blur')) {
+            $image->blur((int) $request->query->get('blur'));
         }
     }
 }

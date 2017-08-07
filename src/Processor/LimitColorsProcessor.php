@@ -26,19 +26,24 @@
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  *
  */
 class LimitColorsProcessor extends AbstractProcessor
 {
-    public function process(Image $image)
+    /**
+     * @param Image $image
+     * @param Request $request
+     */
+    public function process(Image $image, Request $request)
     {
-        if ($this->request->query->has('background') ||
-            $this->request->query->has('limit_color')) {
-            $background = $this->request->query->has('background') ?
-                                        $this->request->query->get('background') :
-                                        $this->request->query->get('limit_color');
+        if ($request->query->has('background') ||
+            $request->query->has('limit_color')) {
+            $background = $request->query->has('background') ?
+                                        $request->query->get('background') :
+                                        $request->query->get('limit_color');
 
             if (1 === preg_match('#^([0-9a-f]{6})$#', $background)) {
                 $image->limitColors(null, '#' . $background);

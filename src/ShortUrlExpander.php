@@ -72,8 +72,8 @@ class ShortUrlExpander
     /**
      * Convert param shortcuts to full request GET params.
      *
-     * @param  string $queryString
-     * @param  string $filename
+     * @param string $queryString
+     * @param string $filename
      */
     public function injectParamsToRequest($queryString, $filename)
     {
