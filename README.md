@@ -304,12 +304,12 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
 
 With default quality to 90%
 
-| Url | PHP raw | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) |
-| --- | ------- | ----------------- | --------- | ------------------ | 
-| /?image=/images/testUHD.jpg&width=2300 | 405 kB | 187 kB | 395 kB | 390 kB |
-| /?image=/images/testUHD.jpg&width=1920 | 294 kB | 134 kB | 285 kB | 282 kB |
-| /?image=/images/rhino.jpg&width=1920 | 642 kB | 534 kB | 598 kB | 596 kB |
-| /?image=/images/rhino.jpg&width=1280 | 325 kB | 278 kB | 303 kB | 301 kB |
+| Url | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) |
+| --- | ------- | -------------- | ------------------- | --------- | ------------------ | 
+| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB |
+| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB |
+| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB |
+| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB |
 
 ## License
 
