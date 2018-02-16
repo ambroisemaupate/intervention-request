@@ -20,14 +20,15 @@
     ],
     "require": {
         "intervention/image": "~2.3",
-        "symfony/http-foundation": "~2.8 || ~3.2",
-        "symfony/console": "~2.8 || ~3.2",
-        "symfony/finder": "~2.8 || ~3.2",
-        "symfony/filesystem": "~2.8 || ~3.2",
-        "symfony/event-dispatcher": "~2.8 || ~3.2",
-        "symfony/process": "~2.8 || ~3.2",
+        "symfony/http-foundation": "~2.8 || ~3.4",
+        "symfony/console": "~2.8 || ~3.4",
+        "symfony/finder": "~2.8 || ~3.4",
+        "symfony/filesystem": "~2.8 || ~3.4",
+        "symfony/event-dispatcher": "~2.8 || ~3.4",
+        "symfony/process": "~2.8 || ~3.4",
         "monolog/monolog": "~1.22",
-        "kraken-io/kraken-php": "^1.6"
+        "kraken-io/kraken-php": "^1.6",
+        "tinify/tinify": "^1.5"
     },
     "autoload": {
         "psr-4": {

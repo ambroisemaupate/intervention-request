@@ -230,6 +230,7 @@ Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to regis
 
 - `WatermarkListener` will print text on your image
 - `KrakenListener` will optimize your image file using *kraken.io* external service
+- `TinifyListener` will optimize your image file using *tinyjpg.com* external service
 - `JpegTranListener` will optimize your image file using local `jpegtran` binary
 
 Of course you can build your own listeners and share them with us!
