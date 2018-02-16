@@ -276,13 +276,25 @@ $conf->setPngquantPath('/usr/local/bin/pngquant');
 If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated 
 `KrakenListener` to send your resized images over the external service.
 
-Make sure that you have loaded *suggested* Composer package `kraken-io/kraken-php`. It is not available by default.
-
 ```php
 $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\KrakenListener(
     'your-api-key', 
     'your-api-secret', 
     true,
+    $log
+));
+```
+
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+
+### tinyjpg.com
+
+If you have subscribed to a paid [tinyjpg.com](https://tinyjpg.com) plan, you can add the dedicated 
+`TinifyListener` to send your resized images over the external service.
+
+```php
+$iRequest->addSubscriber(new \AM\InterventionRequest\Listener\TinifyListener(
+    'your-api-key',
     $log
 ));
 ```
