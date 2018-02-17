@@ -25,6 +25,7 @@ namespace AM\InterventionRequest\Cache;
 
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -59,6 +60,21 @@ class PassThroughFileCache extends FileCache
             $gcProbability,
             $useFileChecksum
         );
+
+        /*
+         * Check that cache folder is really used in request
+         */
+        $cacheFolder = str_replace($this->request->server->get('DOCUMENT_ROOT'), '', $this->cachePath);
+        $cacheFolderRegex = '#^' . preg_quote($cacheFolder) . '#';
+        if (0 === preg_match($cacheFolderRegex, $this->request->getPathInfo())) {
+            if ($logger !== null) {
+                $logger->error('Cache path was not found in your request path info.', [
+                    'pathInfo' => $this->request->getPathInfo(),
+                    'cacheRegex' => $cacheFolderRegex,
+                ]);
+            }
+            throw new FileNotFoundException('Cache path was not found in your request path info.');
+        }
 
         $this->cacheFilePath = $this->request->server->get('DOCUMENT_ROOT') . $this->request->getPathInfo();
     }

@@ -68,7 +68,8 @@ class ShortUrlExpander
         $pathInfo = $this->request->getPathInfo();
 
         if ($this->ignorePath !== '') {
-            $pathInfo = str_replace($this->ignorePath, '', $pathInfo);
+            $ignoreRegex = '#^' . preg_quote($this->ignorePath) . '#';
+            $pathInfo = preg_replace($ignoreRegex, '', $pathInfo);
         }
 
         if (preg_match(
