@@ -26,6 +26,7 @@
 namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
+use AM\InterventionRequest\Cache\PassThroughFileCache;
 use AM\InterventionRequest\Event\ImageProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
@@ -144,6 +145,39 @@ class InterventionRequest
     }
 
     /**
+     * @param Request $request
+     * @return FileCache|PassThroughFileCache
+     */
+    protected function getCache(Request $request)
+    {
+        if ($this->configuration->isUsingPassThroughCache()) {
+            $cache = new PassThroughFileCache(
+                $request,
+                $this->nativeImage,
+                $this->configuration->getCachePath(),
+                $this->logger,
+                $this->quality,
+                $this->configuration->getTtl(),
+                $this->configuration->getGcProbability(),
+                $this->configuration->getUseFileChecksum()
+            );
+        } else {
+            $cache = new FileCache(
+                $request,
+                $this->nativeImage,
+                $this->configuration->getCachePath(),
+                $this->logger,
+                $this->quality,
+                $this->configuration->getTtl(),
+                $this->configuration->getGcProbability(),
+                $this->configuration->getUseFileChecksum()
+            );
+        }
+        $cache->setDispatcher($this->dispatcher);
+        return $cache;
+    }
+
+    /**
      * Handle request to convert it to a Response object.
      * @param Request $request
      */
@@ -159,17 +193,7 @@ class InterventionRequest
             $this->parseQuality($request);
 
             if ($this->configuration->hasCaching()) {
-                $cache = new FileCache(
-                    $request,
-                    $this->nativeImage,
-                    $this->configuration->getCachePath(),
-                    $this->logger,
-                    $this->quality,
-                    $this->configuration->getTtl(),
-                    $this->configuration->getGcProbability(),
-                    $this->configuration->getUseFileChecksum()
-                );
-                $cache->setDispatcher($this->dispatcher);
+                $cache = $this->getCache($request);
 
                 /** @var Response response */
                 $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) use ($request) {
@@ -183,7 +207,7 @@ class InterventionRequest
                     [
                         'Content-Type' => $this->image->mime(),
                         'Content-Disposition' => 'filename="' . $this->nativeImage->getFilename() . '"',
-                        'X-Generator-First-Render' => true,
+                        'X-Generator-No-Cache' => true,
                     ]
                 );
                 $this->response->setLastModified(new \DateTime('now'));

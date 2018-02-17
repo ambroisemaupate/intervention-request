@@ -141,6 +141,31 @@ if (null !== $params) {
 }
 ```
 
+## Use pass-through cache
+
+Intervention request can save your images in a public folder to let *Apache* or *Nginx* serve them once they’ve been generated. This can reduce *time-to-first-byte* as PHP is not called any more.
+
+- Make sure you have configured *Apache* or *Nginx* to serve real files **before** proxying your request to PHP. Otherwise this could lead to file overwriting!
+- Pass-through cache is only available if you are using `ShortUrlExpander` to mimic a real image path without any query-string.
+- Your cache folder **must** be public (in your document root), so your documents will be visible to anyone. If your images must be protected behind a PHP firewall, you should not activate *pass-through* cache.
+- Garbage collector won’t be called, so you will need to purge manually your cache.
+- Pass-through cache will save image for the first time at the real path used in your request, make sure it won’t overwrite any application file.
+
+Define your configuration cache path to a public folder:
+
+```php
+$conf = new Configuration();
+$conf->setCachePath(APP_ROOT . '/cache');
+$conf->setUsePassThroughCache(true);
+```
+
+Then enable the `ShortUrlExpander` and **ignore your cache path** to process only path info after it.
+```php
+$expander = new ShortUrlExpander($request);
+// Enables using /cache in request path to mimic a pass-through file serve.
+$expander->setIgnorePath('/cache');
+```
+
 ### Shortcuts
 
 URL shortcuts can be combined using `-` (dash) character.
@@ -329,4 +354,14 @@ With default quality to 90%
 
 Have fun!
 
+
+## Testing 
+
+Copy `index.php` to `dev.php` then launch PHP server command using `test/router.php` as router.
+
+```bash
+php -S 0.0.0.0:8080 test/router.php
+```
+
+Then open `http://0.0.0.0:8080/w300/images/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
 
