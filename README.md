@@ -3,6 +3,8 @@
 **A customizable *Intervention Image* wrapper to use simple image re-sampling features over urls and a configurable cache.**
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
+[![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
+[![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 
 * [Install](#install)
 * [Configuration](#configuration)
@@ -56,6 +58,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 
 - `setCaching(true|false)`: use or not request cache to store generated images on filesystem (default: `true`);
 - `setCachePath(string)`: image cache folder path;
+- `setUsePassThroughCache(true|false)`: use or not *pass-through* cache to by-pass PHP processing once image is generated;
 - `setDefaultQuality(int)`: default 90, set the quality amount when user does not specify it;
 - `setImagesPath(string)`: requested images root path;
 - `setTtl(integer)`: cache images time to live;
@@ -158,6 +161,8 @@ use AM\InterventionRequest\ShortUrlExpander;
  * Handle short url with Url rewriting
  */
 $expander = new ShortUrlExpander($request);
+// Enables using /cache in request path to mimic a pass-through file serve.
+//$expander->setIgnorePath('/cache');
 $params = $expander->parsePathInfo();
 if (null !== $params) {
     // this will convert rewritten path to request with query params
