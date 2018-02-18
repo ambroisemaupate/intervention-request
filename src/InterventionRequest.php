@@ -189,7 +189,7 @@ class InterventionRequest
             }
 
             $nativePath = $this->configuration->getImagesPath() . '/' . $request->query->get('image');
-            $this->nativeImage = new File($nativePath);
+            $this->nativeImage = new WebpFile($nativePath);
             $this->parseQuality($request);
 
             if ($this->configuration->hasCaching()) {

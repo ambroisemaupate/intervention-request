@@ -1,8 +1,8 @@
 {
     "name": "ambroisemaupate/intervention-request",
-    "description":"A customizable Intervention-Image wrapper to use simple resample features over urls.",
+    "description":"A customizable Intervention Image wrapper to use simple image re-sampling features over urls and a configurable cache.",
     "license":"MIT",
-    "type": "project",
+    "type": "library",
     "keywords": [
         "image manipulation",
         "url",
@@ -19,6 +19,8 @@
         }
     ],
     "require": {
+        "php": ">=5.6.0",
+        "ext-gd": "*",
         "intervention/image": "~2.4",
         "symfony/http-foundation": "~2.8 || ~3.4",
         "symfony/console": "~2.8 || ~3.4",
@@ -29,6 +31,9 @@
         "monolog/monolog": "~1.22",
         "kraken-io/kraken-php": "^1.6",
         "tinify/tinify": "^1.5"
+    },
+    "suggest" : {
+        "ext-imagick": "Allow TIFF images to be implicitly converted to jpeg."
     },
     "autoload": {
         "psr-4": {

@@ -1,13 +1,13 @@
 # Intervention Request
 
-**A customizable *Intervention Image* wrapper to use simple resample features over urls.**
+**A customizable *Intervention Image* wrapper to use simple image re-sampling features over urls and a configurable cache.**
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
 
 ## Install
 
 ```shell
-composer install --no-dev -o
+composer require ambroisemaupate/intervention-request
 ```
 
 Intervention Request is based on *symfony/http-foundation* component for handling
@@ -165,6 +165,16 @@ $expander = new ShortUrlExpander($request);
 // Enables using /cache in request path to mimic a pass-through file serve.
 $expander->setIgnorePath('/cache');
 ```
+
+## Convert to webp
+
+**Make sure your PHP is compiled with WebP image format.**
+
+Intervention Request can automatically generated webp images by appending `.webp` to an existing image file.
+
+Use `/image.jpg.webp` for `/image.jpg` file.
+
+Intervention Request will look for a image file without `.webp` extension and throw a 404 error if it does not exist.
 
 ### Shortcuts
 
