@@ -4,6 +4,30 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
 
+* [Install](#install)
+* [Configuration](#configuration)
+* [Available operations](#available-operations)
+* [Using standalone entry point](#using-standalone-entry-point)
+* [Using as a library inside your projects](#using-as-a-library-inside-your-projects)
+* [Use URL rewriting](#use-url-rewriting)
+    + [Shortcuts](#shortcuts)
+* [Use pass-through cache](#use-pass-through-cache)
+* [Convert to webp](#convert-to-webp)
+* [Force garbage collection](#force-garbage-collection)
+    + [Using command-line](#using-command-line)
+* [Extend Intervention Request](#extend-intervention-request)
+    + [Add custom event subscribers](#add-custom-event-subscribers)
+* [Performances](#performances)
+* [Optimization](#optimization)
+    + [jpegoptim](#jpegoptim)
+    + [pngquant](#pngquant)
+    + [kraken.io](#krakenio)
+    + [tinyjpg.com](#tinyjpgcom)
+    + [jpegtran](#jpegtran)
+    + [Benchmark](#optimization-benchmark)
+* [License](#license)
+* [Testing](#testing)
+
 ## Install
 
 ```shell
@@ -141,6 +165,27 @@ if (null !== $params) {
 }
 ```
 
+### Shortcuts
+
+URL shortcuts can be combined using `-` (dash) character.
+For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&progressive=0`.
+
+|  Query attribute  |  Shortcut letter  |
+| ----------------- | ------------- |
+| fit | f |
+| crop | c |
+| width | w |
+| height | h |
+| background | b |
+| greyscale | g |
+| blur | l |
+| quality | q |
+| progressive | p |
+| interlace | i |
+| sharpen | s |
+| contrast *(only from 0 to 100)* | k |
+
+
 ## Use pass-through cache
 
 Intervention request can save your images in a public folder to let *Apache* or *Nginx* serve them once they’ve been generated. This can reduce *time-to-first-byte* as PHP is not called any more.
@@ -175,26 +220,6 @@ Intervention Request can automatically generated webp images by appending `.webp
 Use `/image.jpg.webp` for `/image.jpg` file.
 
 Intervention Request will look for a image file without `.webp` extension and throw a 404 error if it does not exist.
-
-### Shortcuts
-
-URL shortcuts can be combined using `-` (dash) character.
-For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&progressive=0`.
-
-|  Query attribute  |  Shortcut letter  |
-| ----------------- | ------------- |
-| fit | f |
-| crop | c |
-| width | w |
-| height | h |
-| background | b |
-| greyscale | g |
-| blur | l |
-| quality | q |
-| progressive | p |
-| interlace | i |
-| sharpen | s |
-| contrast *(only from 0 to 100)* | k |
 
 ## Force garbage collection
 
@@ -374,4 +399,6 @@ php -S 0.0.0.0:8080 test/router.php
 ```
 
 Then open `http://0.0.0.0:8080/w300/images/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
+
+If you enabled *pass-through* cache, uncomment lines 46 and 55 and open `http://0.0.0.0:8080/cache/w300/images/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
 
