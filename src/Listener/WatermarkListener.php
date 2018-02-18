@@ -27,6 +27,7 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
+use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 
 class WatermarkListener implements ImageEventSubscriberInterface
@@ -96,14 +97,19 @@ class WatermarkListener implements ImageEventSubscriberInterface
         $image = $event->getImage();
         if ($this->supports($image)) {
             // use callback to define details
-            $image->text($this->watermarkText, $image->getWidth()/2, $image->getHeight()/2, function($font) {
-                $font->file($this->fontFile);
-                $font->size($this->size);
-                $font->color($this->color);
-                $font->align($this->align);
-                $font->valign($this->valign);
-                $font->angle($this->angle);
-            });
+            $image->text(
+                $this->watermarkText,
+                $image->getWidth()/2,
+                $image->getHeight()/2,
+                function(AbstractFont $font) {
+                    $font->file($this->fontFile);
+                    $font->size($this->size);
+                    $font->color($this->color);
+                    $font->align($this->align);
+                    $font->valign($this->valign);
+                    $font->angle($this->angle);
+                }
+            );
 
             $event->setImage($image);
         }

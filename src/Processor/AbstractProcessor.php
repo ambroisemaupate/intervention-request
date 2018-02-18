@@ -42,7 +42,6 @@ abstract class AbstractProcessor
      *
      * @param  Image $image
      * @param Request $request
-     * @return
      */
     public abstract function process(Image $image, Request $request);
 }

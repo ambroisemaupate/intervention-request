@@ -34,6 +34,8 @@ class ShortUrlExpander
 {
     protected $request;
 
+    protected $ignorePath;
+
     protected static $operations = array(
         'c' => 'crop',
         'w' => 'width',
@@ -53,16 +55,28 @@ class ShortUrlExpander
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->ignorePath = '';
     }
 
     /**
-     * Parse query stirg and filename from request pathinfo.
+     * Parse query string and filename from request path-info.
      *
      * @return array|null
      */
     public function parsePathInfo()
     {
-        if (preg_match('#(?P<queryString>[a-zA-Z:0-9\\-]+)/(?P<filename>[a-zA-Z0-9\\-_\\./]+)$#s', $this->request->getPathInfo(), $matches)) {
+        $pathInfo = $this->request->getPathInfo();
+
+        if ($this->ignorePath !== '') {
+            $ignoreRegex = '#^' . preg_quote($this->ignorePath) . '#';
+            $pathInfo = preg_replace($ignoreRegex, '', $pathInfo);
+        }
+
+        if (preg_match(
+            '#(?P<queryString>[a-zA-Z:0-9\\-]+)/(?P<filename>[a-zA-Z0-9\\-_\\./]+)$#s',
+            $pathInfo,
+            $matches
+        )) {
             return $matches;
         } else {
             return null;
@@ -90,5 +104,15 @@ class ShortUrlExpander
                 );
             }
         }
+    }
+
+    /**
+     * @param string $ignorePath
+     * @return ShortUrlExpander
+     */
+    public function setIgnorePath($ignorePath)
+    {
+        $this->ignorePath = $ignorePath;
+        return $this;
     }
 }

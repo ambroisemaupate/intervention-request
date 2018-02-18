@@ -1,13 +1,39 @@
 # Intervention Request
 
-**A customizable *Intervention Image* wrapper to use simple resample features over urls.**
+**A customizable *Intervention Image* wrapper to use simple image re-sampling features over urls and a configurable cache.**
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
+[![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
+[![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
+
+* [Install](#install)
+* [Configuration](#configuration)
+* [Available operations](#available-operations)
+* [Using standalone entry point](#using-standalone-entry-point)
+* [Using as a library inside your projects](#using-as-a-library-inside-your-projects)
+* [Use URL rewriting](#use-url-rewriting)
+    + [Shortcuts](#shortcuts)
+* [Use pass-through cache](#use-pass-through-cache)
+* [Convert to webp](#convert-to-webp)
+* [Force garbage collection](#force-garbage-collection)
+    + [Using command-line](#using-command-line)
+* [Extend Intervention Request](#extend-intervention-request)
+    + [Add custom event subscribers](#add-custom-event-subscribers)
+* [Performances](#performances)
+* [Optimization](#optimization)
+    + [jpegoptim](#jpegoptim)
+    + [pngquant](#pngquant)
+    + [kraken.io](#krakenio)
+    + [tinyjpg.com](#tinyjpgcom)
+    + [jpegtran](#jpegtran)
+    + [Benchmark](#optimization-benchmark)
+* [License](#license)
+* [Testing](#testing)
 
 ## Install
 
 ```shell
-composer install --no-dev -o
+composer require ambroisemaupate/intervention-request
 ```
 
 Intervention Request is based on *symfony/http-foundation* component for handling
@@ -32,6 +58,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 
 - `setCaching(true|false)`: use or not request cache to store generated images on filesystem (default: `true`);
 - `setCachePath(string)`: image cache folder path;
+- `setUsePassThroughCache(true|false)`: use or not *pass-through* cache to by-pass PHP processing once image is generated;
 - `setDefaultQuality(int)`: default 90, set the quality amount when user does not specify it;
 - `setImagesPath(string)`: requested images root path;
 - `setTtl(integer)`: cache images time to live;
@@ -134,6 +161,8 @@ use AM\InterventionRequest\ShortUrlExpander;
  * Handle short url with Url rewriting
  */
 $expander = new ShortUrlExpander($request);
+// Enables using /cache in request path to mimic a pass-through file serve.
+//$expander->setIgnorePath('/cache');
 $params = $expander->parsePathInfo();
 if (null !== $params) {
     // this will convert rewritten path to request with query params
@@ -160,6 +189,42 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | interlace | i |
 | sharpen | s |
 | contrast *(only from 0 to 100)* | k |
+
+
+## Use pass-through cache
+
+Intervention request can save your images in a public folder to let *Apache* or *Nginx* serve them once they’ve been generated. This can reduce *time-to-first-byte* as PHP is not called any more.
+
+- Make sure you have configured *Apache* or *Nginx* to serve real files **before** proxying your request to PHP. Otherwise this could lead to file overwriting!
+- Pass-through cache is only available if you are using `ShortUrlExpander` to mimic a real image path without any query-string.
+- Your cache folder **must** be public (in your document root), so your documents will be visible to anyone. If your images must be protected behind a PHP firewall, you should not activate *pass-through* cache.
+- Garbage collector won’t be called, so you will need to purge manually your cache.
+- Pass-through cache will save image for the first time at the real path used in your request, make sure it won’t overwrite any application file.
+
+Define your configuration cache path to a public folder:
+
+```php
+$conf = new Configuration();
+$conf->setCachePath(APP_ROOT . '/cache');
+$conf->setUsePassThroughCache(true);
+```
+
+Then enable the `ShortUrlExpander` and **ignore your cache path** to process only path info after it.
+```php
+$expander = new ShortUrlExpander($request);
+// Enables using /cache in request path to mimic a pass-through file serve.
+$expander->setIgnorePath('/cache');
+```
+
+## Convert to webp
+
+**Make sure your PHP is compiled with WebP image format.**
+
+Intervention Request can automatically generated webp images by appending `.webp` to an existing image file.
+
+Use `/image.jpg.webp` for `/image.jpg` file.
+
+Intervention Request will look for a image file without `.webp` extension and throw a 404 error if it does not exist.
 
 ## Force garbage collection
 
@@ -230,6 +295,7 @@ Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to regis
 
 - `WatermarkListener` will print text on your image
 - `KrakenListener` will optimize your image file using *kraken.io* external service
+- `TinifyListener` will optimize your image file using *tinyjpg.com* external service
 - `JpegTranListener` will optimize your image file using local `jpegtran` binary
 
 Of course you can build your own listeners and share them with us!
@@ -275,13 +341,25 @@ $conf->setPngquantPath('/usr/local/bin/pngquant');
 If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated 
 `KrakenListener` to send your resized images over the external service.
 
-Make sure that you have loaded *suggested* Composer package `kraken-io/kraken-php`. It is not available by default.
-
 ```php
 $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\KrakenListener(
     'your-api-key', 
     'your-api-secret', 
     true,
+    $log
+));
+```
+
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+
+### tinyjpg.com
+
+If you have subscribed to a paid [tinyjpg.com](https://tinyjpg.com) plan, you can add the dedicated 
+`TinifyListener` to send your resized images over the external service.
+
+```php
+$iRequest->addSubscriber(new \AM\InterventionRequest\Listener\TinifyListener(
+    'your-api-key',
     $log
 ));
 ```
@@ -303,12 +381,12 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
 
 With default quality to 90%
 
-| Url | PHP raw | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) |
-| --- | ------- | ----------------- | --------- | ------------------ | 
-| /?image=/images/testUHD.jpg&width=2300 | 405 kB | 187 kB | 395 kB | 390 kB |
-| /?image=/images/testUHD.jpg&width=1920 | 294 kB | 134 kB | 285 kB | 282 kB |
-| /?image=/images/rhino.jpg&width=1920 | 642 kB | 534 kB | 598 kB | 596 kB |
-| /?image=/images/rhino.jpg&width=1280 | 325 kB | 278 kB | 303 kB | 301 kB |
+| Url | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) |
+| --- | ------- | -------------- | ------------------- | --------- | ------------------ | 
+| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB |
+| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB |
+| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB |
+| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB |
 
 ## License
 
@@ -316,4 +394,16 @@ With default quality to 90%
 
 Have fun!
 
+
+## Testing 
+
+Copy `index.php` to `dev.php` then launch PHP server command using `test/router.php` as router.
+
+```bash
+php -S 0.0.0.0:8080 test/router.php
+```
+
+Then open `http://0.0.0.0:8080/w300/images/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
+
+If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8080/cache/w300/images/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
 

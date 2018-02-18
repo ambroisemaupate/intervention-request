@@ -35,6 +35,10 @@ class Configuration
      */
     protected $caching = true;
     /**
+     * @var bool
+     */
+    protected $usePassThroughCache = false;
+    /**
      * @var string
      */
     protected $cachePath;
@@ -324,6 +328,24 @@ class Configuration
     {
         $this->useFileChecksum = (boolean) $useFileChecksum;
 
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUsingPassThroughCache()
+    {
+        return $this->usePassThroughCache;
+    }
+
+    /**
+     * @param bool $usePassThroughCache
+     * @return Configuration
+     */
+    public function setUsePassThroughCache($usePassThroughCache)
+    {
+        $this->usePassThroughCache = $usePassThroughCache;
         return $this;
     }
 }
