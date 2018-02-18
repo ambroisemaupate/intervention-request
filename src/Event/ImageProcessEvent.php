@@ -30,5 +30,4 @@ class ImageProcessEvent extends ImageEvent
 {
     const BEFORE_PROCESS = 'image.before_process';
     const AFTER_PROCESS = 'image.after_process';
-
 }

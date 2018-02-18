@@ -46,6 +46,7 @@ $conf->setCachePath(APP_ROOT . '/cache');
 //$conf->setUsePassThroughCache(true);
 $conf->setImagesPath(APP_ROOT . '/test');
 $conf->setUseFileChecksum(false);
+//$conf->setDriver('imagick');
 
 /*
  * Handle short url with Url rewriting

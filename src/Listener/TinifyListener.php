@@ -27,12 +27,11 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Exception;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
-use Tinify\Tinify;
 use Tinify\AccountException;
 use Tinify\Source;
+use Tinify\Tinify;
 
 /**
  * Class TinifyListener
@@ -94,6 +93,9 @@ class TinifyListener implements ImageEventSubscriberInterface
 
             $source = \Tinify\fromFile($event->getImageFile()->getPathname());
             $this->overrideImageFile($event->getImageFile()->getPathname(), $source);
+            if (null !== $this->logger) {
+                $this->logger->debug("Used tinify.io to minify file.", $event->getImageFile()->getPathname());
+            }
         }
     }
 
