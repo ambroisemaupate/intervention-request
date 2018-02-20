@@ -114,7 +114,7 @@ class FileCache
         $useFileChecksum = false
     ) {
         $this->request = $request;
-        $this->cachePath = $cachePath;
+        $this->cachePath = realpath($cachePath);
         $this->logger = $logger;
         $this->realImage = $realImage;
         $this->quality = $quality;
