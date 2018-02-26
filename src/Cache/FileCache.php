@@ -25,6 +25,7 @@
  */
 namespace AM\InterventionRequest\Cache;
 
+use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\InterventionRequest;
 use Closure;
@@ -91,6 +92,10 @@ class FileCache
         'png',
         'psd',
     );
+    /**
+     * @var ImageEncoder
+     */
+    private $imageEncoder;
 
     /**
      * FileCache constructor.
@@ -120,6 +125,7 @@ class FileCache
         $this->quality = $quality;
         $this->ttl = $ttl;
         $this->gcProbability = $gcProbability;
+        $this->imageEncoder = new ImageEncoder();
 
         /*
          * Get file MD5 to check real image integrity
@@ -141,21 +147,12 @@ class FileCache
 
         $this->cacheFilePath = $cachePath .
         '/' . implode('/', str_split($cacheHash, 2)) .
-        '.' . $this->getExtension();
-    }
-
-    protected function getExtension()
-    {
-        $extension = 'jpg';
-        if (in_array(strtolower($this->realImage->getExtension()), static::$allowedExtensions)) {
-            $extension = strtolower($this->realImage->getExtension());
-        }
-
-        return $extension;
+        '.' . $this->imageEncoder->getImageAllowedExtension($this->realImage->getRealPath());
     }
 
     /**
      * @param Image $image
+     * @return Image
      */
     public function saveImage(Image $image)
     {
@@ -163,7 +160,7 @@ class FileCache
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
-        $image->save($this->cacheFilePath, $this->quality);
+        return $this->imageEncoder->save($image, $this->cacheFilePath, $this->quality);
     }
 
     /**
