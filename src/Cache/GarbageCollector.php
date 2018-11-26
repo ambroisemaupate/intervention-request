@@ -82,7 +82,6 @@ class GarbageCollector
 
         foreach ($finder as $file) {
             if (!$file->isDir()) {
-
                 $this->fs->remove($file->getPathName());
                 if (null !== $this->logger) {
                     $this->logger->info('GC purge image cache file.', ['file' => $file->getPathname()]);

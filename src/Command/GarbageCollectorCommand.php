@@ -88,7 +88,6 @@ class GarbageCollectorCommand extends Command
             }
             $gc->launch();
             $text .= "<info>Garbage collection finished.</info>" . PHP_EOL;
-
         } else {
             $text .= "<error>Cache directory does not exist.</error>" . PHP_EOL;
         }

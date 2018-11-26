@@ -57,7 +57,6 @@ class UnlockGarbageCollectorCommand extends Command
                 unlink($gc->getLockPath());
             }
             $text .= "<info>Garbage collection unlocked.</info>" . PHP_EOL;
-
         } else {
             $text .= "<error>Cache directory does not exist.</error>" . PHP_EOL;
         }

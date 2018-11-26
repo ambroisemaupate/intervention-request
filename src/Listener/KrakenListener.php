@@ -152,11 +152,11 @@ class KrakenListener implements ImageEventSubscriberInterface
         /**
          * Execute the cURL session
          */
-        curl_exec ($ch);
+        curl_exec($ch);
         /**
          * Close cURL session and file
          */
-        curl_close ($ch);
+        curl_close($ch);
         fclose($fp);
     }
 }

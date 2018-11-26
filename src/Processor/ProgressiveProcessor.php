@@ -41,7 +41,6 @@ class ProgressiveProcessor extends AbstractProcessor
     {
         if ($request->query->has('progressive') ||
             $request->query->has('interlace')) {
-
             $process = $request->query->has('progressive') ?
                                         $request->query->get('progressive') :
                                         $request->query->get('interlace');

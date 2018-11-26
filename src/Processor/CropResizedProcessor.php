@@ -44,7 +44,6 @@ class CropResizedProcessor extends AbstractProcessor
         if ($request->query->has('crop') &&
             1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop'), $crop) &&
             ($request->query->has('width') || $request->query->has('height'))) {
-
             $fitRatio = (float) $crop[1] / (float) $crop[2];
 
             if ($request->query->has('width')) {

@@ -23,7 +23,6 @@
 
 namespace AM\InterventionRequest\Cache;
 
-
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;

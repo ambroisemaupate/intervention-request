@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file AbstractProcessor.php
+ * @file FitProcessor.php
  * @author Ambroise Maupate
  */
 namespace AM\InterventionRequest\Processor;
@@ -29,19 +29,19 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Define an abstract image processor class.
  *
- * Extend this class if you want to create your own
- * image processor. All your process should be contained in
- * `process` method.
  */
-abstract class AbstractProcessor
+class FlipProcessor extends AbstractProcessor
 {
     /**
-     * Execute image intervention operations.
-     *
-     * @param  Image $image
+     * @param Image $image
      * @param Request $request
      */
-    abstract public function process(Image $image, Request $request);
+    public function process(Image $image, Request $request)
+    {
+        if ($request->query->has('flip') &&
+            1 === preg_match('#^(h|v)$#', $request->query->get('flip'), $fit)) {
+            $image->flip($fit[1]);
+        }
+    }
 }
