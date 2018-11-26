@@ -110,6 +110,7 @@ class InterventionRequest
         if (null === $processors) {
             $this->processors = [
                 new Processor\RotateProcessor(),
+                new Processor\FlipProcessor(),
                 new Processor\CropResizedProcessor(),
                 new Processor\FitProcessor(),
                 new Processor\CropProcessor(),
@@ -185,7 +186,7 @@ class InterventionRequest
     {
         try {
             if (!$request->query->has('image')) {
-                throw new FileNotFoundException("No valid image path found in URI");
+                throw new \InvalidArgumentException("No valid image path found in URI");
             }
 
             $nativePath = $this->configuration->getImagesPath() . '/' . $request->query->get('image');

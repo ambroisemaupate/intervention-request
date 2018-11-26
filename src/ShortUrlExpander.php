@@ -44,6 +44,7 @@ class ShortUrlExpander
         'l' => 'blur',
         'q' => 'quality',
         'f' => 'fit',
+        'm' => 'flip', // m for mirror
         'r' => 'rotate',
         'b' => 'background',
         'i' => 'interlace',

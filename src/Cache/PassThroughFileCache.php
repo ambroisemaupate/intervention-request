@@ -73,7 +73,7 @@ class PassThroughFileCache extends FileCache
                     'cacheRegex' => $cacheFolderRegex,
                 ]);
             }
-            throw new FileNotFoundException('Cache path was not found in your request path info.');
+            throw new FileNotFoundException($this->request->getPathInfo());
         }
 
         $this->cacheFilePath = $this->request->server->get('DOCUMENT_ROOT') . $this->request->getPathInfo();
