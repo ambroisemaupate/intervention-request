@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2015, Ambroise Maupate
+ * Copyright © 2018, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,7 @@ class ShortUrlExpander
         'l' => 'blur',
         'q' => 'quality',
         'f' => 'fit',
+        'm' => 'flip', // m for mirror
         'r' => 'rotate',
         'b' => 'background',
         'i' => 'interlace',

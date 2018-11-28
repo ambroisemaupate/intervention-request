@@ -40,5 +40,8 @@
             "AM\\InterventionRequest\\": "src/"
         }
     },
-    "bin": ["bin/intervention", "bin/intervention.php"]
+    "bin": ["bin/intervention", "bin/intervention.php"],
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.3"
+    }
 }

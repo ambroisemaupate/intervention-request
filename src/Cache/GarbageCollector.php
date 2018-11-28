@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2015, Ambroise Maupate
+ * Copyright © 2018, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,6 @@ class GarbageCollector
 
         foreach ($finder as $file) {
             if (!$file->isDir()) {
-
                 $this->fs->remove($file->getPathName());
                 if (null !== $this->logger) {
                     $this->logger->info('GC purge image cache file.', ['file' => $file->getPathname()]);

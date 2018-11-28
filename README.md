@@ -76,6 +76,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 | ----------------- | ------------- | ------------- |
 | image | Native image path relative to your configuration `imagePath` | `?image=path/to/image.jpg` |
 | fit | [Crop and resize combined](http://image.intervention.io/api/fit) It needs a `width` and a `height` in pixels | `…&fit=300x300` |
+| flip | [Mirror image horizontal or vertical](http://image.intervention.io/api/flip) You can set `h` for horizontal or `v` for vertical flip. | `…&flip=h` |
 | crop | [Crop an image](http://image.intervention.io/api/crop) It needs a `width` and a `height` in pixels | `…&crop=300x300` |
 | width | [Resize image proportionally to given width](http://image.intervention.io/api/widen) It needs a `width` in pixels | `…&width=300` |
 | height | [Resize image proportionally to given height](http://image.intervention.io/api/heighten) It needs a `height` in pixels | `…&height=300` |
@@ -178,6 +179,7 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 |  Query attribute  |  Shortcut letter  |
 | ----------------- | ------------- |
 | fit | f |
+| flip | m |
 | crop | c |
 | width | w |
 | height | h |
@@ -381,12 +383,12 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
 
 With default quality to 90%
 
-| Url | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) |
-| --- | ------- | -------------- | ------------------- | --------- | ------------------ | 
-| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB |
-| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB |
-| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB |
-| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB |
+| Url | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) |
+| --- | ------- | -------------- | ------------------- | --------- | ------------------ | ---- | ---- |
+| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB | 235 kB | 155 kB |
+| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB | 176 kB | 115 kB |
+| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB | 564 kB | 429 kB |
+| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB | 295 kB | 229 kB |
 
 ## License
 

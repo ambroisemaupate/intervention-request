@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2015, Ambroise Maupate
+ * Copyright © 2018, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,5 +43,5 @@ abstract class AbstractProcessor
      * @param  Image $image
      * @param Request $request
      */
-    public abstract function process(Image $image, Request $request);
+    abstract public function process(Image $image, Request $request);
 }

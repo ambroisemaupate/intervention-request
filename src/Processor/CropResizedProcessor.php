@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2015, Ambroise Maupate
+ * Copyright © 2018, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,6 @@ class CropResizedProcessor extends AbstractProcessor
         if ($request->query->has('crop') &&
             1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop'), $crop) &&
             ($request->query->has('width') || $request->query->has('height'))) {
-
             $fitRatio = (float) $crop[1] / (float) $crop[2];
 
             if ($request->query->has('width')) {

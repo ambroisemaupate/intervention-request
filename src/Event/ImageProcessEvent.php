@@ -25,7 +25,6 @@
  */
 namespace AM\InterventionRequest\Event;
 
-
 class ImageProcessEvent extends ImageEvent
 {
     const BEFORE_PROCESS = 'image.before_process';

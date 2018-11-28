@@ -101,7 +101,7 @@ class WatermarkListener implements ImageEventSubscriberInterface
                 $this->watermarkText,
                 $image->getWidth()/2,
                 $image->getHeight()/2,
-                function(AbstractFont $font) {
+                function (AbstractFont $font) {
                     $font->file($this->fontFile);
                     $font->size($this->size);
                     $font->color($this->color);

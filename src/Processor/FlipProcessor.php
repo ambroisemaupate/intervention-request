@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file LimitColorsProcessor.php
+ * @file FitProcessor.php
  * @author Ambroise Maupate
  */
 namespace AM\InterventionRequest\Processor;
@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class LimitColorsProcessor extends AbstractProcessor
+class FlipProcessor extends AbstractProcessor
 {
     /**
      * @param Image $image
@@ -39,15 +39,9 @@ class LimitColorsProcessor extends AbstractProcessor
      */
     public function process(Image $image, Request $request)
     {
-        if ($request->query->has('background') ||
-            $request->query->has('limit_color')) {
-            $background = $request->query->has('background') ?
-                                        $request->query->get('background') :
-                                        $request->query->get('limit_color');
-
-            if (1 === preg_match('#^([0-9a-f]{6})$#', $background)) {
-                $image->limitColors(null, '#' . $background);
-            }
+        if ($request->query->has('flip') &&
+            1 === preg_match('#^(h|v)$#', $request->query->get('flip'), $fit)) {
+            $image->flip($fit[1]);
         }
     }
 }
