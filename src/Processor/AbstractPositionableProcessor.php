@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2018, Ambroise Maupate
+ * Copyright © 2019, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file FitProcessor.php
+ * @file AbstractProcessor.php
  * @author Ambroise Maupate
  */
 namespace AM\InterventionRequest\Processor;
 
-use Intervention\Image\Image;
-use Intervention\Image\Constraint;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- *
- */
-class FitProcessor extends AbstractPositionableProcessor
+abstract class AbstractPositionableProcessor extends AbstractProcessor
 {
     /**
-     * @param Image $image
      * @param Request $request
+     * @return string
      */
-    public function process(Image $image, Request $request)
+    protected function parsePosition(Request $request)
     {
-        if ($request->query->has('fit') &&
-            !$request->query->has('width') &&
-            !$request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('fit'), $fit)) {
-            $image->fit($fit[1], $fit[2], function (Constraint $constraint) {
-                $constraint->upsize();
-            }, $this->parsePosition($request));
+        $alignment = 'center';
+        if ($request->query->has('align')) {
+            $alignment = $request->query->get('align', 'c');
+            $availablePosition = [
+                'tl' => 'top-left',
+                't' => 'top',
+                'tr' => 'top-right',
+                'l' => 'left',
+                'c' => 'center',
+                'r' => 'right',
+                'bl' => 'bottom-left',
+                'b' => 'bottom',
+                'br' => 'bottom-right',
+            ];
+            if (in_array($alignment, array_keys($availablePosition))) {
+                return $availablePosition[$alignment];
+            }
         }
+
+        return $alignment;
     }
 }
