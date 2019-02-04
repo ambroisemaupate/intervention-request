@@ -37,6 +37,7 @@ class ShortUrlExpander
     protected $ignorePath;
 
     protected static $operations = array(
+        'a' => 'align',
         'c' => 'crop',
         'w' => 'width',
         'h' => 'height',

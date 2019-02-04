@@ -75,7 +75,8 @@ You can edit each configuration parameters using their corresponding *setters*:
 |  Query attribute  |  Description  |  Usage  |
 | ----------------- | ------------- | ------------- |
 | image | Native image path relative to your configuration `imagePath` | `?image=path/to/image.jpg` |
-| fit | [Crop and resize combined](http://image.intervention.io/api/fit) It needs a `width` and a `height` in pixels | `…&fit=300x300` |
+| fit | [Crop and resize combined](http://image.intervention.io/api/fit) It needs a `width` and a `height` in pixels, this filter can be combined with `align` to choose which part of your image to fit | `…&fit=300x300` |
+| align | [Crop and resize combined](http://image.intervention.io/api/fit) Choose which part of your image to fit. | `…&align=c` |
 | flip | [Mirror image horizontal or vertical](http://image.intervention.io/api/flip) You can set `h` for horizontal or `v` for vertical flip. | `…&flip=h` |
 | crop | [Crop an image](http://image.intervention.io/api/crop) It needs a `width` and a `height` in pixels | `…&crop=300x300` |
 | width | [Resize image proportionally to given width](http://image.intervention.io/api/widen) It needs a `width` in pixels | `…&width=300` |
@@ -89,6 +90,22 @@ You can edit each configuration parameters using their corresponding *setters*:
 | interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
 | sharpen | [Sharpen image](http://image.intervention.io/api/sharpen) (1 - 100) | `…&sharpen=10` |
 | contrast | [Change image contrast](http://image.intervention.io/api/contrast) (-100 to 100, 0 means no changes) | `…&contrast=10` |
+
+### Fit position
+
+Due to URL rewriting, `align` filter can only takes one or two letters as a value. When no align filter is specified, `center` is used:
+
+| URL value | Alignment |
+| --- | --- |
+| `tl` | top-left |
+| `t` | top |
+| `tr` | top-right |
+| `l` | left |
+| `c` | center |
+| `r` | right |
+| `bl` | bottom-left |
+| `b` | bottom |
+| `br` | bottom-right |
 
 ## Using standalone entry point
 
@@ -178,6 +195,7 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 
 |  Query attribute  |  Shortcut letter  |
 | ----------------- | ------------- |
+| align | a |
 | fit | f |
 | flip | m |
 | crop | c |
