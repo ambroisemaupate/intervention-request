@@ -25,6 +25,7 @@
  */
 namespace AM\InterventionRequest\Listener;
 
+use AM\InterventionRequest\Event\ImageAfterProcessEvent;
 use AM\InterventionRequest\Event\ImageProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\AbstractFont;
@@ -77,10 +78,10 @@ class WatermarkListener implements ImageEventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ImageProcessEvent::AFTER_PROCESS => 'watermarkImage',
-            ResponseEvent::NAME => 'onResponse',
-        );
+        return [
+            ImageAfterProcessEvent::class => 'watermarkImage',
+            ResponseEvent::class => 'onResponse',
+        ];
     }
 
     public function onResponse(ResponseEvent $event)

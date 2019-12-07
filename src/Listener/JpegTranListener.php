@@ -51,10 +51,10 @@ class JpegTranListener implements ImageEventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ImageSavedEvent::NAME => 'onJpegImageSaved',
-            ResponseEvent::NAME => 'onResponse',
-        );
+        return [
+            ImageSavedEvent::class => 'onJpegImageSaved',
+            ResponseEvent::class => 'onResponse',
+        ];
     }
 
     public function onResponse(ResponseEvent $event)

@@ -192,7 +192,7 @@ class FileCache
                     if (null !== $this->dispatcher) {
                         // create the ImageSavedEvent and dispatch it
                         $event = new ImageSavedEvent($image, $this->cacheFile);
-                        $this->dispatcher->dispatch(ImageSavedEvent::NAME, $event);
+                        $this->dispatcher->dispatch($event);
                     }
 
                     // send HTTP header and output image data

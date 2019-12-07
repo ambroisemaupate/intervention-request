@@ -81,10 +81,10 @@ class KrakenListener implements ImageEventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ImageSavedEvent::NAME => 'onImageSaved',
-            ResponseEvent::NAME => 'onResponse',
-        );
+        return [
+            ImageSavedEvent::class => 'onImageSaved',
+            ResponseEvent::class => 'onResponse',
+        ];
     }
 
     public function onResponse(ResponseEvent $event)

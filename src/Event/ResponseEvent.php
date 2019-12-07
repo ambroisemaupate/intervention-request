@@ -30,7 +30,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseEvent extends ImageEvent
 {
-    const NAME = 'image.response';
+    /**
+     * @deprecated ResponseEvent::class
+     */
+    const NAME = ResponseEvent::class;
 
     /**
      * @var Response

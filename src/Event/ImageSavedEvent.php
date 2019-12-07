@@ -35,7 +35,10 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class ImageSavedEvent extends ImageEvent
 {
-    const NAME = 'image.saved';
+    /**
+     * @deprecated Use ImageSavedEvent::class
+     */
+    const NAME = ImageSavedEvent::class;
 
     /**
      * @var File
