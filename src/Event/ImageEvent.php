@@ -26,7 +26,7 @@
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class ImageEvent extends Event
 {

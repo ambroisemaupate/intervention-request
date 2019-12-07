@@ -29,7 +29,6 @@ use AM\InterventionRequest\Cache\FileCache;
 use AM\InterventionRequest\Cache\PassThroughFileCache;
 use AM\InterventionRequest\Event\ImageAfterProcessEvent;
 use AM\InterventionRequest\Event\ImageBeforeProcessEvent;
-use AM\InterventionRequest\Event\ImageProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
 use AM\InterventionRequest\Listener\PngFileListener;
@@ -38,6 +37,7 @@ use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -79,7 +79,7 @@ class InterventionRequest
      */
     protected $quality;
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
