@@ -30,7 +30,8 @@
         "symfony/process": "^4.4",
         "monolog/monolog": "^1.22",
         "kraken-io/kraken-php": "^1.6",
-        "tinify/tinify": "^1.5"
+        "tinify/tinify": "^1.5",
+        "ext-curl": "*"
     },
     "suggest" : {
         "ext-imagick": "Allow TIFF images to be implicitly converted to jpeg."

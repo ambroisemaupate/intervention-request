@@ -37,7 +37,7 @@ use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -232,7 +232,7 @@ class InterventionRequest
         if ($message != '') {
             $body .= '<p>' . $message . '</p>';
         }
-        $body = '<!DOCTYPE html><html><body>' . $body . '</body></html>';
+        $body = '<!DOCTYPE html><html lang="en"><body>' . $body . '</body></html>';
 
         return new Response(
             $body,
@@ -250,7 +250,7 @@ class InterventionRequest
         if ($message != '') {
             $body .= '<p>' . $message . '</p>';
         }
-        $body = '<!DOCTYPE html><html><body>' . $body . '</body></html>';
+        $body = '<!DOCTYPE html><html lang="en"><body>' . $body . '</body></html>';
 
         return new Response(
             $body,

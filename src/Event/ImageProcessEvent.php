@@ -25,6 +25,12 @@
  */
 namespace AM\InterventionRequest\Event;
 
+/**
+ * Class ImageProcessEvent
+ *
+ * @package AM\InterventionRequest\Event
+ * @deprecated
+ */
 class ImageProcessEvent extends ImageEvent
 {
     /**

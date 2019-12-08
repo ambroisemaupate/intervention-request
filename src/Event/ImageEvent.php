@@ -26,8 +26,14 @@
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * Class ImageEvent
+ *
+ * @package AM\InterventionRequest\Event
+ * @deprecated
+ */
 abstract class ImageEvent extends Event
 {
     /**

@@ -29,7 +29,6 @@ use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
-use Tinify\AccountException;
 use Tinify\Source;
 use Tinify\Tinify;
 
@@ -83,7 +82,6 @@ class TinifyListener implements ImageEventSubscriberInterface
 
     /**
      * @param ImageSavedEvent $event
-     * @throws AccountException
      */
     public function onImageSaved(ImageSavedEvent $event)
     {
