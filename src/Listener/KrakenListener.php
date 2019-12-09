@@ -61,8 +61,8 @@ class KrakenListener implements ImageEventSubscriberInterface
 
     /**
      * KrakenListener constructor.
-     * @param $apiKey
-     * @param $apiSecret
+     * @param string $apiKey
+     * @param string $apiSecret
      * @param bool $lossy
      * @param LoggerInterface $logger
      */

@@ -43,6 +43,8 @@
     },
     "bin": ["bin/intervention", "bin/intervention.php"],
     "require-dev": {
-        "squizlabs/php_codesniffer": "^3.3"
+        "squizlabs/php_codesniffer": "^3.5",
+        "phpstan/phpstan": "^0.12.2",
+        "friendsofphp/php-cs-fixer": "^2.16"
     }
 }

@@ -101,7 +101,7 @@ class FileCache
      * FileCache constructor.
      * @param Request $request
      * @param File $realImage
-     * @param $cachePath
+     * @param string $cachePath
      * @param LoggerInterface|null $logger
      * @param int $quality
      * @param int $ttl

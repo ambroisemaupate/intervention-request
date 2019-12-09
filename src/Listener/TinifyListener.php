@@ -51,7 +51,7 @@ class TinifyListener implements ImageEventSubscriberInterface
 
     /**
      * TinifyListener constructor.
-     * @param $apiKey
+     * @param string $apiKey
      * @param LoggerInterface $logger
      */
     public function __construct($apiKey, LoggerInterface $logger = null)
