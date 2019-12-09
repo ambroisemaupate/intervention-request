@@ -28,7 +28,7 @@ namespace AM\InterventionRequest\Listener;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\Image;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 class JpegTranListener implements ImageEventSubscriberInterface
 {
@@ -51,10 +51,10 @@ class JpegTranListener implements ImageEventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ImageSavedEvent::NAME => 'onJpegImageSaved',
-            ResponseEvent::NAME => 'onResponse',
-        );
+        return [
+            ImageSavedEvent::class => 'onJpegImageSaved',
+            ResponseEvent::class => 'onResponse',
+        ];
     }
 
     public function onResponse(ResponseEvent $event)
@@ -81,15 +81,15 @@ class JpegTranListener implements ImageEventSubscriberInterface
     public function onJpegImageSaved(ImageSavedEvent $event)
     {
         if ($this->supports($event->getImage())) {
-            $builder = new ProcessBuilder(array(
+            $process = new Process([
                 $this->jpegtranPath,
                 '-copy', 'none',
                 '-optimize',
                 '-progressive',
                 '-outfile', $event->getImageFile()->getPathname(),
                 $event->getImageFile()->getPathname(),
-            ));
-            $builder->getProcess()->run();
+            ]);
+            $process->run();
         }
     }
 }

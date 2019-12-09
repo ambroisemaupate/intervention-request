@@ -66,7 +66,7 @@ class GarbageCollectorCommand extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int|null|void
+     * @return int
      * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -93,5 +93,6 @@ class GarbageCollectorCommand extends Command
         }
 
         $output->writeln($text);
+        return 0;
     }
 }

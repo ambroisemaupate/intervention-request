@@ -28,7 +28,7 @@ namespace AM\InterventionRequest\Listener;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\Image;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 class PngFileListener implements ImageEventSubscriberInterface
 {
@@ -51,10 +51,10 @@ class PngFileListener implements ImageEventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ImageSavedEvent::NAME => 'onPngImageSaved',
-            ResponseEvent::NAME => 'onResponse',
-        );
+        return [
+            ImageSavedEvent::class => 'onPngImageSaved',
+            ResponseEvent::class => 'onResponse',
+        ];
     }
 
     public function onResponse(ResponseEvent $event)
@@ -81,7 +81,7 @@ class PngFileListener implements ImageEventSubscriberInterface
     public function onPngImageSaved(ImageSavedEvent $event)
     {
         if ($this->supports($event->getImage())) {
-            $builder = new ProcessBuilder(array(
+            $process = new Process([
                 $this->pngquantPath,
                 '-f',
                 '--speed',
@@ -89,8 +89,8 @@ class PngFileListener implements ImageEventSubscriberInterface
                 '-o',
                 $event->getImageFile()->getPathname(),
                 $event->getImageFile()->getPathname(),
-            ));
-            $builder->getProcess()->run();
+            ]);
+            $process->run();
         }
     }
 }

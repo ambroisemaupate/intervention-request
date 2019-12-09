@@ -28,7 +28,7 @@ namespace AM\InterventionRequest\Listener;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\Image;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 class JpegFileListener implements ImageEventSubscriberInterface
 {
@@ -51,10 +51,10 @@ class JpegFileListener implements ImageEventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ImageSavedEvent::NAME => 'onJpegImageSaved',
-            ResponseEvent::NAME => 'onResponse',
-        );
+        return [
+            ImageSavedEvent::class => 'onJpegImageSaved',
+            ResponseEvent::class => 'onResponse',
+        ];
     }
 
     public function onResponse(ResponseEvent $event)
@@ -81,15 +81,15 @@ class JpegFileListener implements ImageEventSubscriberInterface
     public function onJpegImageSaved(ImageSavedEvent $event)
     {
         if ($this->supports($event->getImage())) {
-            $builder = new ProcessBuilder(array(
+            $process = new Process([
                 $this->jpegoptimPath,
                 '-s',
                 '-f',
                 '--all-progressive',
                 '-m90',
                 $event->getImageFile()->getPathname(),
-            ));
-            $builder->getProcess()->run();
+            ]);
+            $process->run();
         }
     }
 }

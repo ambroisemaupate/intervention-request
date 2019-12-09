@@ -17,7 +17,7 @@ class ImageEncoder
     /**
      * @param Image $image
      * @param string $path
-     * @param $quality
+     * @param int $quality
      * @return Image
      */
     public function encode(Image $image, $path, $quality)
