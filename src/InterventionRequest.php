@@ -27,7 +27,8 @@ namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
 use AM\InterventionRequest\Cache\PassThroughFileCache;
-use AM\InterventionRequest\Event\ImageProcessEvent;
+use AM\InterventionRequest\Event\ImageAfterProcessEvent;
+use AM\InterventionRequest\Event\ImageBeforeProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
 use AM\InterventionRequest\Listener\PngFileListener;
@@ -36,6 +37,7 @@ use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -77,7 +79,7 @@ class InterventionRequest
      */
     protected $quality;
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -230,7 +232,7 @@ class InterventionRequest
         if ($message != '') {
             $body .= '<p>' . $message . '</p>';
         }
-        $body = '<!DOCTYPE html><html><body>' . $body . '</body></html>';
+        $body = '<!DOCTYPE html><html lang="en"><body>' . $body . '</body></html>';
 
         return new Response(
             $body,
@@ -248,7 +250,7 @@ class InterventionRequest
         if ($message != '') {
             $body .= '<p>' . $message . '</p>';
         }
-        $body = '<!DOCTYPE html><html><body>' . $body . '</body></html>';
+        $body = '<!DOCTYPE html><html lang="en"><body>' . $body . '</body></html>';
 
         return new Response(
             $body,
@@ -267,8 +269,8 @@ class InterventionRequest
             'driver' => $this->configuration->getDriver(),
         ]);
 
-        $beforeProcessEvent = new ImageProcessEvent($manager->make($this->nativeImage->getPathname()));
-        $this->dispatcher->dispatch(ImageProcessEvent::BEFORE_PROCESS, $beforeProcessEvent);
+        $beforeProcessEvent = new ImageBeforeProcessEvent($manager->make($this->nativeImage->getPathname()));
+        $this->dispatcher->dispatch($beforeProcessEvent);
 
         /*
          * Get image altered by BEFORE subscribers
@@ -279,8 +281,8 @@ class InterventionRequest
             $processor->process($this->image, $request);
         }
 
-        $afterProcessEvent = new ImageProcessEvent($this->image);
-        $this->dispatcher->dispatch(ImageProcessEvent::AFTER_PROCESS, $afterProcessEvent);
+        $afterProcessEvent = new ImageAfterProcessEvent($this->image);
+        $this->dispatcher->dispatch($afterProcessEvent);
 
         /*
          * Get image altered by AFTER subscribers
@@ -324,7 +326,7 @@ class InterventionRequest
             $this->response->setCharset('UTF-8');
 
             $responseEvent = new ResponseEvent($this->response, $this->image);
-            $this->dispatcher->dispatch(ResponseEvent::NAME, $responseEvent);
+            $this->dispatcher->dispatch($responseEvent);
             $this->response = $responseEvent->getResponse();
 
             $this->response->prepare($request);

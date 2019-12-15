@@ -29,7 +29,6 @@ use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
-use Tinify\AccountException;
 use Tinify\Source;
 use Tinify\Tinify;
 
@@ -52,7 +51,7 @@ class TinifyListener implements ImageEventSubscriberInterface
 
     /**
      * TinifyListener constructor.
-     * @param $apiKey
+     * @param string $apiKey
      * @param LoggerInterface $logger
      */
     public function __construct($apiKey, LoggerInterface $logger = null)
@@ -66,10 +65,10 @@ class TinifyListener implements ImageEventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ImageSavedEvent::NAME => 'onImageSaved',
-            ResponseEvent::NAME => 'onResponse',
-        );
+        return [
+            ImageSavedEvent::class => 'onImageSaved',
+            ResponseEvent::class => 'onResponse',
+        ];
     }
 
     public function onResponse(ResponseEvent $event)
@@ -83,7 +82,6 @@ class TinifyListener implements ImageEventSubscriberInterface
 
     /**
      * @param ImageSavedEvent $event
-     * @throws AccountException
      */
     public function onImageSaved(ImageSavedEvent $event)
     {
@@ -94,7 +92,9 @@ class TinifyListener implements ImageEventSubscriberInterface
             $source = \Tinify\fromFile($event->getImageFile()->getPathname());
             $this->overrideImageFile($event->getImageFile()->getPathname(), $source);
             if (null !== $this->logger) {
-                $this->logger->debug("Used tinify.io to minify file.", $event->getImageFile()->getPathname());
+                $this->logger->debug("Used tinify.io to minify file.", [
+                    'path' => $event->getImageFile()->getPathname()
+                ]);
             }
         }
     }

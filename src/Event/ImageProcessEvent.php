@@ -25,8 +25,20 @@
  */
 namespace AM\InterventionRequest\Event;
 
+/**
+ * Class ImageProcessEvent
+ *
+ * @package AM\InterventionRequest\Event
+ * @deprecated
+ */
 class ImageProcessEvent extends ImageEvent
 {
-    const BEFORE_PROCESS = 'image.before_process';
-    const AFTER_PROCESS = 'image.after_process';
+    /**
+     * @deprecated
+     */
+    const BEFORE_PROCESS = ImageBeforeProcessEvent::class;
+    /**
+     * @deprecated
+     */
+    const AFTER_PROCESS = ImageAfterProcessEvent::class;
 }

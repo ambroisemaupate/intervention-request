@@ -31,7 +31,7 @@ use AM\InterventionRequest\InterventionRequest;
 use Closure;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,7 +80,7 @@ class FileCache
      */
     protected $gcProbability;
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -101,7 +101,7 @@ class FileCache
      * FileCache constructor.
      * @param Request $request
      * @param File $realImage
-     * @param $cachePath
+     * @param string $cachePath
      * @param LoggerInterface|null $logger
      * @param int $quality
      * @param int $ttl
@@ -192,7 +192,7 @@ class FileCache
                     if (null !== $this->dispatcher) {
                         // create the ImageSavedEvent and dispatch it
                         $event = new ImageSavedEvent($image, $this->cacheFile);
-                        $this->dispatcher->dispatch(ImageSavedEvent::NAME, $event);
+                        $this->dispatcher->dispatch($event);
                     }
 
                     // send HTTP header and output image data
@@ -250,7 +250,7 @@ class FileCache
     }
 
     /**
-     * @return EventDispatcher
+     * @return EventDispatcherInterface
      */
     public function getDispatcher()
     {
@@ -258,10 +258,10 @@ class FileCache
     }
 
     /**
-     * @param EventDispatcher $dispatcher
+     * @param EventDispatcherInterface $dispatcher
      * @return FileCache
      */
-    public function setDispatcher(EventDispatcher $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
         return $this;

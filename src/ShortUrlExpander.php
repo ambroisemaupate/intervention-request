@@ -97,7 +97,7 @@ class ShortUrlExpander
         $params = explode('-', $queryString);
 
         foreach ($params as $param) {
-            preg_match("/(?P<operation>[a-z]{1})(?P<value>[\S]*)/", $param, $matches);
+            preg_match("/(?P<operation>[a-z])(?P<value>[\S]*)/", $param, $matches);
             if (isset($matches['operation']) &&
                 isset(static::$operations[$matches['operation']])) {
                 $this->request->query->set(

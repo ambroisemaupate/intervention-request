@@ -62,5 +62,6 @@ class UnlockGarbageCollectorCommand extends Command
         }
 
         $output->writeln($text);
+        return 0;
     }
 }
