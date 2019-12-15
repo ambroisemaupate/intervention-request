@@ -43,7 +43,7 @@ feature with a simple file cache managing.
 ## Configuration
 
 Intervention request use a dedicated class to configure your image request
-parameters. Before creating `InterventionRequest` object, you must instanciate
+parameters. Before creating `InterventionRequest` object, you must instantiate
 a new `AM\InterventionRequest\Configuration` object and set cache and images paths.
 
 ```php
