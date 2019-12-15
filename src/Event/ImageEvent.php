@@ -50,7 +50,6 @@ abstract class ImageEvent extends Event
         $this->image = $image;
     }
 
-
     /**
      * @return Image
      */
