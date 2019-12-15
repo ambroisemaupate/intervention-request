@@ -293,9 +293,9 @@ Create a class implementing `ImageEventSubscriberInterface` and, for example, li
 ```php
 public static function getSubscribedEvents()
 {
-    return array(
-        ImageSavedEvent::NAME => 'onImageSaved',
-    );
+    return [
+        ImageSavedEvent::class => 'onImageSaved',
+    ];
 }
 ```
 
@@ -306,10 +306,10 @@ Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to regis
 
 | Event name | Description |
 | ---------- | ----------- |
-| `ImageProcessEvent::BEFORE_PROCESS` | Before `Image` is being processed. |
-| `ImageProcessEvent::AFTER_PROCESS` | After `Image` has been processed. |
-| `ImageSavedEvent::NAME` | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
-| `ResponseEvent::NAME` | After Symfony’s response has been built with image data. (Useful to alter headers) |
+| `ImageBeforeProcessEvent::class` | Before `Image` is being processed. |
+| `ImageAfterProcessEvent::class` | After `Image` has been processed. |
+| `ImageSavedEvent::class` | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
+| `ResponseEvent::class` | After Symfony’s response has been built with image data. (Useful to alter headers) |
 
 #### Listener examples
 
