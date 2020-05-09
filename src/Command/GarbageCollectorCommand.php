@@ -40,7 +40,7 @@ class GarbageCollectorCommand extends Command
     {
         $this
             ->setName('gc:launch')
-            ->setDescription('Launch garbage collector')
+            ->setDescription('Launch Intervention Request garbage collector')
             ->addArgument(
                 'cache',
                 InputArgument::REQUIRED,

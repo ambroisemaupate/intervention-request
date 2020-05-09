@@ -320,7 +320,6 @@ class InterventionRequest
     {
         if (null !== $this->response) {
             $this->response->setPublic();
-            $this->response->setPrivate();
             $this->response->setMaxAge($this->configuration->getTtl());
             $this->response->setSharedMaxAge($this->configuration->getTtl());
             $this->response->setCharset('UTF-8');
