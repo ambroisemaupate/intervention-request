@@ -2,6 +2,7 @@
 
 **A customizable *Intervention Image* wrapper to use simple image re-sampling features over urls and a configurable cache.**
 
+[![Build Status](https://travis-ci.org/ambroisemaupate/intervention-request.svg?branch=develop)](https://travis-ci.org/ambroisemaupate/intervention-request)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
 [![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
@@ -61,7 +62,8 @@ You can edit each configuration parameters using their corresponding *setters*:
 - `setUsePassThroughCache(true|false)`: use or not *pass-through* cache to by-pass PHP processing once image is generated;
 - `setDefaultQuality(int)`: default 90, set the quality amount when user does not specify it;
 - `setImagesPath(string)`: requested images root path;
-- `setTtl(integer)`: cache images time to live for internal garbage collector;
+- `setTtl(integer)`: cache images time to live for internal garbage collector (default: `1 week`);
+- `setResponseTtl(integer)`: image HTTP responses time to live for browser and proxy caches (default: `1 year`);
 - `setDriver('gd'|'imagick')`: choose an available *Image Intervention* driver;
 - `setTimezone(string)`: PHP timezone to build \DateTime object used for caching. Set it here if you have not set it in your `php.ini` file;
 - `setGcProbability(integer)`: Garbage collector probability divisor. Garbage collection launch probability is 1/$gcProbability where a probability of 1/1 will launch GC at every request.
