@@ -47,6 +47,6 @@
         "phpstan/phpstan": "^0.12.2",
         "friendsofphp/php-cs-fixer": "^2.16",
         "symfony/debug": "^4.4",
-        "symfony/var-dumper": "^5.0"
+        "symfony/var-dumper": "^4.4"
     }
 }
