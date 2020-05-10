@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class SharpenProcessor extends AbstractProcessor
+class SharpenProcessor implements Processor
 {
     /**
      * @param Image $image

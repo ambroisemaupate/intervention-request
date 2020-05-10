@@ -89,8 +89,8 @@ class KrakenListener implements ImageEventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        if ($this->supports()) {
-            $response = $event->getResponse();
+        $response = $event->getResponse();
+        if ($this->supports() && (bool) $response->headers->get('X-IR-First-Gen')) {
             $response->headers->set('X-IR-Kraken', true);
             $event->setResponse($response);
         }

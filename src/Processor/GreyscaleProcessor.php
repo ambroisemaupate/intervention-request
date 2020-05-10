@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class GreyscaleProcessor extends AbstractProcessor
+class GreyscaleProcessor implements Processor
 {
     /**
      * @param Image $image

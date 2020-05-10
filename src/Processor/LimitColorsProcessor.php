@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class LimitColorsProcessor extends AbstractProcessor
+class LimitColorsProcessor implements Processor
 {
     /**
      * @param Image $image

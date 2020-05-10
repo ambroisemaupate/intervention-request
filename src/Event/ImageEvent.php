@@ -32,7 +32,6 @@ use Symfony\Component\EventDispatcher\Event;
  * Class ImageEvent
  *
  * @package AM\InterventionRequest\Event
- * @deprecated
  */
 abstract class ImageEvent extends Event
 {
@@ -51,9 +50,9 @@ abstract class ImageEvent extends Event
     }
 
     /**
-     * @return Image
+     * @return Image|null
      */
-    public function getImage()
+    public function getImage(): ?Image
     {
         return $this->image;
     }
@@ -62,7 +61,7 @@ abstract class ImageEvent extends Event
      * @param Image $image
      * @return ImageEvent
      */
-    public function setImage($image)
+    public function setImage(Image $image)
     {
         $this->image = $image;
         return $this;

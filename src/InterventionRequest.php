@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2016, Ambroise Maupate
+ * Copyright © 2020, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,20 +27,19 @@ namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
 use AM\InterventionRequest\Cache\PassThroughFileCache;
-use AM\InterventionRequest\Event\ImageAfterProcessEvent;
-use AM\InterventionRequest\Event\ImageBeforeProcessEvent;
+use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
+use AM\InterventionRequest\Listener\NoCacheImageRequestSubscriber;
 use AM\InterventionRequest\Listener\PngFileListener;
+use AM\InterventionRequest\Listener\QualitySubscriber;
+use AM\InterventionRequest\Listener\StripExifListener;
 use AM\InterventionRequest\Processor as Processor;
-use Intervention\Image\Image;
-use Intervention\Image\ImageManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -63,22 +62,6 @@ class InterventionRequest
      */
     protected $configuration;
     /**
-     * @var File
-     */
-    protected $nativeImage;
-    /**
-     * @var Image
-     */
-    protected $image;
-    /**
-     * @var array|null
-     */
-    protected $processors;
-    /**
-     * @var integer
-     */
-    protected $quality;
-    /**
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
@@ -93,43 +76,43 @@ class InterventionRequest
     public function __construct(
         Configuration $configuration,
         LoggerInterface $logger = null,
-        array $processors = null
+        ?array $processors = null
     ) {
-        $this->logger = $logger;
         $this->dispatcher = new EventDispatcher();
+        $this->logger = $logger;
         $this->configuration = $configuration;
+        $chainProcessor = $this->getChainProcessor($processors);
 
-        if ($this->configuration->getJpegoptimPath() != '') {
-            $this->dispatcher->addSubscriber(new JpegFileListener($this->configuration->getJpegoptimPath()));
+        if (null !== $this->configuration->getJpegoptimPath()) {
+            $this->addSubscriber(new JpegFileListener($this->configuration->getJpegoptimPath()));
         }
-
-        if ($this->configuration->getPngquantPath() != '') {
-            $this->dispatcher->addSubscriber(new PngFileListener($this->configuration->getPngquantPath()));
+        if (null !== $this->configuration->getPngquantPath()) {
+            $this->addSubscriber(new PngFileListener($this->configuration->getPngquantPath()));
         }
+        $this->addSubscriber(new StripExifListener());
+        $this->addSubscriber(new QualitySubscriber());
+        $this->addSubscriber(new FileCache(
+            $chainProcessor,
+            $this->configuration->getCachePath(),
+            $this->logger,
+            $this->configuration->getTtl(),
+            $this->configuration->getGcProbability(),
+            $this->configuration->getUseFileChecksum()
+        ));
+        $this->addSubscriber(new PassThroughFileCache(
+            $chainProcessor,
+            $this->configuration->getCachePath(),
+            $this->logger,
+            $this->configuration->getTtl(),
+            $this->configuration->getGcProbability(),
+            $this->configuration->getUseFileChecksum()
+        ));
+        $this->addSubscriber(new NoCacheImageRequestSubscriber(
+            $chainProcessor
+        ));
 
         $this->defineTimezone();
-
-        if (null === $processors) {
-            $this->processors = [
-                new Processor\RotateProcessor(),
-                new Processor\FlipProcessor(),
-                new Processor\CropResizedProcessor(),
-                new Processor\FitProcessor(),
-                new Processor\CropProcessor(),
-                new Processor\WidenProcessor(),
-                new Processor\HeightenProcessor(),
-                new Processor\LimitColorsProcessor(),
-                new Processor\GreyscaleProcessor(),
-                new Processor\ContrastProcessor(),
-                new Processor\BlurProcessor(),
-                new Processor\SharpenProcessor(),
-                new Processor\ProgressiveProcessor(),
-            ];
-        } elseif (is_array($processors)) {
-            $this->processors = $processors;
-        }
     }
-
 
     private function defineTimezone()
     {
@@ -148,41 +131,39 @@ class InterventionRequest
     }
 
     /**
-     * @param Request $request
-     * @return FileCache|PassThroughFileCache
+     * @param array|null $processors
+     *
+     * @return Processor\ChainProcessor
      */
-    protected function getCache(Request $request)
+    protected function getChainProcessor(?array $processors = null): Processor\ChainProcessor
     {
-        if ($this->configuration->isUsingPassThroughCache()) {
-            $cache = new PassThroughFileCache(
-                $request,
-                $this->nativeImage,
-                $this->configuration->getCachePath(),
-                $this->logger,
-                $this->quality,
-                $this->configuration->getTtl(),
-                $this->configuration->getGcProbability(),
-                $this->configuration->getUseFileChecksum()
-            );
-        } else {
-            $cache = new FileCache(
-                $request,
-                $this->nativeImage,
-                $this->configuration->getCachePath(),
-                $this->logger,
-                $this->quality,
-                $this->configuration->getTtl(),
-                $this->configuration->getGcProbability(),
-                $this->configuration->getUseFileChecksum()
-            );
-        }
-        $cache->setDispatcher($this->dispatcher);
-        return $cache;
+        return new Processor\ChainProcessor(
+            $this->configuration,
+            $this->dispatcher,
+            $processors ?? [
+                new Processor\RotateProcessor(),
+                new Processor\FlipProcessor(),
+                new Processor\CropResizedProcessor(),
+                new Processor\FitProcessor(),
+                new Processor\CropProcessor(),
+                new Processor\WidenProcessor(),
+                new Processor\HeightenProcessor(),
+                new Processor\LimitColorsProcessor(),
+                new Processor\GreyscaleProcessor(),
+                new Processor\ContrastProcessor(),
+                new Processor\BlurProcessor(),
+                new Processor\SharpenProcessor(),
+                new Processor\ProgressiveProcessor(),
+            ]
+        );
     }
 
     /**
      * Handle request to convert it to a Response object.
+     *
      * @param Request $request
+     *
+     * @throws \Exception
      */
     public function handleRequest(Request $request)
     {
@@ -191,29 +172,10 @@ class InterventionRequest
                 throw new \InvalidArgumentException("No valid image path found in URI");
             }
 
-            $nativePath = $this->configuration->getImagesPath() . '/' . $request->query->get('image');
-            $this->nativeImage = new WebpFile($nativePath);
-            $this->parseQuality($request);
-
-            if ($this->configuration->hasCaching()) {
-                $cache = $this->getCache($request);
-
-                /** @var Response response */
-                $this->response = $cache->getResponse(function (InterventionRequest $interventionRequest) use ($request) {
-                    return $interventionRequest->processImage($request);
-                }, $this);
-            } else {
-                $this->processImage($request);
-                $this->response = new Response(
-                    (string) $this->image->encode(null, $this->quality),
-                    Response::HTTP_OK,
-                    [
-                        'Content-Type' => $this->image->mime(),
-                        'Content-Disposition' => 'filename="' . $this->nativeImage->getFilename() . '"',
-                        'X-Generator-No-Cache' => true,
-                    ]
-                );
-                $this->response->setLastModified(new \DateTime('now'));
+            $event = new RequestEvent($request, $this);
+            $this->dispatcher->dispatch($event);
+            if (null === $this->response = $event->getResponse()) {
+                $this->response = $this->getBadRequestResponse('No listener was configured for current request');
             }
         } catch (FileNotFoundException $e) {
             $this->response = $this->getNotFoundResponse($e->getMessage());
@@ -260,74 +222,19 @@ class InterventionRequest
 
     /**
      * @param Request $request
-     * @return Image
-     */
-    public function processImage(Request $request)
-    {
-        // create an image manager instance with favored driver
-        $manager = new ImageManager([
-            'driver' => $this->configuration->getDriver(),
-        ]);
-
-        $beforeProcessEvent = new ImageBeforeProcessEvent($manager->make($this->nativeImage->getPathname()));
-        $this->dispatcher->dispatch($beforeProcessEvent);
-
-        /*
-         * Get image altered by BEFORE subscribers
-         */
-        $this->image = $beforeProcessEvent->getImage();
-
-        foreach ($this->processors as $processor) {
-            $processor->process($this->image, $request);
-        }
-
-        $afterProcessEvent = new ImageAfterProcessEvent($this->image);
-        $this->dispatcher->dispatch($afterProcessEvent);
-
-        /*
-         * Get image altered by AFTER subscribers
-         */
-        return $afterProcessEvent->getImage();
-    }
-
-    /**
-     * @param Request $request
-     * @return int|mixed
-     */
-    public function parseQuality(Request $request)
-    {
-        if ($request->query->has('quality')) {
-            $quality = (int) $request->query->get('quality');
-
-            if ($quality <= 100 &&
-                $quality > 0) {
-                $this->quality = $quality;
-            } else {
-                $this->quality = $this->configuration->getDefaultQuality();
-            }
-        } else {
-            $this->quality = $this->configuration->getDefaultQuality();
-        }
-
-        return $this->quality;
-    }
-
-    /**
-     * @param Request $request
      * @return Response
      */
     public function getResponse(Request $request)
     {
         if (null !== $this->response) {
             $this->response->setPublic();
-            $this->response->setMaxAge($this->configuration->getTtl());
-            $this->response->setSharedMaxAge($this->configuration->getTtl());
+            $this->response->setMaxAge($this->configuration->getResponseTtl());
+            $this->response->setSharedMaxAge($this->configuration->getResponseTtl());
             $this->response->setCharset('UTF-8');
 
-            $responseEvent = new ResponseEvent($this->response, $this->image);
+            $responseEvent = new ResponseEvent($this->response);
             $this->dispatcher->dispatch($responseEvent);
             $this->response = $responseEvent->getResponse();
-
             $this->response->prepare($request);
 
             return $this->response;
@@ -337,26 +244,10 @@ class InterventionRequest
     }
 
     /**
-     * @return File
-     */
-    public function getNativeImage()
-    {
-        return $this->nativeImage;
-    }
-
-    /**
      * @return Configuration
      */
     public function getConfiguration()
     {
         return $this->configuration;
-    }
-
-    /**
-     * @return null|LoggerInterface
-     */
-    public function getLogger()
-    {
-        return $this->logger;
     }
 }

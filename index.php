@@ -33,6 +33,9 @@ use AM\InterventionRequest\ShortUrlExpander;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Debug\Debug;
+
+//Debug::enable();
 
 $request = Request::createFromGlobals();
 $log = new Logger('InterventionRequest');
@@ -42,6 +45,11 @@ $log->pushHandler(new StreamHandler('interventionRequest.log', Logger::INFO));
  * A test configuration
  */
 $conf = new Configuration();
+//$conf->setJpegoptimPath('/usr/bin/jpegoptim');
+//$conf->setPngquantPath('/usr/bin/pngquant');
+//$conf->setGcProbability(1);
+//$conf->setTtl(10);
+//$conf->setResponseTtl(300);
 $conf->setCachePath(APP_ROOT . '/cache');
 //$conf->setUsePassThroughCache(true);
 $conf->setImagesPath(APP_ROOT . '/test');

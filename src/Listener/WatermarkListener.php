@@ -26,7 +26,6 @@
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageAfterProcessEvent;
-use AM\InterventionRequest\Event\ImageProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
@@ -86,14 +85,14 @@ class WatermarkListener implements ImageEventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        if ($this->supports($event->getImage())) {
-            $response = $event->getResponse();
+        $response = $event->getResponse();
+        if ((bool) $response->headers->get('X-IR-First-Gen')) {
             $response->headers->set('X-IR-Watermarked', true);
             $event->setResponse($response);
         }
     }
 
-    public function watermarkImage(ImageProcessEvent $event)
+    public function watermarkImage(ImageAfterProcessEvent $event)
     {
         $image = $event->getImage();
         if ($this->supports($image)) {

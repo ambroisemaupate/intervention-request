@@ -61,7 +61,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 - `setUsePassThroughCache(true|false)`: use or not *pass-through* cache to by-pass PHP processing once image is generated;
 - `setDefaultQuality(int)`: default 90, set the quality amount when user does not specify it;
 - `setImagesPath(string)`: requested images root path;
-- `setTtl(integer)`: cache images time to live;
+- `setTtl(integer)`: cache images time to live for internal garbage collector;
 - `setDriver('gd'|'imagick')`: choose an available *Image Intervention* driver;
 - `setTimezone(string)`: PHP timezone to build \DateTime object used for caching. Set it here if you have not set it in your `php.ini` file;
 - `setGcProbability(integer)`: Garbage collector probability divisor. Garbage collection launch probability is 1/$gcProbability where a probability of 1/1 will launch GC at every request.
@@ -218,7 +218,7 @@ Intervention request can save your images in a public folder to let *Apache* or 
 - Make sure you have configured *Apache* or *Nginx* to serve real files **before** proxying your request to PHP. Otherwise this could lead to file overwriting!
 - Pass-through cache is only available if you are using `ShortUrlExpander` to mimic a real image path without any query-string.
 - Your cache folder **must** be public (in your document root), so your documents will be visible to anyone. If your images must be protected behind a PHP firewall, you should not activate *pass-through* cache.
-- Garbage collector won’t be called, so you will need to purge manually your cache.
+- **Garbage collector won’t be called** because cached image won’t be served by your PHP server anymore but *Apache* or *Nginx*
 - Pass-through cache will save image for the first time at the real path used in your request, make sure it won’t overwrite any application file.
 
 Define your configuration cache path to a public folder:
@@ -306,6 +306,7 @@ Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to regis
 
 | Event name | Description |
 | ---------- | ----------- |
+| `RequestEvent::class` | Main request handling event which handles `quality` and image processing and caching. |
 | `ImageBeforeProcessEvent::class` | Before `Image` is being processed. |
 | `ImageAfterProcessEvent::class` | After `Image` has been processed. |
 | `ImageSavedEvent::class` | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
@@ -318,7 +319,7 @@ Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to regis
 - `TinifyListener` will optimize your image file using *tinyjpg.com* external service
 - `JpegTranListener` will optimize your image file using local `jpegtran` binary
 
-Of course you can build your own listeners and share them with us!
+Of course, you can build your own listeners and share them with us!
 
 ## Performances
 

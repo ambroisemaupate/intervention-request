@@ -27,7 +27,17 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class WebpFile extends File
 {
+    private $isWebp = false;
+
+    /**
+     * @var string
+     */
     protected $requestedPath;
+
+    /**
+     * @var File
+     */
+    protected $requestedFile;
 
     /**
      * @inheritDoc
@@ -35,7 +45,9 @@ class WebpFile extends File
     public function __construct($path, $checkPath = true)
     {
         if (preg_match('#\.(jpe?g|gif|png)\.webp$#', $path) > 0) {
+            $this->isWebp = true;
             $this->requestedPath = $path;
+            $this->requestedFile = new File($path, false);
             $realPath = preg_replace('#\.webp$#', '', $path);
             parent::__construct($realPath, $checkPath);
         } else {
@@ -49,5 +61,21 @@ class WebpFile extends File
     public function getRequestedPath()
     {
         return $this->requestedPath;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWebp(): bool
+    {
+        return $this->isWebp;
+    }
+
+    /**
+     * @return File
+     */
+    public function getRequestedFile(): File
+    {
+        return $this->requestedFile ?? $this;
     }
 }

@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class FlipProcessor extends AbstractProcessor
+class FlipProcessor implements Processor
 {
     /**
      * @param Image $image

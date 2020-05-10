@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2018, Ambroise Maupate
+ * Copyright © 2020, Ambroise Maupate
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,38 +27,20 @@ namespace AM\InterventionRequest\Cache;
 
 use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\ImageSavedEvent;
-use AM\InterventionRequest\InterventionRequest;
-use Closure;
+use AM\InterventionRequest\Event\RequestEvent;
+use AM\InterventionRequest\Processor\ChainProcessor;
+use AM\InterventionRequest\ShortUrlExpander;
+use AM\InterventionRequest\WebpFile;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FileCache
+class FileCache implements EventSubscriberInterface
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-    /**
-     * @var Response
-     */
-    protected $response;
-    /**
-     * @var File
-     */
-    protected $realImage;
-    /**
-     * @var string
-     */
-    protected $cacheFilePath;
-    /**
-     * @var File
-     */
-    protected $cacheFile;
     /**
      * @var string
      */
@@ -70,28 +52,19 @@ class FileCache
     /**
      * @var int
      */
-    protected $quality;
-    /**
-     * @var int
-     */
     protected $ttl;
     /**
      * @var int
      */
     protected $gcProbability;
     /**
-     * @var EventDispatcherInterface
+     * @var bool
      */
-    protected $dispatcher;
-
-    protected static $allowedExtensions = array(
-        'jpeg',
-        'jpg',
-        'gif',
-        'tiff',
-        'png',
-        'psd',
-    );
+    protected $useFileChecksum;
+    /**
+     * @var ChainProcessor
+     */
+    protected $chainProcessor;
     /**
      * @var ImageEncoder
      */
@@ -99,133 +72,69 @@ class FileCache
 
     /**
      * FileCache constructor.
-     * @param Request $request
-     * @param File $realImage
-     * @param string $cachePath
+     *
+     * @param ChainProcessor       $chainProcessor
+     * @param string               $cachePath
      * @param LoggerInterface|null $logger
-     * @param int $quality
-     * @param int $ttl
-     * @param int $gcProbability
-     * @param bool $useFileChecksum
+     * @param int                  $ttl
+     * @param int                  $gcProbability
+     * @param bool                 $useFileChecksum
      */
     public function __construct(
-        Request $request,
-        File $realImage,
-        $cachePath,
+        ChainProcessor $chainProcessor,
+        string $cachePath,
         LoggerInterface $logger = null,
-        $quality = 90,
         $ttl = 604800,
         $gcProbability = 300,
         $useFileChecksum = false
     ) {
-        $this->request = $request;
         $this->cachePath = realpath($cachePath);
         $this->logger = $logger;
-        $this->realImage = $realImage;
-        $this->quality = $quality;
         $this->ttl = $ttl;
         $this->gcProbability = $gcProbability;
         $this->imageEncoder = new ImageEncoder();
-
-        /*
-         * Get file MD5 to check real image integrity
-         */
-        if ($useFileChecksum === true) {
-            $fileMd5 = hash_file('adler32', $this->realImage->getPathname());
-        } else {
-            $fileMd5 = '';
-        }
-
-        /*
-         * Generate a unique cache hash key
-         * which will be used as image path
-         *
-         * The key vary on request param and file md5
-         * if enabled.
-         */
-        $cacheHash = hash('crc32b', serialize($this->request->query->all()) . $fileMd5);
-
-        $this->cacheFilePath = $cachePath .
-        '/' . implode('/', str_split($cacheHash, 2)) .
-        '.' . $this->imageEncoder->getImageAllowedExtension($this->realImage->getRealPath());
+        $this->useFileChecksum = $useFileChecksum;
+        $this->chainProcessor = $chainProcessor;
     }
 
     /**
-     * @param Image $image
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * @return array The event names to listen to
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            RequestEvent::class => ['onRequest', -100]
+        ];
+    }
+
+    /**
+     * @param Image  $image
+     * @param string $cacheFilePath
+     * @param int    $quality
+     *
      * @return Image
      */
-    public function saveImage(Image $image)
+    protected function saveImage(Image $image, string $cacheFilePath, int $quality)
     {
-        $path = dirname($this->cacheFilePath);
+        $path = dirname($cacheFilePath);
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
-        return $this->imageEncoder->save($image, $this->cacheFilePath, $this->quality);
+        return $this->imageEncoder->save($image, $cacheFilePath, $quality);
     }
 
-    /**
-     * @param Closure $callback
-     * @param InterventionRequest $interventionRequest
-     * @return Response
-     */
-    public function getResponse(Closure $callback, InterventionRequest $interventionRequest)
-    {
-        try {
-            $this->cacheFile = new File($this->cacheFilePath);
-            $response = new Response(
-                file_get_contents($this->cacheFile->getPathname()),
-                Response::HTTP_OK,
-                [
-                    'Content-Type' => $this->cacheFile->getMimeType(),
-                    'Content-Disposition' => 'filename="' . $this->realImage->getFilename() . '"',
-                    'X-Generator-Cached' => true,
-                ]
-            );
-            $response->setLastModified(new \DateTime(date("Y-m-d H:i:s", $this->cacheFile->getMTime())));
-        } catch (FileNotFoundException $e) {
-            if (is_callable($callback)) {
-                $image = $callback($interventionRequest);
-                if ($image instanceof Image) {
-                    $this->saveImage($image);
-                    $this->cacheFile = new File($this->cacheFilePath);
-
-                    if (null !== $this->dispatcher) {
-                        // create the ImageSavedEvent and dispatch it
-                        $event = new ImageSavedEvent($image, $this->cacheFile);
-                        $this->dispatcher->dispatch($event);
-                    }
-
-                    // send HTTP header and output image data
-                    $response = new Response(
-                        file_get_contents($this->cacheFile->getPathname()),
-                        Response::HTTP_OK,
-                        [
-                            'Content-Type' => $image->mime(),
-                            'Content-Disposition' => 'filename="' . $this->realImage->getFilename() . '"',
-                            'X-Generator-First-Render' => true,
-                        ]
-                    );
-                    $response->setLastModified(new \DateTime('now'));
-                } else {
-                    throw new \RuntimeException("Image is not a valid InterventionImage instance.", 1);
-                }
-            } else {
-                throw new \RuntimeException("No image handle closure defined", 1);
-            }
-        }
-
-        $this->initializeGarbageCollection();
-
-        return $response;
-    }
     /**
      * Determines if the garbage collector should run for this request.
      *
+     * @param Request $request
+     *
      * @return boolean
      */
-    private function garbageCollectionShouldRun()
+    private function garbageCollectionShouldRun(Request $request)
     {
-        if (true === (boolean) $this->request->query->get('force_gc')) {
+        if (true === (boolean) $request->get('force_gc', false)) {
             return true;
         }
 
@@ -235,14 +144,17 @@ class FileCache
             return false;
         }
     }
+
     /**
      * Checks to see if the garbage collector should be initialized, and if it should, initializes it.
      *
+     * @param Request $request
+     *
      * @return void
      */
-    private function initializeGarbageCollection()
+    protected function initializeGarbageCollection(Request $request)
     {
-        if ($this->garbageCollectionShouldRun()) {
+        if ($this->garbageCollectionShouldRun($request)) {
             $garbageCollector = new GarbageCollector($this->cachePath, $this->logger);
             $garbageCollector->setTtl($this->ttl);
             $garbageCollector->launch();
@@ -250,20 +162,106 @@ class FileCache
     }
 
     /**
-     * @return EventDispatcherInterface
+     * @param RequestEvent $requestEvent
+     *
+     * @return bool
      */
-    public function getDispatcher()
+    protected function supports(RequestEvent $requestEvent): bool
     {
-        return $this->dispatcher;
+        $config = $requestEvent->getInterventionRequest()->getConfiguration();
+        return $config->hasCaching() && !$config->isUsingPassThroughCache();
     }
 
     /**
+     * @param RequestEvent             $requestEvent
+     * @param string                   $eventName
      * @param EventDispatcherInterface $dispatcher
-     * @return FileCache
+     *
+     * @throws \Exception
      */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function onRequest(RequestEvent $requestEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
-        return $this;
+        if ($this->supports($requestEvent)) {
+            $request = $requestEvent->getRequest();
+            $nativePath = $requestEvent->getInterventionRequest()->getConfiguration()->getImagesPath() .
+                '/' . $request->get('image');
+            $nativeImage = new WebpFile($nativePath);
+            $cacheFilePath = $this->getCacheFilePath($request, $nativeImage);
+            $cacheFile = new File($cacheFilePath, false);
+            $firstGen = false;
+            /*
+             * First render cached image file.
+             */
+            if (!is_file($cacheFilePath)) {
+                $image = $this->chainProcessor->process($nativeImage, $request);
+                $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
+                // create the ImageSavedEvent and dispatch it
+                $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile));
+                $firstGen = true;
+            }
+
+            $response = new Response(
+                file_get_contents($cacheFile->getPathname()),
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => $cacheFile->getMimeType(),
+                    'Content-Disposition' => 'filename="' .
+                        ($nativeImage instanceof WebpFile ?
+                            $nativeImage->getRequestedFile()->getFilename() :
+                            $nativeImage->getFilename())
+                        . '"',
+                    'X-IR-Cached' => 1,
+                    'X-IR-First-Gen' => (int) $firstGen
+                ]
+            );
+            $response->setLastModified(new \DateTime(date("Y-m-d H:i:s", $cacheFile->getMTime())));
+
+            $this->initializeGarbageCollection($request);
+            $requestEvent->setResponse($response);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param File    $nativeImage
+     *
+     * @return string
+     */
+    protected function getCacheFilePath(Request $request, File $nativeImage): string
+    {
+        /*
+         * Get file MD5 to check real image integrity
+         */
+        if ($this->useFileChecksum === true) {
+            $fileMd5 = hash_file('adler32', $nativeImage->getPathname());
+        } else {
+            $fileMd5 = $nativeImage->getPathname();
+        }
+
+        /*
+         * Generate a unique cache hash key
+         * which will be used as image path
+         *
+         * The key vary on request ALLOWED params and file md5
+         * if enabled.
+         */
+        $cacheParams = [];
+        foreach ($request->query->all() as $name => $value) {
+            if (in_array($name, ShortUrlExpander::getAllowedOperationsNames())) {
+                $cacheParams[$name] = $value;
+            }
+        }
+        if ($nativeImage instanceof WebpFile && $nativeImage->isWebp()) {
+            $cacheParams['webp'] = true;
+            $extension = 'webp';
+        } else {
+            $cacheParams['webp'] = false;
+            $extension = $this->imageEncoder->getImageAllowedExtension($nativeImage->getRealPath());
+        }
+        $cacheHash = hash('sha1', serialize($cacheParams) . $fileMd5);
+
+        return $this->cachePath .
+            '/' . substr($cacheHash, 0, 2) .
+            '/' . substr($cacheHash, 2) . '.' . $extension;
     }
 }

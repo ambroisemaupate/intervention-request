@@ -41,7 +41,7 @@ class JpegTranListener implements ImageEventSubscriberInterface
      * JpegFileListener constructor.
      * @param string $jpegtranPath
      */
-    public function __construct($jpegtranPath)
+    public function __construct(string $jpegtranPath)
     {
         $this->jpegtranPath = $jpegtranPath;
     }
@@ -59,9 +59,11 @@ class JpegTranListener implements ImageEventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        if ($this->supports($event->getImage())) {
-            $response = $event->getResponse();
-            $response->headers->set('X-IR-JpegTran', true);
+        $response = $event->getResponse();
+        if ($this->jpegtranPath !== '' &&
+            $response->headers->get('Content-Type') === 'image/jpeg' &&
+            (bool) $response->headers->get('X-IR-First-Gen')) {
+            $response->headers->add(['X-IR-JpegTran' => 1]);
             $event->setResponse($response);
         }
     }
@@ -72,7 +74,7 @@ class JpegTranListener implements ImageEventSubscriberInterface
      */
     public function supports(Image $image = null)
     {
-        return null !== $image && $image->mime() == "image/jpeg" && $this->jpegtranPath != "";
+        return null !== $image && $image->mime() === 'image/jpeg' && $this->jpegtranPath !== '';
     }
 
     /**
