@@ -1,6 +1,6 @@
 # Intervention Request
 
-**A customizable *Intervention Image* wrapper to use simple image re-sampling features over urls and a configurable cache.**
+**A customizable *Intervention Image* wrapper to use image simple re-sampling features over urls and a configurable cache.**
 
 [![Build Status](https://travis-ci.org/ambroisemaupate/intervention-request.svg?branch=develop)](https://travis-ci.org/ambroisemaupate/intervention-request)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440/mini.png)](https://insight.sensiolabs.com/projects/2a4900b9-ca14-4740-b688-116602b16440)
