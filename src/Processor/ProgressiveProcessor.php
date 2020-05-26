@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class ProgressiveProcessor extends AbstractProcessor
+class ProgressiveProcessor implements Processor
 {
     /**
      * @param Image $image

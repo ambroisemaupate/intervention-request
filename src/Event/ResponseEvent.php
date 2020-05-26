@@ -28,7 +28,7 @@ namespace AM\InterventionRequest\Event;
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Response;
 
-class ResponseEvent extends ImageEvent
+final class ResponseEvent extends ImageEvent
 {
     /**
      * @deprecated ResponseEvent::class

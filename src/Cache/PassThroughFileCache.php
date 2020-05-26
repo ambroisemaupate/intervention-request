@@ -23,7 +23,7 @@
 
 namespace AM\InterventionRequest\Cache;
 
-use Psr\Log\LoggerInterface;
+use AM\InterventionRequest\Event\RequestEvent;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,47 +34,42 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @package AM\InterventionRequest\Cache
  */
-class PassThroughFileCache extends FileCache
+final class PassThroughFileCache extends FileCache
 {
     /**
-     * @inheritDoc
+     * @param RequestEvent $requestEvent
+     *
+     * @return bool
      */
-    public function __construct(
-        Request $request,
-        File $realImage,
-        $cachePath,
-        LoggerInterface $logger = null,
-        $quality = 90,
-        $ttl = 604800,
-        $gcProbability = 300,
-        $useFileChecksum = false
-    ) {
-        parent::__construct(
-            $request,
-            $realImage,
-            $cachePath,
-            $logger,
-            $quality,
-            $ttl,
-            $gcProbability,
-            $useFileChecksum
-        );
+    protected function supports(RequestEvent $requestEvent): bool
+    {
+        $config = $requestEvent->getInterventionRequest()->getConfiguration();
+        return $config->hasCaching() && $config->isUsingPassThroughCache();
+    }
 
+    /**
+     * @param Request $request
+     * @param File    $nativeImage
+     *
+     * @return string
+     */
+    protected function getCacheFilePath(Request $request, File $nativeImage): string
+    {
         /*
          * Check that cache folder is really used in request
          */
-        $cacheFolder = str_replace($this->request->server->get('DOCUMENT_ROOT'), '', $this->cachePath);
+        $cacheFolder = str_replace($request->server->get('DOCUMENT_ROOT'), '', $this->cachePath);
         $cacheFolderRegex = '#^' . preg_quote($cacheFolder) . '#';
-        if (0 === preg_match($cacheFolderRegex, $this->request->getPathInfo())) {
-            if ($logger !== null) {
-                $logger->error('Cache path was not found in your request path info.', [
-                    'pathInfo' => $this->request->getPathInfo(),
+        if (0 === preg_match($cacheFolderRegex, $request->getPathInfo())) {
+            if ($this->logger !== null) {
+                $this->logger->error('Cache path was not found in your request path info.', [
+                    'pathInfo' => $request->getPathInfo(),
                     'cacheRegex' => $cacheFolderRegex,
                 ]);
             }
-            throw new FileNotFoundException($this->request->getPathInfo());
+            throw new FileNotFoundException($request->getPathInfo());
         }
 
-        $this->cacheFilePath = $this->request->server->get('DOCUMENT_ROOT') . $this->request->getPathInfo();
+        return $request->server->get('DOCUMENT_ROOT') . $request->getPathInfo();
     }
 }

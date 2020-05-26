@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class RotateProcessor extends AbstractProcessor
+class RotateProcessor implements Processor
 {
     /**
      * @param Image $image

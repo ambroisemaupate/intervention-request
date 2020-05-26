@@ -159,7 +159,8 @@ class GarbageCollector
             error_log($msg);
         }
 
-        // Create the file that tells SLIR that the garbage collector is currently running and doesn't need to run again right now.
+        // Create the file that tells Intervention Request that
+        // the garbage collector is currently running and doesn't need to run again right now.
         $this->fs->touch($this->lockPath);
     }
 
@@ -170,7 +171,7 @@ class GarbageCollector
      */
     private function finish($successful = true)
     {
-        // Delete the file that tells SLIR that the garbage collector is running
+        // Delete the file that tells Intervention Request that the garbage collector is running
         $this->fs->remove($this->lockPath);
 
         if ($successful) {

@@ -27,7 +27,7 @@ namespace AM\InterventionRequest\Processor;
 
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class AbstractPositionableProcessor extends AbstractProcessor
+abstract class AbstractPositionableProcessor implements Processor
 {
     /**
      * @param Request $request

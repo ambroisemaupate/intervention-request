@@ -41,7 +41,7 @@ class JpegFileListener implements ImageEventSubscriberInterface
      * JpegFileListener constructor.
      * @param string $jpegoptimPath
      */
-    public function __construct($jpegoptimPath)
+    public function __construct(string $jpegoptimPath)
     {
         $this->jpegoptimPath = $jpegoptimPath;
     }
@@ -59,9 +59,11 @@ class JpegFileListener implements ImageEventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        if ($this->supports($event->getImage())) {
-            $response = $event->getResponse();
-            $response->headers->set('X-IR-JpegOptim', true);
+        $response = $event->getResponse();
+        if ($this->jpegoptimPath !== '' &&
+            $response->headers->get('Content-Type') === 'image/jpeg' &&
+            (bool) $response->headers->get('X-IR-First-Gen')) {
+            $response->headers->add(['X-IR-JpegOptim' => 1]);
             $event->setResponse($response);
         }
     }
@@ -72,7 +74,7 @@ class JpegFileListener implements ImageEventSubscriberInterface
      */
     public function supports(Image $image = null)
     {
-        return null !== $image && $image->mime() == "image/jpeg";
+        return $this->jpegoptimPath !== '' && null !== $image && $image->mime() === 'image/jpeg';
     }
 
     /**

@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Class CropResizedProcessor
  * @package AM\InterventionRequest\Processor
  */
-class CropResizedProcessor extends AbstractProcessor
+class CropResizedProcessor implements Processor
 {
     /**
      * @param Image $image

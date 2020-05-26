@@ -36,7 +36,7 @@ class ShortUrlExpander
 
     protected $ignorePath;
 
-    protected static $operations = array(
+    protected static $operations = [
         'a' => 'align',
         'c' => 'crop',
         'w' => 'width',
@@ -52,12 +52,22 @@ class ShortUrlExpander
         'p' => 'progressive',
         's' => 'sharpen',
         'k' => 'contrast',
-    );
+    ];
 
     public function __construct(Request $request)
     {
         $this->request = $request;
         $this->ignorePath = '';
+    }
+
+    public static function getAllowedOperationsNames(): array
+    {
+        return array_values(static::$operations);
+    }
+
+    public static function getAllowedOperationsShortcuts(): array
+    {
+        return array_keys(static::$operations);
     }
 
     /**

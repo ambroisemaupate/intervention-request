@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class HeightenProcessor extends AbstractProcessor
+class HeightenProcessor implements Processor
 {
     /**
      * @param Image $image

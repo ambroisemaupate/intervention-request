@@ -51,7 +51,7 @@ class Configuration
      */
     protected $driver = 'gd';
     /**
-     * @var int
+     * @var int Garbage collector ttl
      */
     protected $ttl = 604800; // 7*24*60*60
     /**
@@ -78,6 +78,10 @@ class Configuration
      * @var string
      */
     protected $jpegoptimPath;
+    /**
+     * @var int
+     */
+    protected $responseTtl = 31536000; // 365*24*60*60
 
     /**
      * @return string
@@ -208,7 +212,7 @@ class Configuration
     }
 
     /**
-     * Gets the value of ttl.
+     * Gets the value of garbage collector ttl.
      *
      * @return mixed
      */
@@ -218,7 +222,7 @@ class Configuration
     }
 
     /**
-     * Sets the value of ttl.
+     * Sets the value of garbage collector ttl.
      *
      * @param mixed $ttl the ttl
      * @return Configuration
@@ -347,5 +351,22 @@ class Configuration
     {
         $this->usePassThroughCache = $usePassThroughCache;
         return $this;
+    }
+
+    /**
+     * @param int $responseTtl
+     *
+     * @return Configuration
+     */
+    public function setResponseTtl(int $responseTtl): Configuration
+    {
+        $this->responseTtl = $responseTtl;
+
+        return $this;
+    }
+
+    public function getResponseTtl(): int
+    {
+        return $this->responseTtl;
     }
 }

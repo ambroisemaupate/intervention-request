@@ -37,7 +37,7 @@ class UnlockGarbageCollectorCommand extends Command
     {
         $this
             ->setName('gc:unlock')
-            ->setDescription('Unlock garbage collector')
+            ->setDescription('Unlock Intervention Request garbage collector')
             ->addArgument(
                 'cache',
                 InputArgument::REQUIRED,

@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class CropProcessor extends AbstractProcessor
+class CropProcessor implements Processor
 {
     /**
      * @param Image $image

@@ -34,8 +34,9 @@ use Symfony\Component\HttpFoundation\Request;
  * Extend this class if you want to create your own
  * image processor. All your process should be contained in
  * `process` method.
+ * @deprecated  Use Processor interface
  */
-abstract class AbstractProcessor
+abstract class AbstractProcessor implements Processor
 {
     /**
      * Execute image intervention operations.

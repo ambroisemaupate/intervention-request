@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class BlurProcessor extends AbstractProcessor
+class BlurProcessor implements Processor
 {
     /**
      * @param Image $image

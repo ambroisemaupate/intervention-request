@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  *
  */
-class ContrastProcessor extends AbstractProcessor
+class ContrastProcessor implements Processor
 {
     /**
      * @param Image $image

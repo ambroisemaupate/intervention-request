@@ -51,6 +51,7 @@ class TinifyListener implements ImageEventSubscriberInterface
 
     /**
      * TinifyListener constructor.
+     *
      * @param string $apiKey
      * @param LoggerInterface $logger
      */
@@ -73,8 +74,8 @@ class TinifyListener implements ImageEventSubscriberInterface
 
     public function onResponse(ResponseEvent $event)
     {
-        if ($this->supports()) {
-            $response = $event->getResponse();
+        $response = $event->getResponse();
+        if ($this->supports() && (bool) $response->headers->get('X-IR-First-Gen')) {
             $response->headers->set('X-IR-Tinify', true);
             $event->setResponse($response);
         }
@@ -82,6 +83,8 @@ class TinifyListener implements ImageEventSubscriberInterface
 
     /**
      * @param ImageSavedEvent $event
+     *
+     * @throws \Tinify\AccountException
      */
     public function onImageSaved(ImageSavedEvent $event)
     {
