@@ -45,6 +45,8 @@ docker run -v "/my/images/folder:/var/www/html/web/images:ro" -p 8080:80/tcp amb
 - Create a `/my/images/folder/your-image.png`
 - Then try http://localhost:8080/assets/f300x300-s5/images/your-image.png.webp
 
+Garbage collector runs every hour as a `crontab` job and will purge cache files created more than `$IR_GC_TTL` seconds ago.
+
 ### Docker Compose example
 
 ```yaml
