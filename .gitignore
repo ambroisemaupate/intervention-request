@@ -1,4 +1,6 @@
-/dev.php
+/web/dev.php
+web/cache
+web/assets
 
 ### Composer ###
 composer.phar
@@ -10,11 +12,9 @@ composer.lock
 
 
 ### Laravel ###
-/bootstrap/compiled.php
-.env.*.php
-.env.php
-.env
-
+.env.local
+.env.prod.local
+.env.dev.local
 
 ### OSX ###
 .AppleDouble
@@ -108,3 +108,4 @@ fabric.properties
 # End of https://www.gitignore.io/api/phpstorm+all
 
 report.txt
+project_env.sh

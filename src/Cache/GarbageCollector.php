@@ -84,7 +84,7 @@ class GarbageCollector
             if (!$file->isDir()) {
                 $this->fs->remove($file->getPathName());
                 if (null !== $this->logger) {
-                    $this->logger->info('GC purge image cache file.', ['file' => $file->getPathname()]);
+                    $this->logger->info('Purge file.', ['file' => $file->getPathname()]);
                 }
             }
         }
@@ -118,7 +118,7 @@ class GarbageCollector
                 if (iterator_count($fileFinder) === 0) {
                     $this->fs->remove($dir->getPathname());
                     if (null !== $this->logger) {
-                        $this->logger->info('GC delete empty folder.', ['folder' => $dir->getPathname()]);
+                        $this->logger->info('Delete empty folder.', ['folder' => $dir->getPathname()]);
                     }
                 }
 

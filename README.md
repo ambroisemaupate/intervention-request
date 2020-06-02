@@ -420,13 +420,13 @@ Have fun!
 
 ## Testing 
 
-Copy `index.php` to `dev.php` then launch PHP server command using `test/router.php` as router.
+Copy `index.php` to `dev.php` then launch PHP server command using `router.php` as router.
 
 ```bash
-php -S 0.0.0.0:8080 test/router.php
+php -S 0.0.0.0:8088 -t web router.php 
 ```
 
-Then open `http://0.0.0.0:8080/w300/images/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
+Then open `http://0.0.0.0:8080/w300/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
 
-If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8080/cache/w300/images/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
+If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8080/cache/w300/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
 
