@@ -29,20 +29,23 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class CropProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class CropProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('crop') &&
             !$request->query->has('width') &&
             !$request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop'), $crop)) {
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop') ?? '', $crop)) {
             $image->crop($crop[1], $crop[2]);
         }
     }

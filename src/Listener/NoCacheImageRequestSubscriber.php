@@ -38,6 +38,7 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
 
     /**
      * @param RequestEvent $requestEvent
+     * @return void
      */
     public function onRequest(RequestEvent $requestEvent)
     {
@@ -48,14 +49,14 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
             $nativeImage = new WebpFile($nativePath);
             $image = $this->processor->process($nativeImage, $request);
 
-            if ($nativeImage instanceof WebpFile) {
+            if ($nativeImage instanceof WebpFile && $nativeImage->isWebp()) {
                 $response = new Response(
                     (string) $image->encode('webp', $requestEvent->getQuality()),
                     Response::HTTP_OK,
                     [
                         'Content-Type' => 'image/webp',
                         'Content-Disposition' => 'filename="' . $nativeImage->getRequestedFile()->getFilename() . '"',
-                        'X-IR-Cached' => 0,
+                        'X-IR-Cached' => '0',
                     ]
                 );
             } else {
@@ -65,7 +66,7 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
                     [
                         'Content-Type' => $image->mime(),
                         'Content-Disposition' => 'filename="' . $nativeImage->getFilename() . '"',
-                        'X-IR-Cached' => 0,
+                        'X-IR-Cached' => '0',
                     ]
                 );
             }

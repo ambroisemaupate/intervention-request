@@ -38,22 +38,23 @@ class CropResizedProcessor implements Processor
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('crop') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop'), $crop) &&
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop') ?? '', $crop) &&
             ($request->query->has('width') || $request->query->has('height'))) {
             $fitRatio = (float) $crop[1] / (float) $crop[2];
 
             if ($request->query->has('width')) {
                 $realFitSize = [
                     (int) $request->query->get('width'),
-                    round($request->query->get('width') / $fitRatio),
+                    (int) round($request->query->get('width') / $fitRatio),
                 ];
             } elseif ($request->query->has('height')) {
                 $realFitSize = [
-                    round($request->query->get('height') * $fitRatio),
+                    (int) round($request->query->get('height') * $fitRatio),
                     (int) $request->query->get('height'),
                 ];
             }

@@ -16,9 +16,6 @@ $request = Request::createFromGlobals();
 $log = new Logger('InterventionRequest');
 $log->pushHandler(new StreamHandler('php://stderr', Logger::INFO));
 
-/*
- * A test configuration
- */
 $conf = new Configuration();
 $conf->setJpegoptimPath((string) getenv('IR_JPEGOPTIM_PATH'));
 $conf->setPngquantPath((string) getenv('IR_PNGQUANT_PATH'));

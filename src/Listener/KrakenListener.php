@@ -32,6 +32,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Class KrakenListener
+ *
  * @package AM\InterventionRequest\Listener
  */
 class KrakenListener implements ImageEventSubscriberInterface
@@ -45,15 +46,13 @@ class KrakenListener implements ImageEventSubscriberInterface
      */
     private $apiSecret;
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
     private $logger;
-
     /**
      * @var bool
      */
     private $lossy;
-
     /**
      * @var \Kraken
      */
@@ -61,6 +60,7 @@ class KrakenListener implements ImageEventSubscriberInterface
 
     /**
      * KrakenListener constructor.
+     *
      * @param string $apiKey
      * @param string $apiSecret
      * @param bool $lossy
@@ -87,15 +87,23 @@ class KrakenListener implements ImageEventSubscriberInterface
         ];
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return void
+     */
     public function onResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
         if ($this->supports() && (bool) $response->headers->get('X-IR-First-Gen')) {
-            $response->headers->set('X-IR-Kraken', true);
+            $response->headers->set('X-IR-Kraken', '1');
             $event->setResponse($response);
         }
     }
 
+    /**
+     * @param ImageSavedEvent $event
+     * @return void
+     */
     public function onImageSaved(ImageSavedEvent $event)
     {
         if ($this->supports() && $event->getImageFile()->getPathname()) {
@@ -130,6 +138,7 @@ class KrakenListener implements ImageEventSubscriberInterface
     /**
      * @param string $localPath
      * @param string $krakedUrl
+     * @return void
      */
     protected function overrideImageFile($localPath, $krakedUrl)
     {
@@ -145,18 +154,20 @@ class KrakenListener implements ImageEventSubscriberInterface
          * Create a new file
          */
         $fp = fopen($localPath, 'w');
-        /**
-         * Ask cURL to write the contents to a file
-         */
-        curl_setopt($ch, CURLOPT_FILE, $fp);
-        /**
-         * Execute the cURL session
-         */
-        curl_exec($ch);
-        /**
-         * Close cURL session and file
-         */
-        curl_close($ch);
-        fclose($fp);
+        if (false !== $fp) {
+            /**
+             * Ask cURL to write the contents to a file
+             */
+            curl_setopt($ch, CURLOPT_FILE, $fp);
+            /**
+             * Execute the cURL session
+             */
+            curl_exec($ch);
+            /**
+             * Close cURL session and file
+             */
+            curl_close($ch);
+            fclose($fp);
+        }
     }
 }

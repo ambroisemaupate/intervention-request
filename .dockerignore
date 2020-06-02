@@ -1,9 +1,10 @@
 !vendor
 !composer.lock
 
-public/cache
-public/images
-public/dev.php
+web/cache
+web/assets
+web/images
+web/dev.php
 .git
 .editorconfig
 .idea

@@ -15,14 +15,23 @@ final class StripExifListener implements ImageEventSubscriberInterface
         ];
     }
 
+    /**
+     * @param Image|null $image
+     *
+     * @return bool
+     */
     public function supports(Image $image = null)
     {
-        return null !== $image && $image->getCore() instanceof \Imagick;
+        return null !== $image && class_exists('\Imagick') && $image->getCore() instanceof \Imagick;
     }
 
+    /**
+     * @param ImageAfterProcessEvent $afterProcessEvent
+     * @return void
+     */
     public function afterProcess(ImageAfterProcessEvent $afterProcessEvent)
     {
-        if ($this->supports($afterProcessEvent->getImage())) {
+        if (null !== $afterProcessEvent->getImage() && $this->supports($afterProcessEvent->getImage())) {
             $afterProcessEvent->getImage()->getCore()->stripImage();
         }
     }

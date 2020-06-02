@@ -29,13 +29,16 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class SharpenProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class SharpenProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {

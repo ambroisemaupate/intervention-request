@@ -31,12 +31,32 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Class GarbageCollector
+ *
+ * @package AM\InterventionRequest\Cache
+ */
 class GarbageCollector
 {
+    /**
+     * @var string
+     */
     protected $cacheDirectory;
+    /**
+     * @var string
+     */
     protected $lockPath;
+    /**
+     * @var LoggerInterface|null
+     */
     protected $logger;
+    /**
+     * @var Filesystem
+     */
     protected $fs;
+    /**
+     * @var int
+     */
     protected $ttl = 604800;
 
     /**
@@ -55,6 +75,9 @@ class GarbageCollector
         $this->fs = new Filesystem();
     }
 
+    /**
+     * @return void
+     */
     public function launch()
     {
         if (!$this->isRunning()) {
@@ -71,6 +94,7 @@ class GarbageCollector
      * Used by the garbage collector to keep the cache directories from overflowing.
      *
      * @param string $path Directory to delete stale files from
+     * @return void
      */
     private function deleteStaleFilesFromDirectory($path)
     {
@@ -98,6 +122,7 @@ class GarbageCollector
      * Used by the garbage collector to keep the cache directories from overflowing.
      *
      * @param string $path Directory to delete empty directories from
+     * @return void
      */
     private function deleteEmptyDirectory($path)
     {
@@ -168,6 +193,7 @@ class GarbageCollector
      * Removes the file that signifies that the garbage collector is currently running.
      *
      * @param boolean $successful
+     * @return void
      */
     private function finish($successful = true)
     {

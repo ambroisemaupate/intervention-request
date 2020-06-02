@@ -39,6 +39,7 @@ class PngFileListener implements ImageEventSubscriberInterface
 
     /**
      * PngFileListener constructor.
+     *
      * @param string $pngquantPath
      */
     public function __construct(string $pngquantPath)
@@ -57,13 +58,17 @@ class PngFileListener implements ImageEventSubscriberInterface
         ];
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return void
+     */
     public function onResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
         if ($this->pngquantPath !== '' &&
             $response->headers->get('Content-Type') === 'image/png' &&
             (bool) $response->headers->get('X-IR-First-Gen')) {
-            $response->headers->add(['X-IR-PngQuant' => 1]);
+            $response->headers->add(['X-IR-PngQuant' => '1']);
             $event->setResponse($response);
         }
     }
@@ -79,6 +84,7 @@ class PngFileListener implements ImageEventSubscriberInterface
 
     /**
      * @param ImageSavedEvent $event
+     * @return void
      */
     public function onPngImageSaved(ImageSavedEvent $event)
     {
