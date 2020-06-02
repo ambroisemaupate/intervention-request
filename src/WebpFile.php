@@ -27,6 +27,9 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class WebpFile extends File
 {
+    /**
+     * @var bool
+     */
     private $isWebp = false;
 
     /**
@@ -49,7 +52,7 @@ class WebpFile extends File
             $this->requestedPath = $path;
             $this->requestedFile = new File($path, false);
             $realPath = preg_replace('#\.webp$#', '', $path);
-            parent::__construct($realPath, $checkPath);
+            parent::__construct($realPath ?? '', $checkPath);
         } else {
             parent::__construct($path, $checkPath);
         }

@@ -88,7 +88,11 @@ class FileCache implements EventSubscriberInterface
         $gcProbability = 300,
         $useFileChecksum = false
     ) {
-        $this->cachePath = realpath($cachePath);
+        $cachePath = realpath($cachePath);
+        if (false === $cachePath) {
+            throw new \InvalidArgumentException($cachePath . ' path does not exist.');
+        }
+        $this->cachePath = $cachePath;
         $this->logger = $logger;
         $this->ttl = $ttl;
         $this->gcProbability = $gcProbability;
@@ -149,7 +153,6 @@ class FileCache implements EventSubscriberInterface
      * Checks to see if the garbage collector should be initialized, and if it should, initializes it.
      *
      * @param Request $request
-     *
      * @return void
      */
     protected function initializeGarbageCollection(Request $request)
@@ -163,7 +166,6 @@ class FileCache implements EventSubscriberInterface
 
     /**
      * @param RequestEvent $requestEvent
-     *
      * @return bool
      */
     protected function supports(RequestEvent $requestEvent): bool
@@ -176,8 +178,8 @@ class FileCache implements EventSubscriberInterface
      * @param RequestEvent             $requestEvent
      * @param string                   $eventName
      * @param EventDispatcherInterface $dispatcher
-     *
      * @throws \Exception
+     * @return void
      */
     public function onRequest(RequestEvent $requestEvent, $eventName, EventDispatcherInterface $dispatcher)
     {
@@ -200,21 +202,25 @@ class FileCache implements EventSubscriberInterface
                 $firstGen = true;
             }
 
-            $response = new Response(
-                file_get_contents($cacheFile->getPathname()),
-                Response::HTTP_OK,
-                [
-                    'Content-Type' => $cacheFile->getMimeType(),
-                    'Content-Disposition' => 'filename="' .
-                        ($nativeImage instanceof WebpFile ?
-                            $nativeImage->getRequestedFile()->getFilename() :
-                            $nativeImage->getFilename())
-                        . '"',
-                    'X-IR-Cached' => 1,
-                    'X-IR-First-Gen' => (int) $firstGen
-                ]
-            );
-            $response->setLastModified(new \DateTime(date("Y-m-d H:i:s", $cacheFile->getMTime())));
+            $fileContent = file_get_contents($cacheFile->getPathname());
+            if (false !== $fileContent) {
+                $response = new Response(
+                    $fileContent,
+                    Response::HTTP_OK,
+                    [
+                        'Content-Type' => $cacheFile->getMimeType(),
+                        'Content-Disposition' => 'filename="' . $nativeImage->getRequestedFile()->getFilename() . '"',
+                        'X-IR-Cached' => '1',
+                        'X-IR-First-Gen' => (int) $firstGen
+                    ]
+                );
+                $response->setLastModified(new \DateTime(date("Y-m-d H:i:s", $cacheFile->getMTime())));
+            } else {
+                $response = new Response(
+                    null,
+                    Response::HTTP_NOT_FOUND
+                );
+            }
 
             $this->initializeGarbageCollection($request);
             $requestEvent->setResponse($response);
@@ -256,6 +262,9 @@ class FileCache implements EventSubscriberInterface
             $extension = 'webp';
         } else {
             $cacheParams['webp'] = false;
+            if (false === $nativeImage->getRealPath()) {
+                throw new \InvalidArgumentException('Native image does not exist.');
+            }
             $extension = $this->imageEncoder->getImageAllowedExtension($nativeImage->getRealPath());
         }
         $cacheHash = hash('sha1', serialize($cacheParams) . $fileMd5);

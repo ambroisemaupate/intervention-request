@@ -12,6 +12,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Class ChainProcessor
+ *
+ * @package AM\InterventionRequest\Processor
+ */
 final class ChainProcessor
 {
     /**
@@ -62,6 +67,10 @@ final class ChainProcessor
          */
         $image = $beforeProcessEvent->getImage();
 
+        if (null === $image) {
+            throw new \InvalidArgumentException('Image should not be null before process.');
+        }
+
         foreach ($this->processors as $processor) {
             if ($processor instanceof Processor) {
                 $processor->process($image, $request);
@@ -71,9 +80,10 @@ final class ChainProcessor
         $afterProcessEvent = new ImageAfterProcessEvent($image);
         $this->dispatcher->dispatch($afterProcessEvent);
 
-        /*
-         * Get image altered by AFTER subscribers
-         */
-        return $afterProcessEvent->getImage();
+        if (null === $image = $afterProcessEvent->getImage()) {
+            throw new \InvalidArgumentException('Image should not be null after process.');
+        }
+
+        return $image;
     }
 }

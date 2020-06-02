@@ -33,9 +33,9 @@ class ImageEncoder
      */
     public function save(Image $image, $path, $quality)
     {
-        $path = is_null($path) ? $image->basePath() : $path;
+        $path = empty($path) ? $image->basePath() : $path;
 
-        if (is_null($path)) {
+        if (empty($path)) {
             throw new NotWritableException(
                 "Can't write to undefined path."
             );

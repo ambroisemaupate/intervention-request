@@ -50,7 +50,7 @@ use Symfony\Component\HttpFoundation\Response;
 class InterventionRequest
 {
     /**
-     * @var Response
+     * @var Response|null
      */
     protected $response;
     /**
@@ -114,6 +114,9 @@ class InterventionRequest
         $this->defineTimezone();
     }
 
+    /**
+     * @return void
+     */
     private function defineTimezone()
     {
         /*
@@ -124,6 +127,7 @@ class InterventionRequest
 
     /**
      * @param EventSubscriberInterface $subscriber
+     * @return void
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
@@ -162,7 +166,7 @@ class InterventionRequest
      * Handle request to convert it to a Response object.
      *
      * @param Request $request
-     *
+     * @return void
      * @throws \Exception
      */
     public function handleRequest(Request $request)

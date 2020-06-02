@@ -30,6 +30,11 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\Image;
 use Symfony\Component\Process\Process;
 
+/**
+ * Class JpegTranListener
+ *
+ * @package AM\InterventionRequest\Listener
+ */
 class JpegTranListener implements ImageEventSubscriberInterface
 {
     /**
@@ -57,13 +62,17 @@ class JpegTranListener implements ImageEventSubscriberInterface
         ];
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return void
+     */
     public function onResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
         if ($this->jpegtranPath !== '' &&
             $response->headers->get('Content-Type') === 'image/jpeg' &&
             (bool) $response->headers->get('X-IR-First-Gen')) {
-            $response->headers->add(['X-IR-JpegTran' => 1]);
+            $response->headers->add(['X-IR-JpegTran' => '1']);
             $event->setResponse($response);
         }
     }
@@ -79,6 +88,7 @@ class JpegTranListener implements ImageEventSubscriberInterface
 
     /**
      * @param ImageSavedEvent $event
+     * @return void
      */
     public function onJpegImageSaved(ImageSavedEvent $event)
     {

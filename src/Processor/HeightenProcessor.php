@@ -30,18 +30,21 @@ use Intervention\Image\Constraint;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class HeightenProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class HeightenProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)$#', $request->query->get('height'), $height)) {
+            1 === preg_match('#^([0-9]+)$#', $request->query->get('height') ?? '', $height)) {
             $image->heighten($height[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });

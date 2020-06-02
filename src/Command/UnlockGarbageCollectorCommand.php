@@ -33,6 +33,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UnlockGarbageCollectorCommand extends Command
 {
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -46,12 +49,18 @@ class UnlockGarbageCollectorCommand extends Command
         ;
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $cacheDir = $input->getArgument('cache');
         $text = "";
 
-        if (file_exists($cacheDir)) {
+        if (null !== $cacheDir && is_string($cacheDir) && file_exists($cacheDir)) {
             $gc = new GarbageCollector($cacheDir);
             if (file_exists($gc->getLockPath())) {
                 unlink($gc->getLockPath());

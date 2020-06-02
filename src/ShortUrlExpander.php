@@ -32,10 +32,19 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ShortUrlExpander
 {
+    /**
+     * @var Request
+     */
     protected $request;
 
+    /**
+     * @var string
+     */
     protected $ignorePath;
 
+    /**
+     * @var string[]
+     */
     protected static $operations = [
         'a' => 'align',
         'c' => 'crop',
@@ -60,11 +69,17 @@ class ShortUrlExpander
         $this->ignorePath = '';
     }
 
+    /**
+     * @return array<string>
+     */
     public static function getAllowedOperationsNames(): array
     {
         return array_values(static::$operations);
     }
 
+    /**
+     * @return array<string>
+     */
     public static function getAllowedOperationsShortcuts(): array
     {
         return array_keys(static::$operations);
@@ -86,7 +101,7 @@ class ShortUrlExpander
 
         if (preg_match(
             '#(?P<queryString>[a-zA-Z:0-9\\-]+)/(?P<filename>[a-zA-Z0-9\\-_\\./]+)$#s',
-            $pathInfo,
+            $pathInfo ?? '',
             $matches
         )) {
             return $matches;
@@ -100,6 +115,7 @@ class ShortUrlExpander
      *
      * @param string $queryString
      * @param string $filename
+     * @return void
      */
     public function injectParamsToRequest($queryString, $filename)
     {

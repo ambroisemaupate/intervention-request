@@ -30,16 +30,39 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 
+/**
+ * Class WatermarkListener
+ *
+ * @package AM\InterventionRequest\Listener
+ */
 class WatermarkListener implements ImageEventSubscriberInterface
 {
+    /**
+     * @var string
+     */
     private $watermarkText;
-    private $size;
-    private $color;
-    private $align;
-    private $valign;
-    private $angle;
     /**
      * @var int
+     */
+    private $size;
+    /**
+     * @var array|string
+     */
+    private $color;
+    /**
+     * @var string
+     */
+    private $align;
+    /**
+     * @var string
+     */
+    private $valign;
+    /**
+     * @var int
+     */
+    private $angle;
+    /**
+     * @var int|string
      */
     private $fontFile;
 
@@ -83,26 +106,34 @@ class WatermarkListener implements ImageEventSubscriberInterface
         ];
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return void
+     */
     public function onResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
         if ((bool) $response->headers->get('X-IR-First-Gen')) {
-            $response->headers->set('X-IR-Watermarked', true);
+            $response->headers->set('X-IR-Watermarked', '1');
             $event->setResponse($response);
         }
     }
 
+    /**
+     * @param ImageAfterProcessEvent $event
+     * @return void
+     */
     public function watermarkImage(ImageAfterProcessEvent $event)
     {
         $image = $event->getImage();
-        if ($this->supports($image)) {
+        if (null !== $image && $this->supports($image)) {
             // use callback to define details
             $image->text(
                 $this->watermarkText,
                 $image->getWidth()/2,
                 $image->getHeight()/2,
                 function (AbstractFont $font) {
-                    $font->file($this->fontFile);
+                    $font->file((string) $this->fontFile);
                     $font->size($this->size);
                     $font->color($this->color);
                     $font->align($this->align);

@@ -29,13 +29,16 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class RotateProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class RotateProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {
