@@ -34,6 +34,7 @@ use Tinify\Tinify;
 
 /**
  * Class TinifyListener
+ *
  * @package AM\InterventionRequest\Listener
  */
 class TinifyListener implements ImageEventSubscriberInterface
@@ -42,12 +43,10 @@ class TinifyListener implements ImageEventSubscriberInterface
      * @var string
      */
     private $apiKey;
-
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
     private $logger;
-
 
     /**
      * TinifyListener constructor.
@@ -72,18 +71,22 @@ class TinifyListener implements ImageEventSubscriberInterface
         ];
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return void
+     */
     public function onResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
         if ($this->supports() && (bool) $response->headers->get('X-IR-First-Gen')) {
-            $response->headers->set('X-IR-Tinify', true);
+            $response->headers->set('X-IR-Tinify', '1');
             $event->setResponse($response);
         }
     }
 
     /**
      * @param ImageSavedEvent $event
-     *
+     * @return void
      * @throws \Tinify\AccountException
      */
     public function onImageSaved(ImageSavedEvent $event)
@@ -114,6 +117,7 @@ class TinifyListener implements ImageEventSubscriberInterface
     /**
      * @param string $localPath
      * @param Source $source
+     * @return void
      */
     protected function overrideImageFile($localPath, Source $source)
     {

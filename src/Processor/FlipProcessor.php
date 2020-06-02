@@ -29,18 +29,21 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class FlipProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class FlipProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('flip') &&
-            1 === preg_match('#^(h|v)$#', $request->query->get('flip'), $fit)) {
+            1 === preg_match('#^(h|v)$#', $request->query->get('flip') ?? '', $fit)) {
             $image->flip($fit[1]);
         }
     }

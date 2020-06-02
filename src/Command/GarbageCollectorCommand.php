@@ -34,8 +34,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class GarbageCollectorCommand
+ *
+ * @package AM\InterventionRequest\Command
+ */
 class GarbageCollectorCommand extends Command
 {
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this
@@ -45,7 +53,7 @@ class GarbageCollectorCommand extends Command
                 'cache',
                 InputArgument::OPTIONAL,
                 'Cache directory path',
-                getenv('IR_CACHE_PATH')
+                getenv('IR_CACHE_PATH') ?: null
             )
             ->addOption(
                 'log',
@@ -59,7 +67,7 @@ class GarbageCollectorCommand extends Command
                 't',
                 InputOption::VALUE_REQUIRED,
                 'Time to live to set to the garbage collector.',
-                getenv('IR_GC_TTL')
+                getenv('IR_GC_TTL') ?: null
             )
         ;
     }
@@ -73,15 +81,16 @@ class GarbageCollectorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $cacheDir = $input->getArgument('cache');
+        $logFile = $input->getOption('log');
         $text = "";
         $log = null;
 
-        if ($input->getOption('log')) {
+        if (is_string($logFile) && !empty($logFile)) {
             $log = new Logger('InterventionRequest');
-            $log->pushHandler(new StreamHandler($input->getOption('log'), Logger::INFO));
+            $log->pushHandler(new StreamHandler($logFile, Logger::INFO));
         }
 
-        if (file_exists($cacheDir)) {
+        if (is_string($cacheDir) && !empty($cacheDir) && file_exists($cacheDir)) {
             $gc = new GarbageCollector($cacheDir, $log);
             if ($ttl = $input->getOption('ttl')) {
                 $gc->setTtl($ttl);

@@ -29,13 +29,16 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class ProgressiveProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class ProgressiveProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {

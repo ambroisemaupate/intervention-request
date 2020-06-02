@@ -30,6 +30,11 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\Image;
 use Symfony\Component\Process\Process;
 
+/**
+ * Class JpegFileListener
+ *
+ * @package AM\InterventionRequest\Listener
+ */
 class JpegFileListener implements ImageEventSubscriberInterface
 {
     /**
@@ -39,6 +44,7 @@ class JpegFileListener implements ImageEventSubscriberInterface
 
     /**
      * JpegFileListener constructor.
+     *
      * @param string $jpegoptimPath
      */
     public function __construct(string $jpegoptimPath)
@@ -57,6 +63,10 @@ class JpegFileListener implements ImageEventSubscriberInterface
         ];
     }
 
+    /**
+     * @param ResponseEvent $event
+     * @return void
+     */
     public function onResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
@@ -79,6 +89,7 @@ class JpegFileListener implements ImageEventSubscriberInterface
 
     /**
      * @param ImageSavedEvent $event
+     * @return void
      */
     public function onJpegImageSaved(ImageSavedEvent $event)
     {

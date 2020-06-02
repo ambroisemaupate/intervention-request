@@ -29,13 +29,16 @@ use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class LimitColorsProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class LimitColorsProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {
@@ -45,8 +48,9 @@ class LimitColorsProcessor implements Processor
                                         $request->query->get('background') :
                                         $request->query->get('limit_color');
 
-            if (1 === preg_match('#^([0-9a-f]{6})$#', $background)) {
-                $image->limitColors(null, '#' . $background);
+            if (1 === preg_match('#^([0-9a-f]{6})$#', $background ?? '')) {
+                // count higher than 256 does not trigger palette creation
+                $image->limitColors(257, '#' . $background);
             }
         }
     }

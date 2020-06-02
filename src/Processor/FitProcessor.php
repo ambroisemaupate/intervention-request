@@ -30,20 +30,23 @@ use Intervention\Image\Constraint;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
+ * Class FitProcessor
  *
+ * @package AM\InterventionRequest\Processor
  */
 class FitProcessor extends AbstractPositionableProcessor
 {
     /**
      * @param Image $image
      * @param Request $request
+     * @return void
      */
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('fit') &&
             !$request->query->has('width') &&
             !$request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('fit'), $fit)) {
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('fit') ?? '', $fit)) {
             $image->fit($fit[1], $fit[2], function (Constraint $constraint) {
                 $constraint->upsize();
             }, $this->parsePosition($request));
