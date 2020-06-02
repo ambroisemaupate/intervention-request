@@ -7,6 +7,7 @@
 [![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 
+* [Ready-to-go Docker image](#ready-to-go-docker-image)
 * [Install](#install)
 * [Configuration](#configuration)
 * [Available operations](#available-operations)
@@ -30,6 +31,63 @@
     + [Benchmark](#optimization-benchmark)
 * [License](#license)
 * [Testing](#testing)
+
+## Ready-to-go *Docker* image
+
+Intervention Request is now available as a standalone Docker server to use with whatever CMS or language you need:
+
+```php
+docker pull ambroisemaupate/intervention-request;
+# Make sure to share your volume with READ-ONLY flag
+docker run -v "/my/images/folder:/var/www/html/web/images:ro" -p 8080:80/tcp ambroisemaupate/intervention-request;
+```
+
+- Create a `/my/images/folder/your-image.png`
+- Then try http://localhost:8080/assets/f300x300-s5/images/your-image.png.webp
+
+Garbage collector runs every hour as a `crontab` job and will purge cache files created more than `$IR_GC_TTL` seconds ago.
+
+### Docker Compose example
+
+```yaml
+version: '3'
+services:
+    intervention:
+        image: ambroisemaupate/intervention-request:latest
+        volumes:
+            # You can store cache in a volume too
+            #- cache:/var/www/html/web/assets
+            - ./my/images/folder:/var/www/html/web/images:ro
+        # You can override some defaults below
+        environment:
+            IR_GC_PROBABILITY: 400
+            IR_GC_TTL: 604800
+            IR_RESPONSE_TTL: 31557600
+            IR_USE_FILECHECKSUM: 0
+            IR_USE_PASSTHROUGH_CACHE: 1
+            IR_DRIVER: gd
+            IR_CACHE_PATH: /var/www/html/web/assets
+            IR_IMAGES_PATH: /var/www/html/web/images
+            IR_IGNORE_PATH: /assets
+            IR_DEFAULT_QUALITY: 80
+        ports:
+            - 8080:80/tcp
+        # Uncomment lines below for Traefik usage
+        #labels:
+        #    - "traefik.enable=true"
+        #    - "traefik.http.services.intervention.loadbalancer.server.scheme=http"
+        #    - "traefik.http.services.intervention.loadbalancer.server.port=80"
+        #    - "traefik.http.services.intervention.loadbalancer.passhostheader=true"
+        #    # Listen HTTP
+        #    - "traefik.http.routers.intervention.entrypoints=http"
+        #    - "traefik.http.routers.intervention.rule=Host(`intervention.test`)"
+        #    - "traefik.http.routers.intervention.service=intervention"
+        #networks:
+        #    - default
+        #    - frontproxynet
+```
+
+You don’t need to read further if you do not plan to embed this library in your PHP application.
 
 ## Install
 
@@ -420,13 +478,13 @@ Have fun!
 
 ## Testing 
 
-Copy `index.php` to `dev.php` then launch PHP server command using `test/router.php` as router.
+Copy `index.php` to `dev.php` then launch PHP server command using `router.php` as router.
 
 ```bash
-php -S 0.0.0.0:8080 test/router.php
+php -S 0.0.0.0:8088 -t web router.php 
 ```
 
-Then open `http://0.0.0.0:8080/w300/images/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
+Then open `http://0.0.0.0:8080/w300/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
 
-If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8080/cache/w300/images/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
+If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8080/cache/w300/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
 

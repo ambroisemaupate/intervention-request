@@ -1,3 +1,16 @@
 #!/usr/bin/env php
 <?php
-include('intervention.php');
+use AM\InterventionRequest\Command\GarbageCollectorCommand;
+use AM\InterventionRequest\Command\UnlockGarbageCollectorCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Dotenv\Dotenv;
+
+// include composer autoload
+require dirname(__DIR__) . "/vendor/autoload.php";
+
+(new Dotenv())->usePutenv(true)->loadEnv(dirname(__DIR__) .  '/.env');
+
+$application = new Application();
+$application->add(new GarbageCollectorCommand());
+$application->add(new UnlockGarbageCollectorCommand());
+$application->run();

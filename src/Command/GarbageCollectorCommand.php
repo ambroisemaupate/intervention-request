@@ -43,8 +43,9 @@ class GarbageCollectorCommand extends Command
             ->setDescription('Launch Intervention Request garbage collector')
             ->addArgument(
                 'cache',
-                InputArgument::REQUIRED,
-                'Cache directory path'
+                InputArgument::OPTIONAL,
+                'Cache directory path',
+                getenv('IR_CACHE_PATH')
             )
             ->addOption(
                 'log',
@@ -58,7 +59,7 @@ class GarbageCollectorCommand extends Command
                 't',
                 InputOption::VALUE_REQUIRED,
                 'Time to live to set to the garbage collector.',
-                604800
+                getenv('IR_GC_TTL')
             )
         ;
     }
@@ -81,11 +82,11 @@ class GarbageCollectorCommand extends Command
         }
 
         if (file_exists($cacheDir)) {
-            $text .= "<info>Garbage collection started.</info>" . PHP_EOL;
             $gc = new GarbageCollector($cacheDir, $log);
-            if ($input->getOption('ttl')) {
-                $gc->setTtl($input->getOption('ttl'));
+            if ($ttl = $input->getOption('ttl')) {
+                $gc->setTtl($ttl);
             }
+            $text .= "<info>Garbage collection started on ".$cacheDir." for TTL ".$gc->getTtl().".</info>" . PHP_EOL;
             $gc->launch();
             $text .= "<info>Garbage collection finished.</info>" . PHP_EOL;
         } else {

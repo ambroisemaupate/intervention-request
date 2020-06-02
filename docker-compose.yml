@@ -1,0 +1,39 @@
+version: '3'
+services:
+    intervention:
+        build: .
+        image: ambroisemaupate/intervention-request:latest
+        volumes:
+            - cache:/var/www/html/web/assets
+            - ./web/images:/var/www/html/web/images:ro
+        environment:
+            IR_GC_PROBABILITY: ${IR_GC_PROBABILITY}
+            IR_GC_TTL: ${IR_GC_TTL}
+            IR_RESPONSE_TTL: ${IR_RESPONSE_TTL}
+            IR_USE_FILECHECKSUM: ${IR_USE_FILECHECKSUM}
+            IR_USE_PASSTHROUGH_CACHE: ${IR_USE_PASSTHROUGH_CACHE}
+            IR_DRIVER: ${IR_DRIVER}
+            IR_JPEGOPTIM_PATH: ${IR_JPEGOPTIM_PATH}
+            IR_PNGQUANT_PATH: ${IR_PNGQUANT_PATH}
+            IR_CACHE_PATH: ${IR_CACHE_PATH}
+            IR_IMAGES_PATH: ${IR_IMAGES_PATH}
+            IR_IGNORE_PATH: ${IR_IGNORE_PATH}
+            IR_DEFAULT_QUALITY: ${IR_DEFAULT_QUALITY}
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.services.intervention.loadbalancer.server.scheme=http"
+            - "traefik.http.services.intervention.loadbalancer.server.port=80"
+            - "traefik.http.services.intervention.loadbalancer.passhostheader=true"
+            # Listen HTTP
+            - "traefik.http.routers.intervention.entrypoints=http"
+            - "traefik.http.routers.intervention.rule=Host(`intervention.test`)"
+            - "traefik.http.routers.intervention.service=intervention"
+        networks:
+            - default
+            - frontproxynet
+volumes:
+  cache:
+
+networks:
+    frontproxynet:
+        external: true
