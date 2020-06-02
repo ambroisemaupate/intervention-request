@@ -30,6 +30,7 @@ $conf->setUsePassThroughCache((bool) getenv('IR_USE_PASSTHROUGH_CACHE'));
 $conf->setImagesPath((string) getenv('IR_IMAGES_PATH'));
 $conf->setUseFileChecksum((bool) getenv('IR_USE_FILECHECKSUM'));
 $conf->setDriver((string) getenv('IR_DRIVER'));
+$conf->setDefaultQuality((string) getenv('IR_DEFAULT_QUALITY'));
 
 /*
  * Handle short url with Url rewriting

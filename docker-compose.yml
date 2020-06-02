@@ -2,6 +2,7 @@ version: '3'
 services:
     intervention:
         build: .
+        image: ambroisemaupate/intervention-request:latest
         volumes:
             - cache:/var/www/html/web/assets
             - ./web/images:/var/www/html/web/images:ro
@@ -17,6 +18,7 @@ services:
             IR_CACHE_PATH: ${IR_CACHE_PATH}
             IR_IMAGES_PATH: ${IR_IMAGES_PATH}
             IR_IGNORE_PATH: ${IR_IGNORE_PATH}
+            IR_DEFAULT_QUALITY: ${IR_DEFAULT_QUALITY}
         labels:
             - "traefik.enable=true"
             - "traefik.http.services.intervention.loadbalancer.server.scheme=http"
