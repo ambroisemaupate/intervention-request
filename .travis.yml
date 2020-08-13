@@ -5,6 +5,7 @@ php:
     - 7.2
     - 7.3
     - 7.4
+    - nigthly
 
 install:
     - curl -s http://getcomposer.org/installer | php
