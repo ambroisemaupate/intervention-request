@@ -58,7 +58,11 @@ final class PassThroughFileCache extends FileCache
         /*
          * Check that cache folder is really used in request
          */
-        $cacheFolder = str_replace($request->server->get('DOCUMENT_ROOT'), '', $this->cachePath);
+        $documentRoot = realpath($request->server->get('DOCUMENT_ROOT'));
+        if (false === $documentRoot) {
+            throw new \RuntimeException($request->server->get('DOCUMENT_ROOT') . ' path does not exist.');
+        }
+        $cacheFolder = str_replace($documentRoot, '', $this->cachePath);
         $cacheFolderRegex = '#^' . preg_quote($cacheFolder) . '#';
         if (0 === preg_match($cacheFolderRegex, $request->getPathInfo())) {
             if ($this->logger !== null) {
@@ -70,6 +74,6 @@ final class PassThroughFileCache extends FileCache
             throw new FileNotFoundException($request->getPathInfo());
         }
 
-        return $request->server->get('DOCUMENT_ROOT') . $request->getPathInfo();
+        return $documentRoot . $request->getPathInfo();
     }
 }
