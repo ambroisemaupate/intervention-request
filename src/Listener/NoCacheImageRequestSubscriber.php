@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\RequestEvent;
+use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
-use AM\InterventionRequest\WebpFile;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -46,15 +46,15 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
             $request = $requestEvent->getRequest();
             $nativePath = $requestEvent->getInterventionRequest()->getConfiguration()->getImagesPath() .
                 '/' . $request->get('image');
-            $nativeImage = new WebpFile($nativePath);
+            $nativeImage = new NextGenFile($nativePath);
             $image = $this->processor->process($nativeImage, $request);
 
-            if ($nativeImage instanceof WebpFile && $nativeImage->isWebp()) {
+            if ($nativeImage instanceof NextGenFile && $nativeImage->isNextGen()) {
                 $response = new Response(
-                    (string) $image->encode('webp', $requestEvent->getQuality()),
+                    (string) $image->encode($nativeImage->getNextGenExtension(), $requestEvent->getQuality()),
                     Response::HTTP_OK,
                     [
-                        'Content-Type' => 'image/webp',
+                        'Content-Type' => $nativeImage->getNextGenMimeType(),
                         'Content-Disposition' => 'filename="' . $nativeImage->getRequestedFile()->getFilename() . '"',
                         'X-IR-Cached' => '0',
                     ]

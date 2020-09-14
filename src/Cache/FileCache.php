@@ -28,9 +28,9 @@ namespace AM\InterventionRequest\Cache;
 use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
+use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use AM\InterventionRequest\ShortUrlExpander;
-use AM\InterventionRequest\WebpFile;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -187,7 +187,7 @@ class FileCache implements EventSubscriberInterface
             $request = $requestEvent->getRequest();
             $nativePath = $requestEvent->getInterventionRequest()->getConfiguration()->getImagesPath() .
                 '/' . $request->get('image');
-            $nativeImage = new WebpFile($nativePath);
+            $nativeImage = new NextGenFile($nativePath);
             $cacheFilePath = $this->getCacheFilePath($request, $nativeImage);
             $cacheFile = new File($cacheFilePath, false);
             $firstGen = false;
@@ -257,11 +257,12 @@ class FileCache implements EventSubscriberInterface
                 $cacheParams[$name] = $value;
             }
         }
-        if ($nativeImage instanceof WebpFile && $nativeImage->isWebp()) {
-            $cacheParams['webp'] = true;
-            $extension = 'webp';
+        if ($nativeImage instanceof NextGenFile && $nativeImage->isNextGen()) {
+            $cacheParams[$nativeImage->getNextGenExtension()] = true;
+            $extension = $nativeImage->getNextGenExtension();
         } else {
             $cacheParams['webp'] = false;
+            $cacheParams['avif'] = false;
             if (false === $nativeImage->getRealPath()) {
                 throw new \InvalidArgumentException('Native image does not exist.');
             }

@@ -4,7 +4,7 @@ services:
         build: .
         image: ambroisemaupate/intervention-request:latest
         volumes:
-            - cache:/var/www/html/web/assets
+            - ./web/cache:/var/www/html/web/assets:delegated
             - ./web/images:/var/www/html/web/images:ro
         environment:
             IR_GC_PROBABILITY: ${IR_GC_PROBABILITY}
@@ -31,8 +31,6 @@ services:
         networks:
             - default
             - frontproxynet
-volumes:
-  cache:
 
 networks:
     frontproxynet:
