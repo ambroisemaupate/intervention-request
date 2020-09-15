@@ -36,7 +36,18 @@ class NextGenFile extends File
      */
     public function __construct($path, $checkPath = true)
     {
-        if (preg_match('#\.(jpe?g|gif|png)\.heic$#', $path) > 0) {
+        if (preg_match('#\.(heic|heif)\.jpg$#', $path) > 0) {
+            /*
+             * Convert HEIC format back to JPEG
+             */
+            $this->isNextGen = true;
+            $this->nextGenMimeType = 'image/jpeg';
+            $this->nextGenExtension = 'jpg';
+            $this->requestedPath = $path;
+            $this->requestedFile = new File($path, false);
+            $realPath = preg_replace('#\.jpg$#', '', $path);
+            parent::__construct($realPath ?? '', $checkPath);
+        } elseif (preg_match('#\.(jpe?g|gif|png)\.heic$#', $path) > 0) {
             /*
              * HEIC format
              */
@@ -47,7 +58,7 @@ class NextGenFile extends File
             $this->requestedFile = new File($path, false);
             $realPath = preg_replace('#\.heic$#', '', $path);
             parent::__construct($realPath ?? '', $checkPath);
-        } elseif (preg_match('#\.(jpe?g|gif|png)\.avif$#', $path) > 0) {
+        } elseif (preg_match('#\.(jpe?g|gif|png|heic|heif)\.avif$#', $path) > 0) {
             /*
              * AVIF format
              */

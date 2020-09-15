@@ -460,14 +460,15 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
 
 ### Optimization benchmark
 
-With default quality to 90%
+With default quality to 90%. \
+AVIF conversion only supports custom compiled *ImageMagick* and only support lossless encoding.
 
-| Url | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) |
-| --- | ------- | -------------- | ------------------- | --------- | ------------------ | ---- | ---- |
-| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB | 235 kB | 155 kB |
-| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB | 176 kB | 115 kB |
-| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB | 564 kB | 429 kB |
-| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB | 295 kB | 229 kB |
+| Url       | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) | AVIF (100%) |
+| ----------------------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
+| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB | 235 kB | 155 kB |  94 kB |
+| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB | 176 kB | 115 kB |  71 kB |
+| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB | 564 kB | 429 kB | 398 kB |
+| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB | 295 kB | 229 kB | 227 kB |
 
 ## License
 
