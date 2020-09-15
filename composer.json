@@ -21,7 +21,7 @@
         "php": "^7.1 || ^8.0",
         "ext-gd": "*",
         "ext-curl": "*",
-        "intervention/image": "^2.4",
+        "intervention/image": "dev-master",
         "symfony/http-foundation": "^4.4 || ^5.0.7",
         "symfony/console": "^4.4",
         "symfony/finder": "^4.4",
@@ -48,5 +48,11 @@
         "symfony/debug": "^4.4",
         "symfony/var-dumper": "^4.4",
         "symfony/dotenv": "^4.4 || ^5.1"
+    },
+    "repositories": {
+        "intervention/image": {
+            "type": "vcs",
+            "url": "https://github.com/ambroisemaupate/image.git"
+        }
     }
 }
