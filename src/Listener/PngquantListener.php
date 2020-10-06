@@ -27,24 +27,28 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-class PngFileListener implements ImageEventSubscriberInterface
+class PngquantListener implements ImageFileEventSubscriberInterface
 {
     /**
      * @var string
      */
     protected $pngquantPath;
+    /**
+     * @var bool
+     */
+    protected $lossy = false;
 
     /**
-     * PngFileListener constructor.
-     *
      * @param string $pngquantPath
+     * @param bool $lossy
      */
-    public function __construct(string $pngquantPath)
+    public function __construct(string $pngquantPath, bool $lossy = false)
     {
         $this->pngquantPath = $pngquantPath;
+        $this->lossy = $lossy;
     }
 
     /**
@@ -68,18 +72,19 @@ class PngFileListener implements ImageEventSubscriberInterface
         if ($this->pngquantPath !== '' &&
             $response->headers->get('Content-Type') === 'image/png' &&
             (bool) $response->headers->get('X-IR-First-Gen')) {
-            $response->headers->add(['X-IR-PngQuant' => '1']);
+            $response->headers->add(['X-IR-Pngquant' => '1']);
+            $response->headers->add(['X-IR-Pngquant-Lossy' => (int) $this->lossy]);
             $event->setResponse($response);
         }
     }
 
     /**
-     * @param Image $image
+     * @param File|null $image
      * @return bool
      */
-    public function supports(Image $image = null)
+    public function supports(File $image = null)
     {
-        return $this->pngquantPath !== '' && null !== $image && $image->mime() === 'image/png';
+        return $this->pngquantPath !== '' && null !== $image && $image->getMimeType() === 'image/png';
     }
 
     /**
@@ -88,12 +93,21 @@ class PngFileListener implements ImageEventSubscriberInterface
      */
     public function onPngImageSaved(ImageSavedEvent $event)
     {
-        if ($this->supports($event->getImage())) {
+        if ($this->supports($event->getImageFile())) {
+            $maxQuality = $event->getQuality();
+            $minQuality = $maxQuality - 10;
+            if ($maxQuality > 100) {
+                $maxQuality = 100;
+            }
+            if ($minQuality < 0) {
+                $minQuality = 0;
+            }
             $process = new Process([
                 $this->pngquantPath,
                 '-f',
                 '--speed',
-                '1',
+                '2',
+                $this->lossy ? '--quality=' . sprintf('%d-%d', $minQuality, $maxQuality) : '',
                 '-o',
                 $event->getImageFile()->getPathname(),
                 $event->getImageFile()->getPathname(),

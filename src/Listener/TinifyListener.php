@@ -27,8 +27,8 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Tinify\Source;
 use Tinify\Tinify;
 
@@ -37,7 +37,7 @@ use Tinify\Tinify;
  *
  * @package AM\InterventionRequest\Listener
  */
-class TinifyListener implements ImageEventSubscriberInterface
+class TinifyListener implements ImageFileEventSubscriberInterface
 {
     /**
      * @var string
@@ -91,7 +91,7 @@ class TinifyListener implements ImageEventSubscriberInterface
      */
     public function onImageSaved(ImageSavedEvent $event)
     {
-        if ($this->supports() && $event->getImageFile()->getPathname()) {
+        if ($this->supports($event->getImageFile())) {
             Tinify::setKey($this->apiKey);
             \Tinify\validate();
 
@@ -106,12 +106,12 @@ class TinifyListener implements ImageEventSubscriberInterface
     }
 
     /**
-     * @param Image $image
+     * @param File|null $image
      * @return bool
      */
-    public function supports(Image $image = null)
+    public function supports(File $image = null)
     {
-        return ('' !== $this->apiKey);
+        return ('' !== $this->apiKey && null !== $image && $image->getPathname() !== '');
     }
 
     /**

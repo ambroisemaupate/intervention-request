@@ -27,7 +27,7 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Intervention\Image\Image;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
 /**
@@ -35,7 +35,7 @@ use Symfony\Component\Process\Process;
  *
  * @package AM\InterventionRequest\Listener
  */
-class JpegFileListener implements ImageEventSubscriberInterface
+class JpegFileListener implements ImageFileEventSubscriberInterface
 {
     /**
      * @var string
@@ -79,12 +79,12 @@ class JpegFileListener implements ImageEventSubscriberInterface
     }
 
     /**
-     * @param Image $image
+     * @param File|null $image
      * @return bool
      */
-    public function supports(Image $image = null)
+    public function supports(File $image = null)
     {
-        return $this->jpegoptimPath !== '' && null !== $image && $image->mime() === 'image/jpeg';
+        return $this->jpegoptimPath !== '' && null !== $image && $image->getMimeType() === 'image/jpeg';
     }
 
     /**
@@ -93,7 +93,7 @@ class JpegFileListener implements ImageEventSubscriberInterface
      */
     public function onJpegImageSaved(ImageSavedEvent $event)
     {
-        if ($this->supports($event->getImage())) {
+        if ($this->supports($event->getImageFile())) {
             $process = new Process([
                 $this->jpegoptimPath,
                 '-s',

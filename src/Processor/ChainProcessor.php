@@ -59,6 +59,10 @@ final class ChainProcessor
             'driver' => $this->configuration->getDriver(),
         ]);
 
+        if ($request->query->has('no_process')) {
+            return $manager->make($nativeImage->getPathname());
+        }
+
         $beforeProcessEvent = new ImageBeforeProcessEvent($manager->make($nativeImage->getPathname()));
         $this->dispatcher->dispatch($beforeProcessEvent);
 

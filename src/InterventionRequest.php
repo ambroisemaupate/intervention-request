@@ -31,7 +31,9 @@ use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
 use AM\InterventionRequest\Listener\NoCacheImageRequestSubscriber;
-use AM\InterventionRequest\Listener\PngFileListener;
+use AM\InterventionRequest\Listener\OxipngListener;
+use AM\InterventionRequest\Listener\PingoListener;
+use AM\InterventionRequest\Listener\PngquantListener;
 use AM\InterventionRequest\Listener\QualitySubscriber;
 use AM\InterventionRequest\Listener\StripExifListener;
 use AM\InterventionRequest\Processor as Processor;
@@ -83,12 +85,27 @@ class InterventionRequest
         $this->configuration = $configuration;
         $chainProcessor = $this->getChainProcessor($processors);
 
-        if (null !== $this->configuration->getJpegoptimPath()) {
-            $this->addSubscriber(new JpegFileListener($this->configuration->getJpegoptimPath()));
+        if (null !== $this->configuration->getPingoPath()) {
+            // Pingo replaces jpeg and png optimizers
+            $this->addSubscriber(new PingoListener(
+                $this->configuration->getPingoPath(),
+                $this->configuration->isLossyPng(),
+                $this->configuration->isNoAlphaPingo()
+            ));
+        } else {
+            if (null !== $this->configuration->getJpegoptimPath()) {
+                $this->addSubscriber(new JpegFileListener($this->configuration->getJpegoptimPath()));
+            }
+            if (null !== $this->configuration->getOxipngPath()) {
+                $this->addSubscriber(new OxipngListener($this->configuration->getOxipngPath()));
+            } elseif (null !== $this->configuration->getPngquantPath()) {
+                $this->addSubscriber(new PngquantListener(
+                    $this->configuration->getPngquantPath(),
+                    $this->configuration->isLossyPng()
+                ));
+            }
         }
-        if (null !== $this->configuration->getPngquantPath()) {
-            $this->addSubscriber(new PngFileListener($this->configuration->getPngquantPath()));
-        }
+
         $this->addSubscriber(new StripExifListener());
         $this->addSubscriber(new QualitySubscriber());
         $this->addSubscriber(new FileCache(

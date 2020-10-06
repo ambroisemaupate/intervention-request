@@ -57,6 +57,7 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
                         'Content-Type' => $nativeImage->getNextGenMimeType(),
                         'Content-Disposition' => 'filename="' . $nativeImage->getRequestedFile()->getFilename() . '"',
                         'X-IR-Cached' => '0',
+                        'X-IR-First-Gen' => '1',
                     ]
                 );
             } else {
@@ -67,6 +68,7 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
                         'Content-Type' => $image->mime(),
                         'Content-Disposition' => 'filename="' . $nativeImage->getFilename() . '"',
                         'X-IR-Cached' => '0',
+                        'X-IR-First-Gen' => '1',
                     ]
                 );
             }

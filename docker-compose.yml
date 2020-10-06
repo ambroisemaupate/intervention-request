@@ -15,6 +15,8 @@ services:
             IR_DRIVER: ${IR_DRIVER}
             IR_JPEGOPTIM_PATH: ${IR_JPEGOPTIM_PATH}
             IR_PNGQUANT_PATH: ${IR_PNGQUANT_PATH}
+#            IR_OXIPNG_PATH: ${IR_OXIPNG_PATH}
+#            IR_PINGO_PATH: ${IR_PINGO_PATH}
             IR_CACHE_PATH: ${IR_CACHE_PATH}
             IR_IMAGES_PATH: ${IR_IMAGES_PATH}
             IR_IGNORE_PATH: ${IR_IGNORE_PATH}

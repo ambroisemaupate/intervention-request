@@ -71,11 +71,27 @@ class Configuration
      */
     protected $useFileChecksum = false;
     /**
-     * @var string
+     * @var string|null
      */
     protected $pngquantPath;
     /**
-     * @var string
+     * @var bool
+     */
+    protected $lossyPng = false;
+    /**
+     * @var string|null
+     */
+    protected $pingoPath;
+    /**
+     * @var bool
+     */
+    protected $noAlphaPingo = false;
+    /**
+     * @var string|null
+     */
+    protected $oxipngPath;
+    /**
+     * @var string|null
      */
     protected $jpegoptimPath;
     /**
@@ -84,7 +100,7 @@ class Configuration
     protected $responseTtl = 31536000; // 365*24*60*60
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getPngquantPath()
     {
@@ -92,7 +108,7 @@ class Configuration
     }
 
     /**
-     * @param string $pngquantPath
+     * @param string|null $pngquantPath
      * @return Configuration
      */
     public function setPngquantPath($pngquantPath)
@@ -102,7 +118,7 @@ class Configuration
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getJpegoptimPath()
     {
@@ -110,7 +126,7 @@ class Configuration
     }
 
     /**
-     * @param string $jpegoptimPath
+     * @param string|null $jpegoptimPath
      * @return Configuration
      */
     public function setJpegoptimPath($jpegoptimPath)
@@ -368,5 +384,77 @@ class Configuration
     public function getResponseTtl(): int
     {
         return $this->responseTtl;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOxipngPath()
+    {
+        return $this->oxipngPath;
+    }
+
+    /**
+     * @param string|null $oxipngPath
+     * @return Configuration
+     */
+    public function setOxipngPath($oxipngPath): Configuration
+    {
+        $this->oxipngPath = $oxipngPath;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLossyPng(): bool
+    {
+        return $this->lossyPng;
+    }
+
+    /**
+     * @param bool $lossyPng
+     * @return Configuration
+     */
+    public function setLossyPng(bool $lossyPng): Configuration
+    {
+        $this->lossyPng = $lossyPng;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPingoPath()
+    {
+        return $this->pingoPath;
+    }
+
+    /**
+     * @param string|null $pingoPath
+     * @return Configuration
+     */
+    public function setPingoPath($pingoPath): Configuration
+    {
+        $this->pingoPath = $pingoPath;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNoAlphaPingo(): bool
+    {
+        return $this->noAlphaPingo;
+    }
+
+    /**
+     * @param bool $noAlphaPingo
+     * @return Configuration
+     */
+    public function setNoAlphaPingo(bool $noAlphaPingo): Configuration
+    {
+        $this->noAlphaPingo = $noAlphaPingo;
+        return $this;
     }
 }

@@ -35,6 +35,7 @@ use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -195,8 +196,13 @@ class FileCache implements EventSubscriberInterface
              * First render cached image file.
              */
             if (!is_file($cacheFilePath)) {
-                $image = $this->chainProcessor->process($nativeImage, $request);
-                $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
+                if ($request->query->has('no_process')) {
+                    $image = null;
+                    (new Filesystem())->copy($nativeImage, $cacheFile);
+                } else {
+                    $image = $this->chainProcessor->process($nativeImage, $request);
+                    $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
+                }
                 // create the ImageSavedEvent and dispatch it
                 $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile));
                 $firstGen = true;

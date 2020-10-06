@@ -27,15 +27,15 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Class KrakenListener
  *
  * @package AM\InterventionRequest\Listener
  */
-class KrakenListener implements ImageEventSubscriberInterface
+class KrakenListener implements ImageFileEventSubscriberInterface
 {
     /**
      * @var string
@@ -64,9 +64,9 @@ class KrakenListener implements ImageEventSubscriberInterface
      * @param string $apiKey
      * @param string $apiSecret
      * @param bool $lossy
-     * @param LoggerInterface $logger
+     * @param LoggerInterface|null $logger
      */
-    public function __construct($apiKey, $apiSecret, $lossy = true, LoggerInterface $logger = null)
+    public function __construct(string $apiKey, string $apiSecret, bool $lossy = true, LoggerInterface $logger = null)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
@@ -106,7 +106,7 @@ class KrakenListener implements ImageEventSubscriberInterface
      */
     public function onImageSaved(ImageSavedEvent $event)
     {
-        if ($this->supports() && $event->getImageFile()->getPathname()) {
+        if ($this->supports($event->getImageFile())) {
             $params = array(
                 "file" => $event->getImageFile()->getPathname(),
                 "wait" => true,
@@ -115,7 +115,7 @@ class KrakenListener implements ImageEventSubscriberInterface
 
             $data = $this->kraken->upload($params);
 
-            if ($data["success"] && !empty($data['kraked_url'])) {
+            if (isset($data["success"]) && !empty($data['kraked_url'])) {
                 if (null !== $this->logger) {
                     $this->logger->debug("Used kraken.io to minify file.", $data);
                 }
@@ -127,12 +127,16 @@ class KrakenListener implements ImageEventSubscriberInterface
     }
 
     /**
-     * @param Image $image
+     * @param File|null $image
      * @return bool
      */
-    public function supports(Image $image = null)
+    public function supports(File $image = null)
     {
-        return (null !== $this->kraken && '' !== $this->apiKey && '' !== $this->apiSecret);
+        return null !== $this->kraken &&
+            '' !== $this->apiKey &&
+            '' !== $this->apiSecret &&
+            null !== $image &&
+            $image->getPathname() !== '';
     }
 
     /**
@@ -140,7 +144,7 @@ class KrakenListener implements ImageEventSubscriberInterface
      * @param string $krakedUrl
      * @return void
      */
-    protected function overrideImageFile($localPath, $krakedUrl)
+    protected function overrideImageFile(string $localPath, string $krakedUrl)
     {
         /**
          * Initialize the cURL session
@@ -150,6 +154,7 @@ class KrakenListener implements ImageEventSubscriberInterface
          * Set the URL of the page or file to download.
          */
         curl_setopt($ch, CURLOPT_URL, $krakedUrl);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         /**
          * Create a new file
          */
