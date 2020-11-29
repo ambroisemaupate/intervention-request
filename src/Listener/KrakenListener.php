@@ -68,6 +68,9 @@ class KrakenListener implements ImageFileEventSubscriberInterface
      */
     public function __construct(string $apiKey, string $apiSecret, bool $lossy = true, LoggerInterface $logger = null)
     {
+        if (!class_exists('\Kraken')) {
+            throw new \RuntimeException('kraken-io/kraken-php library is required to use KrakenListener');
+        }
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
         $this->logger = $logger;

@@ -28,13 +28,13 @@
         "symfony/filesystem": "^4.4",
         "symfony/event-dispatcher": "^4.4",
         "symfony/process": "^4.4",
-        "monolog/monolog": "^1.22",
-        "kraken-io/kraken-php": "^1.6",
-        "tinify/tinify": "^1.5",
+        "monolog/monolog": "^1.22 || ^2.1.1",
         "symfony/mime": "^4.4 || ^5.1"
     },
     "suggest" : {
-        "ext-imagick": "Allow TIFF images to be implicitly converted to jpeg."
+        "ext-imagick": "Allow TIFF images to be implicitly converted to jpeg.",
+        "kraken-io/kraken-php": "Allow Kraken.io listener to optimize images",
+        "tinify/tinify": "Allow Tinify API listener to optimize images"
     },
     "autoload": {
         "psr-4": {
@@ -47,7 +47,9 @@
         "phpstan/phpstan": "^0.12.2",
         "symfony/debug": "^4.4",
         "symfony/var-dumper": "^4.4",
-        "symfony/dotenv": "^4.4 || ^5.1"
+        "symfony/dotenv": "^4.4 || ^5.1",
+        "kraken-io/kraken-php": "^1.6",
+        "tinify/tinify": "^1.5"
     },
     "repositories": {
         "intervention/image": {

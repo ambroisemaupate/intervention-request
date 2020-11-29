@@ -29,8 +29,6 @@ use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
-use Tinify\Source;
-use Tinify\Tinify;
 
 /**
  * Class TinifyListener
@@ -49,13 +47,14 @@ class TinifyListener implements ImageFileEventSubscriberInterface
     private $logger;
 
     /**
-     * TinifyListener constructor.
-     *
      * @param string $apiKey
-     * @param LoggerInterface $logger
+     * @param LoggerInterface|null $logger
      */
     public function __construct($apiKey, LoggerInterface $logger = null)
     {
+        if (!class_exists('\Tinify\Tinify')) {
+            throw new \RuntimeException('tinify/tinify library is required to use TinifyListener');
+        }
         $this->apiKey = $apiKey;
         $this->logger = $logger;
     }
@@ -92,7 +91,7 @@ class TinifyListener implements ImageFileEventSubscriberInterface
     public function onImageSaved(ImageSavedEvent $event)
     {
         if ($this->supports($event->getImageFile())) {
-            Tinify::setKey($this->apiKey);
+            \Tinify\Tinify::setKey($this->apiKey);
             \Tinify\validate();
 
             $source = \Tinify\fromFile($event->getImageFile()->getPathname());
@@ -116,10 +115,10 @@ class TinifyListener implements ImageFileEventSubscriberInterface
 
     /**
      * @param string $localPath
-     * @param Source $source
+     * @param \Tinify\Source $source
      * @return void
      */
-    protected function overrideImageFile($localPath, Source $source)
+    protected function overrideImageFile($localPath, \Tinify\Source $source)
     {
         $source->toFile($localPath);
     }
