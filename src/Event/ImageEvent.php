@@ -26,11 +26,9 @@
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class ImageEvent
- *
  * @package AM\InterventionRequest\Event
  */
 abstract class ImageEvent extends Event
@@ -41,7 +39,6 @@ abstract class ImageEvent extends Event
     protected $image;
 
     /**
-     * ImageEvent constructor.
      * @param Image|null $image
      */
     public function __construct(Image $image = null)

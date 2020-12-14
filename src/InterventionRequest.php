@@ -46,7 +46,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class InterventionRequest
  * @package AM\InterventionRequest
  */
 class InterventionRequest
@@ -134,7 +133,7 @@ class InterventionRequest
     /**
      * @return void
      */
-    private function defineTimezone()
+    private function defineTimezone(): void
     {
         /*
          * Define a request wide timezone
@@ -146,7 +145,7 @@ class InterventionRequest
      * @param EventSubscriberInterface $subscriber
      * @return void
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         $this->dispatcher->addSubscriber($subscriber);
     }
@@ -186,7 +185,7 @@ class InterventionRequest
      * @return void
      * @throws \Exception
      */
-    public function handleRequest(Request $request)
+    public function handleRequest(Request $request): void
     {
         try {
             if (!$request->query->has('image')) {
@@ -200,6 +199,8 @@ class InterventionRequest
             }
         } catch (FileNotFoundException $e) {
             $this->response = $this->getNotFoundResponse($e->getMessage());
+        } catch (\InvalidArgumentException $e) {
+            $this->response = $this->getBadRequestResponse($e->getMessage());
         } catch (\RuntimeException $e) {
             $this->response = $this->getBadRequestResponse($e->getMessage());
         }
@@ -209,7 +210,7 @@ class InterventionRequest
      * @param string $message
      * @return Response
      */
-    protected function getNotFoundResponse($message = "")
+    protected function getNotFoundResponse($message = ""): Response
     {
         $body = '<h1>404 Error: File not found</h1>';
         if ($message != '') {
@@ -227,7 +228,7 @@ class InterventionRequest
      * @param string $message
      * @return Response
      */
-    protected function getBadRequestResponse($message = "")
+    protected function getBadRequestResponse($message = ""): Response
     {
         $body = '<h1>400 Error: Bad Request</h1>';
         if ($message != '') {
@@ -245,7 +246,7 @@ class InterventionRequest
      * @param Request $request
      * @return Response
      */
-    public function getResponse(Request $request)
+    public function getResponse(Request $request): Response
     {
         if (null !== $this->response) {
             $this->response->setPublic();
@@ -267,7 +268,7 @@ class InterventionRequest
     /**
      * @return Configuration
      */
-    public function getConfiguration()
+    public function getConfiguration(): Configuration
     {
         return $this->configuration;
     }

@@ -72,8 +72,6 @@ class FileCache implements EventSubscriberInterface
     private $imageEncoder;
 
     /**
-     * FileCache constructor.
-     *
      * @param ChainProcessor       $chainProcessor
      * @param string               $cachePath
      * @param LoggerInterface|null $logger
@@ -85,9 +83,9 @@ class FileCache implements EventSubscriberInterface
         ChainProcessor $chainProcessor,
         string $cachePath,
         LoggerInterface $logger = null,
-        $ttl = 604800,
-        $gcProbability = 300,
-        $useFileChecksum = false
+        int $ttl = 604800,
+        int $gcProbability = 300,
+        bool $useFileChecksum = false
     ) {
         $cachePath = realpath($cachePath);
         if (false === $cachePath) {
@@ -107,7 +105,7 @@ class FileCache implements EventSubscriberInterface
      *
      * @return array The event names to listen to
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RequestEvent::class => ['onRequest', -100]
@@ -121,7 +119,7 @@ class FileCache implements EventSubscriberInterface
      *
      * @return Image
      */
-    protected function saveImage(Image $image, string $cacheFilePath, int $quality)
+    protected function saveImage(Image $image, string $cacheFilePath, int $quality): Image
     {
         $path = dirname($cacheFilePath);
         if (!file_exists($path)) {
@@ -135,9 +133,9 @@ class FileCache implements EventSubscriberInterface
      *
      * @param Request $request
      *
-     * @return boolean
+     * @return bool
      */
-    private function garbageCollectionShouldRun(Request $request)
+    private function garbageCollectionShouldRun(Request $request): bool
     {
         if (true === (boolean) $request->get('force_gc', false)) {
             return true;
@@ -156,7 +154,7 @@ class FileCache implements EventSubscriberInterface
      * @param Request $request
      * @return void
      */
-    protected function initializeGarbageCollection(Request $request)
+    protected function initializeGarbageCollection(Request $request): void
     {
         if ($this->garbageCollectionShouldRun($request)) {
             $garbageCollector = new GarbageCollector($this->cachePath, $this->logger);
@@ -182,7 +180,7 @@ class FileCache implements EventSubscriberInterface
      * @throws \Exception
      * @return void
      */
-    public function onRequest(RequestEvent $requestEvent, $eventName, EventDispatcherInterface $dispatcher)
+    public function onRequest(RequestEvent $requestEvent, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($this->supports($requestEvent)) {
             $request = $requestEvent->getRequest();

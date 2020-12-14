@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Event;
 
 use AM\InterventionRequest\InterventionRequest;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

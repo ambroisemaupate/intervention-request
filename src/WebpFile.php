@@ -26,7 +26,6 @@ namespace AM\InterventionRequest;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
- * Class WebpFile
  * @package AM\InterventionRequest
  * @deprecated Use NextGenFile to support all next-generation formats (WEBP, AVIF, …)
  */

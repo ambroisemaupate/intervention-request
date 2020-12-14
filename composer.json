@@ -21,13 +21,13 @@
         "php": "^7.1 || ^8.0",
         "ext-gd": "*",
         "ext-curl": "*",
-        "intervention/image": "dev-master",
+        "intervention/image": "^2.5.1",
         "symfony/http-foundation": "^4.4 || ^5.0.7",
-        "symfony/console": "^4.4",
-        "symfony/finder": "^4.4",
-        "symfony/filesystem": "^4.4",
-        "symfony/event-dispatcher": "^4.4",
-        "symfony/process": "^4.4",
+        "symfony/console": "^4.4 || ^5.0.7",
+        "symfony/finder": "^4.4 || ^5.0.7",
+        "symfony/filesystem": "^4.4 || ^5.0.7",
+        "symfony/event-dispatcher": "^4.4 || ^5.0.7",
+        "symfony/process": "^4.4 || ^5.0.7",
         "monolog/monolog": "^1.22 || ^2.1.1",
         "symfony/mime": "^4.4 || ^5.1"
     },
@@ -50,11 +50,5 @@
         "symfony/dotenv": "^4.4 || ^5.1",
         "kraken-io/kraken-php": "^1.6",
         "tinify/tinify": "^1.5"
-    },
-    "repositories": {
-        "intervention/image": {
-            "type": "vcs",
-            "url": "https://github.com/ambroisemaupate/image.git"
-        }
     }
 }
