@@ -1,5 +1,4 @@
-FROM roadiz/php74-nginx-alpine:latest
-#FROM roadiz/php80-nginx-alpine:latest
+FROM roadiz/php80-nginx-alpine:latest
 MAINTAINER Ambroise Maupate <ambroise@rezo-zero.com>
 ARG USER_UID=1000
 
