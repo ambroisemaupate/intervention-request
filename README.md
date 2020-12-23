@@ -7,30 +7,36 @@
 [![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 
-* [Ready-to-go Docker image](#ready-to-go-docker-image)
-* [Install](#install)
-* [Configuration](#configuration)
-* [Available operations](#available-operations)
-* [Using standalone entry point](#using-standalone-entry-point)
-* [Using as a library inside your projects](#using-as-a-library-inside-your-projects)
-* [Use URL rewriting](#use-url-rewriting)
-    + [Shortcuts](#shortcuts)
-* [Use pass-through cache](#use-pass-through-cache)
-* [Convert to webp](#convert-to-webp)
-* [Force garbage collection](#force-garbage-collection)
-    + [Using command-line](#using-command-line)
-* [Extend Intervention Request](#extend-intervention-request)
-    + [Add custom event subscribers](#add-custom-event-subscribers)
-* [Performances](#performances)
-* [Optimization](#optimization)
-    + [jpegoptim](#jpegoptim)
-    + [pngquant](#pngquant)
-    + [kraken.io](#krakenio)
-    + [tinyjpg.com](#tinyjpgcom)
-    + [jpegtran](#jpegtran)
-    + [Benchmark](#optimization-benchmark)
-* [License](#license)
-* [Testing](#testing)
+- [Ready-to-go *Docker* image](#ready-to-go-docker-image)
+    * [Docker Compose example](#docker-compose-example)
+- [Install](#install)
+- [Configuration](#configuration)
+- [Available operations](#available-operations)
+    * [Fit position](#fit-position)
+- [Using standalone entry point](#using-standalone-entry-point)
+- [Using as a library inside your projects](#using-as-a-library-inside-your-projects)
+- [Use URL rewriting](#use-url-rewriting)
+    * [Shortcuts](#shortcuts)
+- [Use pass-through cache](#use-pass-through-cache)
+- [Convert to webp](#convert-to-webp)
+- [Force garbage collection](#force-garbage-collection)
+    * [Using command-line](#using-command-line)
+- [Extend Intervention Request](#extend-intervention-request)
+    * [Add custom event subscribers](#add-custom-event-subscribers)
+        + [Available events](#available-events)
+        + [Listener examples](#listener-examples)
+- [Performances](#performances)
+- [Optimization](#optimization)
+    * [jpegoptim](#jpegoptim)
+    * [pngquant](#pngquant)
+    * [oxipng](#oxipng)
+    * [pingo](#pingo)
+    * [kraken.io](#krakenio)
+    * [tinyjpg.com](#tinyjpgcom)
+    * [jpegtran](#jpegtran)
+    * [Optimization benchmark](#optimization-benchmark)
+- [License](#license)
+- [Testing](#testing)
 
 ## Ready-to-go *Docker* image
 
@@ -128,6 +134,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 - `setUseFileChecksum(true|false)`: Use file checksum to test if file is different even if its name does not change. This option can be greedy on large files. (default: `false`).
 - `setJpegoptimPath(string)`: *Optional* — Tells where `jpegoptim` binary is for JPEG post-processing (not useful unless you need to stick to 100 quality).
 - `setPngquantPath(string)`: *Optional* — Tells where `pngquant` binary is for PNG post-processing. **This post-processing tool is highly recommended** as PNG won’t be optimized without it.
+- `setLossyPng(true|false)`: *Optional* — Tells `pngquant`/`pingo` binaries to use *palette* lossy compression (default: `false`).
 
 
 ## Available operations
@@ -141,7 +148,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 | crop | [Crop an image](http://image.intervention.io/api/crop) It needs a `width` and a `height` in pixels | `…&crop=300x300` |
 | width | [Resize image proportionally to given width](http://image.intervention.io/api/widen) It needs a `width` in pixels | `…&width=300` |
 | height | [Resize image proportionally to given height](http://image.intervention.io/api/heighten) It needs a `height` in pixels | `…&height=300` |
-| crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
+| crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
 | background | [Matte a png file with a background color](http://image.intervention.io/api/limitColors) | `…&background=ff0000` |
 | greyscale/grayscale | [Turn an image into a greyscale version](http://image.intervention.io/api/greyscale) | `…&greyscale=1` |
 | blur | [Blurs an image](http://image.intervention.io/api/blur) | `…&blur=20` |
@@ -150,6 +157,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 | interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
 | sharpen | [Sharpen image](http://image.intervention.io/api/sharpen) (1 - 100) | `…&sharpen=10` |
 | contrast | [Change image contrast](http://image.intervention.io/api/contrast) (-100 to 100, 0 means no changes) | `…&contrast=10` |
+| no_process | **Disable all image processing by PHP**, this does not load image in memory but executes any post-process optimizers (such as *pngquant*, *jpegoptim*…) | `…&no_process=1` |
 
 ### Fit position
 
@@ -269,6 +277,7 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | interlace | i |
 | sharpen | s |
 | contrast *(only from 0 to 100)* | k |
+| no_process *(do not process and load image in memory, allows optimizers)* | n |
 
 
 ## Use pass-through cache
@@ -415,6 +424,25 @@ If you have `pngquant` installed on your server, you can add it to your configur
 
 ```php
 $conf->setPngquantPath('/usr/local/bin/pngquant');
+$conf->setLossyPng(true); // use palette lossy png compression - default: false
+```
+
+### oxipng
+
+If you have [`oxipng`](https://github.com/shssoichiro/oxipng) installed on your server, you can add it to your configuration
+
+```php
+$conf->setOxipngPath('/usr/local/bin/oxipng');
+```
+
+### pingo
+
+If you have [`pingo`](https://css-ig.net/pingo) installed on your server and `Wine`, you can add it to your configuration
+
+```php
+$conf->setPingoPath('/usr/local/bin/pingo.exe');
+$conf->setLossyPng(true); // use palette lossy png compression - default: false
+$conf->setNoAlphaPingo(true); // Remove png transparency to compress more - default: false
 ```
 
 ### kraken.io
@@ -460,14 +488,20 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
 
 ### Optimization benchmark
 
-With default quality to 90%
+With default quality to 90%. \
+AVIF conversion only supports custom compiled *ImageMagick* and only support lossless encoding.
 
-| Url | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) |
-| --- | ------- | -------------- | ------------------- | --------- | ------------------ | ---- | ---- |
-| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB | 235 kB | 155 kB |
-| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB | 176 kB | 115 kB |
-| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB | 564 kB | 429 kB |
-| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB | 295 kB | 229 kB |
+| Url       | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) | AVIF (100%) |
+| ----------------------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
+| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB | 235 kB | 155 kB |  94 kB |
+| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB | 176 kB | 115 kB |  71 kB |
+| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB | 564 kB | 429 kB | 398 kB |
+| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB | 295 kB | 229 kB | 227 kB |
+
+
+| Url                                 | PHP raw   | pngquant  | oxipng    | *Kraken.io* + lossy    | WebP (100%) | WebP (85%) | AVIF (100%) |
+| ----------------------------------- | --------- | --------- | --------- | --------- | ----------- | --------- | --------- |
+| /test/images/testPNG.png            | 292 kB | 167 kB | 288 kB | 142 kB | 186 kB   | 28 kB | 11.7 kB |
 
 ## License
 

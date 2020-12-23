@@ -25,22 +25,16 @@ namespace AM\InterventionRequest;
 
 use Symfony\Component\HttpFoundation\File\File;
 
-class WebpFile extends File
+/**
+ * @package AM\InterventionRequest
+ * @deprecated Use NextGenFile to support all next-generation formats (WEBP, AVIF, …)
+ */
+class WebpFile extends NextGenFile
 {
     /**
      * @var bool
      */
     private $isWebp = false;
-
-    /**
-     * @var string
-     */
-    protected $requestedPath;
-
-    /**
-     * @var File
-     */
-    protected $requestedFile;
 
     /**
      * @inheritDoc
@@ -49,6 +43,8 @@ class WebpFile extends File
     {
         if (preg_match('#\.(jpe?g|gif|png)\.webp$#', $path) > 0) {
             $this->isWebp = true;
+            $this->isNextGen = true;
+            $this->nextGenMimeType = 'image/webp';
             $this->requestedPath = $path;
             $this->requestedFile = new File($path, false);
             $realPath = preg_replace('#\.webp$#', '', $path);
@@ -59,26 +55,10 @@ class WebpFile extends File
     }
 
     /**
-     * @return string
-     */
-    public function getRequestedPath()
-    {
-        return $this->requestedPath;
-    }
-
-    /**
      * @return bool
      */
     public function isWebp(): bool
     {
         return $this->isWebp;
-    }
-
-    /**
-     * @return File
-     */
-    public function getRequestedFile(): File
-    {
-        return $this->requestedFile ?? $this;
     }
 }

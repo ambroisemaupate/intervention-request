@@ -28,13 +28,14 @@ namespace AM\InterventionRequest\Cache;
 use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
+use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use AM\InterventionRequest\ShortUrlExpander;
-use AM\InterventionRequest\WebpFile;
 use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,8 +72,6 @@ class FileCache implements EventSubscriberInterface
     private $imageEncoder;
 
     /**
-     * FileCache constructor.
-     *
      * @param ChainProcessor       $chainProcessor
      * @param string               $cachePath
      * @param LoggerInterface|null $logger
@@ -84,9 +83,9 @@ class FileCache implements EventSubscriberInterface
         ChainProcessor $chainProcessor,
         string $cachePath,
         LoggerInterface $logger = null,
-        $ttl = 604800,
-        $gcProbability = 300,
-        $useFileChecksum = false
+        int $ttl = 604800,
+        int $gcProbability = 300,
+        bool $useFileChecksum = false
     ) {
         $cachePath = realpath($cachePath);
         if (false === $cachePath) {
@@ -106,7 +105,7 @@ class FileCache implements EventSubscriberInterface
      *
      * @return array The event names to listen to
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RequestEvent::class => ['onRequest', -100]
@@ -120,7 +119,7 @@ class FileCache implements EventSubscriberInterface
      *
      * @return Image
      */
-    protected function saveImage(Image $image, string $cacheFilePath, int $quality)
+    protected function saveImage(Image $image, string $cacheFilePath, int $quality): Image
     {
         $path = dirname($cacheFilePath);
         if (!file_exists($path)) {
@@ -134,9 +133,9 @@ class FileCache implements EventSubscriberInterface
      *
      * @param Request $request
      *
-     * @return boolean
+     * @return bool
      */
-    private function garbageCollectionShouldRun(Request $request)
+    private function garbageCollectionShouldRun(Request $request): bool
     {
         if (true === (boolean) $request->get('force_gc', false)) {
             return true;
@@ -155,7 +154,7 @@ class FileCache implements EventSubscriberInterface
      * @param Request $request
      * @return void
      */
-    protected function initializeGarbageCollection(Request $request)
+    protected function initializeGarbageCollection(Request $request): void
     {
         if ($this->garbageCollectionShouldRun($request)) {
             $garbageCollector = new GarbageCollector($this->cachePath, $this->logger);
@@ -181,13 +180,13 @@ class FileCache implements EventSubscriberInterface
      * @throws \Exception
      * @return void
      */
-    public function onRequest(RequestEvent $requestEvent, $eventName, EventDispatcherInterface $dispatcher)
+    public function onRequest(RequestEvent $requestEvent, string $eventName, EventDispatcherInterface $dispatcher): void
     {
         if ($this->supports($requestEvent)) {
             $request = $requestEvent->getRequest();
             $nativePath = $requestEvent->getInterventionRequest()->getConfiguration()->getImagesPath() .
                 '/' . $request->get('image');
-            $nativeImage = new WebpFile($nativePath);
+            $nativeImage = new NextGenFile($nativePath);
             $cacheFilePath = $this->getCacheFilePath($request, $nativeImage);
             $cacheFile = new File($cacheFilePath, false);
             $firstGen = false;
@@ -195,8 +194,13 @@ class FileCache implements EventSubscriberInterface
              * First render cached image file.
              */
             if (!is_file($cacheFilePath)) {
-                $image = $this->chainProcessor->process($nativeImage, $request);
-                $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
+                if ($request->query->has('no_process')) {
+                    $image = null;
+                    (new Filesystem())->copy($nativeImage, $cacheFile);
+                } else {
+                    $image = $this->chainProcessor->process($nativeImage, $request);
+                    $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
+                }
                 // create the ImageSavedEvent and dispatch it
                 $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile));
                 $firstGen = true;
@@ -257,11 +261,12 @@ class FileCache implements EventSubscriberInterface
                 $cacheParams[$name] = $value;
             }
         }
-        if ($nativeImage instanceof WebpFile && $nativeImage->isWebp()) {
-            $cacheParams['webp'] = true;
-            $extension = 'webp';
+        if ($nativeImage instanceof NextGenFile && $nativeImage->isNextGen()) {
+            $cacheParams[$nativeImage->getNextGenExtension()] = true;
+            $extension = $nativeImage->getNextGenExtension();
         } else {
             $cacheParams['webp'] = false;
+            $cacheParams['avif'] = false;
             if (false === $nativeImage->getRealPath()) {
                 throw new \InvalidArgumentException('Native image does not exist.');
             }

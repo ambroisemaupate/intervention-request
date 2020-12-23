@@ -25,9 +25,6 @@
  */
 namespace AM\InterventionRequest;
 
-/**
- *
- */
 class Configuration
 {
     /**
@@ -71,11 +68,27 @@ class Configuration
      */
     protected $useFileChecksum = false;
     /**
-     * @var string
+     * @var string|null
      */
     protected $pngquantPath;
     /**
-     * @var string
+     * @var bool
+     */
+    protected $lossyPng = false;
+    /**
+     * @var string|null
+     */
+    protected $pingoPath;
+    /**
+     * @var bool
+     */
+    protected $noAlphaPingo = false;
+    /**
+     * @var string|null
+     */
+    protected $oxipngPath;
+    /**
+     * @var string|null
      */
     protected $jpegoptimPath;
     /**
@@ -84,36 +97,36 @@ class Configuration
     protected $responseTtl = 31536000; // 365*24*60*60
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPngquantPath()
+    public function getPngquantPath(): ?string
     {
         return $this->pngquantPath;
     }
 
     /**
-     * @param string $pngquantPath
+     * @param string|null $pngquantPath
      * @return Configuration
      */
-    public function setPngquantPath($pngquantPath)
+    public function setPngquantPath(?string $pngquantPath): Configuration
     {
         $this->pngquantPath = $pngquantPath;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getJpegoptimPath()
+    public function getJpegoptimPath(): ?string
     {
         return $this->jpegoptimPath;
     }
 
     /**
-     * @param string $jpegoptimPath
+     * @param string|null $jpegoptimPath
      * @return Configuration
      */
-    public function setJpegoptimPath($jpegoptimPath)
+    public function setJpegoptimPath(?string $jpegoptimPath): Configuration
     {
         $this->jpegoptimPath = $jpegoptimPath;
         return $this;
@@ -124,7 +137,7 @@ class Configuration
      *
      * @return boolean
      */
-    public function hasCaching()
+    public function hasCaching(): bool
     {
         return $this->caching;
     }
@@ -135,7 +148,7 @@ class Configuration
      * @param boolean $caching the caching
      * @return Configuration
      */
-    public function setCaching($caching)
+    public function setCaching(bool $caching): Configuration
     {
         $this->caching = (boolean) $caching;
 
@@ -147,7 +160,7 @@ class Configuration
      *
      * @return string
      */
-    public function getDriver()
+    public function getDriver(): string
     {
         return $this->driver;
     }
@@ -158,7 +171,7 @@ class Configuration
      * @param string $driver the driver
      * @return Configuration
      */
-    public function setDriver($driver)
+    public function setDriver(string $driver): Configuration
     {
         $this->driver = $driver;
 
@@ -170,7 +183,7 @@ class Configuration
      *
      * @return string
      */
-    public function getCachePath()
+    public function getCachePath(): string
     {
         return $this->cachePath;
     }
@@ -181,7 +194,7 @@ class Configuration
      * @param string $cachePath the cache path
      * @return Configuration
      */
-    public function setCachePath($cachePath)
+    public function setCachePath(string $cachePath): Configuration
     {
         $this->cachePath = $cachePath;
 
@@ -191,9 +204,9 @@ class Configuration
     /**
      * Gets the value of imagesPath.
      *
-     * @return mixed
+     * @return string
      */
-    public function getImagesPath()
+    public function getImagesPath(): string
     {
         return $this->imagesPath;
     }
@@ -201,10 +214,10 @@ class Configuration
     /**
      * Sets the value of imagesPath.
      *
-     * @param mixed $imagesPath the images path
+     * @param string $imagesPath the images path
      * @return Configuration
      */
-    public function setImagesPath($imagesPath)
+    public function setImagesPath(string $imagesPath): Configuration
     {
         $this->imagesPath = $imagesPath;
 
@@ -214,9 +227,9 @@ class Configuration
     /**
      * Gets the value of garbage collector ttl.
      *
-     * @return mixed
+     * @return int
      */
-    public function getTtl()
+    public function getTtl(): int
     {
         return $this->ttl;
     }
@@ -224,10 +237,10 @@ class Configuration
     /**
      * Sets the value of garbage collector ttl.
      *
-     * @param mixed $ttl the ttl
+     * @param int $ttl the ttl
      * @return Configuration
      */
-    public function setTtl($ttl)
+    public function setTtl(int $ttl): Configuration
     {
         $this->ttl = (int) $ttl;
 
@@ -237,9 +250,9 @@ class Configuration
     /**
      * Gets the value of gcProbability.
      *
-     * @return mixed
+     * @return int
      */
-    public function getGcProbability()
+    public function getGcProbability(): int
     {
         return $this->gcProbability;
     }
@@ -250,13 +263,13 @@ class Configuration
      * Garbage collection launch probability is 1/$gcProbability where
      * probability of 1/1 will launch GC at every request.
      *
-     * @param mixed $gcProbability the gc probability
+     * @param int $gcProbability the gc probability
      * @return Configuration
      */
-    public function setGcProbability($gcProbability)
+    public function setGcProbability(int $gcProbability): Configuration
     {
         if ($gcProbability >= 1) {
-            $this->gcProbability = (int) $gcProbability;
+            $this->gcProbability = $gcProbability;
         }
 
         return $this;
@@ -265,9 +278,9 @@ class Configuration
     /**
      * Gets the value of timezone.
      *
-     * @return mixed
+     * @return string
      */
-    public function getTimezone()
+    public function getTimezone(): string
     {
         return $this->timezone;
     }
@@ -275,10 +288,10 @@ class Configuration
     /**
      * Sets the value of timezone.
      *
-     * @param mixed $timezone the timezone
+     * @param string $timezone the timezone
      * @return Configuration
      */
-    public function setTimezone($timezone)
+    public function setTimezone(string $timezone): Configuration
     {
         $this->timezone = $timezone;
 
@@ -288,9 +301,9 @@ class Configuration
     /**
      * Gets the value of defaultQuality.
      *
-     * @return mixed
+     * @return int
      */
-    public function getDefaultQuality()
+    public function getDefaultQuality(): int
     {
         return $this->defaultQuality;
     }
@@ -301,9 +314,9 @@ class Configuration
      * @param integer $defaultQuality the default quality
      * @return Configuration
      */
-    public function setDefaultQuality($defaultQuality)
+    public function setDefaultQuality(int $defaultQuality): Configuration
     {
-        $this->defaultQuality = (int) $defaultQuality;
+        $this->defaultQuality = $defaultQuality;
 
         return $this;
     }
@@ -311,9 +324,9 @@ class Configuration
     /**
      * Gets the value of useFileChecksum.
      *
-     * @return boolean
+     * @return bool
      */
-    public function getUseFileChecksum()
+    public function getUseFileChecksum(): bool
     {
         return $this->useFileChecksum;
     }
@@ -325,12 +338,12 @@ class Configuration
      * can slow down your php process a lot if you are process large images
      * (> 1 Mo).
      *
-     * @param boolean $useFileChecksum the use file md5
+     * @param bool $useFileChecksum the use file md5
      * @return Configuration
      */
-    public function setUseFileChecksum($useFileChecksum)
+    public function setUseFileChecksum(bool $useFileChecksum): Configuration
     {
-        $this->useFileChecksum = (boolean) $useFileChecksum;
+        $this->useFileChecksum = $useFileChecksum;
 
         return $this;
     }
@@ -338,7 +351,7 @@ class Configuration
     /**
      * @return bool
      */
-    public function isUsingPassThroughCache()
+    public function isUsingPassThroughCache(): bool
     {
         return $this->usePassThroughCache;
     }
@@ -347,7 +360,7 @@ class Configuration
      * @param bool $usePassThroughCache
      * @return Configuration
      */
-    public function setUsePassThroughCache($usePassThroughCache)
+    public function setUsePassThroughCache(bool $usePassThroughCache): Configuration
     {
         $this->usePassThroughCache = $usePassThroughCache;
         return $this;
@@ -368,5 +381,77 @@ class Configuration
     public function getResponseTtl(): int
     {
         return $this->responseTtl;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOxipngPath(): ?string
+    {
+        return $this->oxipngPath;
+    }
+
+    /**
+     * @param string|null $oxipngPath
+     * @return Configuration
+     */
+    public function setOxipngPath(?string $oxipngPath): Configuration
+    {
+        $this->oxipngPath = $oxipngPath;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLossyPng(): bool
+    {
+        return $this->lossyPng;
+    }
+
+    /**
+     * @param bool $lossyPng
+     * @return Configuration
+     */
+    public function setLossyPng(bool $lossyPng): Configuration
+    {
+        $this->lossyPng = $lossyPng;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPingoPath(): ?string
+    {
+        return $this->pingoPath;
+    }
+
+    /**
+     * @param string|null $pingoPath
+     * @return Configuration
+     */
+    public function setPingoPath($pingoPath): Configuration
+    {
+        $this->pingoPath = $pingoPath;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNoAlphaPingo(): bool
+    {
+        return $this->noAlphaPingo;
+    }
+
+    /**
+     * @param bool $noAlphaPingo
+     * @return Configuration
+     */
+    public function setNoAlphaPingo(bool $noAlphaPingo): Configuration
+    {
+        $this->noAlphaPingo = $noAlphaPingo;
+        return $this;
     }
 }

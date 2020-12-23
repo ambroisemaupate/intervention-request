@@ -44,13 +44,17 @@ class ImageSavedEvent extends ImageEvent
      * @var File
      */
     protected $imageFile;
+    /**
+     * @var int
+     */
+    protected $quality;
 
     /**
      * ImageSavedEvent constructor.
-     * @param Image $image
+     * @param Image|null $image
      * @param File $imageFile
      */
-    public function __construct(Image $image, File $imageFile)
+    public function __construct(?Image $image, File $imageFile)
     {
         parent::__construct($image);
         $this->imageFile = $imageFile;
@@ -62,5 +66,23 @@ class ImageSavedEvent extends ImageEvent
     public function getImageFile()
     {
         return $this->imageFile;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQuality(): int
+    {
+        return $this->quality;
+    }
+
+    /**
+     * @param int $quality
+     * @return ImageSavedEvent
+     */
+    public function setQuality(int $quality): ImageSavedEvent
+    {
+        $this->quality = $quality;
+        return $this;
     }
 }

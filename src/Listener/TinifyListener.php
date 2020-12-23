@@ -27,17 +27,15 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
-use Tinify\Source;
-use Tinify\Tinify;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Class TinifyListener
  *
  * @package AM\InterventionRequest\Listener
  */
-class TinifyListener implements ImageEventSubscriberInterface
+class TinifyListener implements ImageFileEventSubscriberInterface
 {
     /**
      * @var string
@@ -49,13 +47,14 @@ class TinifyListener implements ImageEventSubscriberInterface
     private $logger;
 
     /**
-     * TinifyListener constructor.
-     *
      * @param string $apiKey
-     * @param LoggerInterface $logger
+     * @param LoggerInterface|null $logger
      */
     public function __construct($apiKey, LoggerInterface $logger = null)
     {
+        if (!class_exists('\Tinify\Tinify')) {
+            throw new \RuntimeException('tinify/tinify library is required to use TinifyListener');
+        }
         $this->apiKey = $apiKey;
         $this->logger = $logger;
     }
@@ -91,8 +90,8 @@ class TinifyListener implements ImageEventSubscriberInterface
      */
     public function onImageSaved(ImageSavedEvent $event)
     {
-        if ($this->supports() && $event->getImageFile()->getPathname()) {
-            Tinify::setKey($this->apiKey);
+        if ($this->supports($event->getImageFile())) {
+            \Tinify\Tinify::setKey($this->apiKey);
             \Tinify\validate();
 
             $source = \Tinify\fromFile($event->getImageFile()->getPathname());
@@ -106,20 +105,20 @@ class TinifyListener implements ImageEventSubscriberInterface
     }
 
     /**
-     * @param Image $image
+     * @param File|null $image
      * @return bool
      */
-    public function supports(Image $image = null)
+    public function supports(File $image = null)
     {
-        return ('' !== $this->apiKey);
+        return ('' !== $this->apiKey && null !== $image && $image->getPathname() !== '');
     }
 
     /**
      * @param string $localPath
-     * @param Source $source
+     * @param \Tinify\Source $source
      * @return void
      */
-    protected function overrideImageFile($localPath, Source $source)
+    protected function overrideImageFile($localPath, \Tinify\Source $source)
     {
         $source->toFile($localPath);
     }

@@ -1,6 +1,5 @@
 FROM roadiz/php80-nginx-alpine:latest
 MAINTAINER Ambroise Maupate <ambroise@rezo-zero.com>
-ENV USER_UID=1000
 ARG USER_UID=1000
 
 ADD docker/etc /etc
@@ -15,7 +14,6 @@ RUN apk add --no-cache shadow \
     && composer dump-autoload --optimize --apcu \
     && usermod -u ${USER_UID} www-data \
     && groupmod -g ${USER_UID} www-data \
-    && mkdir -p /var/www/html/tmp/client_body \
     && mkdir -p /var/www/html/web/assets \
     && mkdir -p /var/www/html/web/images \
     && chmod +x /before_launch.sh \

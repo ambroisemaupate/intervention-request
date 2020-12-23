@@ -20,47 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * @file ImageEvent.php
+ * @file ImageEventSubscriberInterface.php
  * @author Ambroise Maupate
  */
-namespace AM\InterventionRequest\Event;
+namespace AM\InterventionRequest\Listener;
 
-use Intervention\Image\Image;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
-/**
- * @package AM\InterventionRequest\Event
- */
-abstract class ImageEvent extends Event
+interface ImageFileEventSubscriberInterface extends EventSubscriberInterface
 {
     /**
-     * @var Image|null
+     * Return true if current subscriber can be used for current image.
+     *
+     * @param File|null $image
+     * @return bool
      */
-    protected $image;
-
-    /**
-     * @param Image|null $image
-     */
-    public function __construct(Image $image = null)
-    {
-        $this->image = $image;
-    }
-
-    /**
-     * @return Image|null
-     */
-    public function getImage(): ?Image
-    {
-        return $this->image;
-    }
-
-    /**
-     * @param Image $image
-     * @return ImageEvent
-     */
-    public function setImage(Image $image)
-    {
-        $this->image = $image;
-        return $this;
-    }
+    public function supports(File $image = null);
 }

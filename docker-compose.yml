@@ -4,7 +4,7 @@ services:
         build: .
         image: ambroisemaupate/intervention-request:latest
         volumes:
-            - cache:/var/www/html/web/assets
+            - ./web/cache:/var/www/html/web/assets:delegated
             - ./web/images:/var/www/html/web/images:ro
         environment:
             IR_GC_PROBABILITY: ${IR_GC_PROBABILITY}
@@ -15,6 +15,8 @@ services:
             IR_DRIVER: ${IR_DRIVER}
             IR_JPEGOPTIM_PATH: ${IR_JPEGOPTIM_PATH}
             IR_PNGQUANT_PATH: ${IR_PNGQUANT_PATH}
+#            IR_OXIPNG_PATH: ${IR_OXIPNG_PATH}
+#            IR_PINGO_PATH: ${IR_PINGO_PATH}
             IR_CACHE_PATH: ${IR_CACHE_PATH}
             IR_IMAGES_PATH: ${IR_IMAGES_PATH}
             IR_IGNORE_PATH: ${IR_IGNORE_PATH}
@@ -31,8 +33,6 @@ services:
         networks:
             - default
             - frontproxynet
-volumes:
-  cache:
 
 networks:
     frontproxynet:

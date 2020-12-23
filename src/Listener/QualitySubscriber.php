@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Listener;
 
+use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,6 +22,7 @@ final class QualitySubscriber implements EventSubscriberInterface
     {
         return [
             RequestEvent::class => ['onRequest', 100],
+            ImageSavedEvent::class => ['onImageSaved', 100],
             ResponseEvent::class => 'onResponse',
         ];
     }
@@ -47,12 +49,28 @@ final class QualitySubscriber implements EventSubscriberInterface
             $requestEvent->getInterventionRequest()->getConfiguration()->getDefaultQuality()
         );
 
-        if ($this->quality <= 100 && $this->quality > 0) {
-            $requestEvent->setQuality($this->quality);
+        if ($requestEvent->getRequest()->query->has('no_process')) {
+            // Do not alter quality at image file save. but allow post-process optimizer to use quality info.
+            $requestEvent->setQuality(100);
         } else {
-            $requestEvent->setQuality(
-                $requestEvent->getInterventionRequest()->getConfiguration()->getDefaultQuality()
-            );
+            if ($this->quality <= 100 && $this->quality > 0) {
+                $requestEvent->setQuality($this->quality);
+            } else {
+                $requestEvent->setQuality(
+                    $requestEvent->getInterventionRequest()->getConfiguration()->getDefaultQuality()
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ImageSavedEvent $imageSavedEvent
+     * @return void
+     */
+    public function onImageSaved(ImageSavedEvent $imageSavedEvent)
+    {
+        if ($this->quality <= 100 && $this->quality > 0) {
+            $imageSavedEvent->setQuality($this->quality);
         }
     }
 }

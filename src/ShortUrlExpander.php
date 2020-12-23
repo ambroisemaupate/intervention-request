@@ -61,6 +61,7 @@ class ShortUrlExpander
         'p' => 'progressive',
         's' => 'sharpen',
         'k' => 'contrast',
+        'n' => 'no_process',
     ];
 
     public function __construct(Request $request)

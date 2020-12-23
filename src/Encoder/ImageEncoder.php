@@ -11,7 +11,7 @@ class ImageEncoder
      * @var array<string>
      */
     public static $allowedExtensions = [
-        'jpeg', 'jpg', 'gif', 'png', 'webp', 'tiff', 'tif', 'bmp', 'svg', 'ico'
+        'jpeg', 'jpg', 'gif', 'png', 'webp', 'avif', 'tiff', 'tif', 'bmp', 'svg', 'ico'
     ];
 
     /**
