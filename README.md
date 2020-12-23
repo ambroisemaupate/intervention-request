@@ -7,32 +7,36 @@
 [![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 
-* [Ready-to-go Docker image](#ready-to-go-docker-image)
-* [Install](#install)
-* [Configuration](#configuration)
-* [Available operations](#available-operations)
-* [Using standalone entry point](#using-standalone-entry-point)
-* [Using as a library inside your projects](#using-as-a-library-inside-your-projects)
-* [Use URL rewriting](#use-url-rewriting)
-    + [Shortcuts](#shortcuts)
-* [Use pass-through cache](#use-pass-through-cache)
-* [Convert to webp](#convert-to-webp)
-* [Force garbage collection](#force-garbage-collection)
-    + [Using command-line](#using-command-line)
-* [Extend Intervention Request](#extend-intervention-request)
-    + [Add custom event subscribers](#add-custom-event-subscribers)
-* [Performances](#performances)
-* [Optimization](#optimization)
-    + [jpegoptim](#jpegoptim)
-    + [pngquant](#pngquant)
-    + [oxipng](#oxipng)
-    + [pingo](#pingo)
-    + [kraken.io](#krakenio)
-    + [tinyjpg.com](#tinyjpgcom)
-    + [jpegtran](#jpegtran)
-    + [Benchmark](#optimization-benchmark)
-* [License](#license)
-* [Testing](#testing)
+- [Ready-to-go *Docker* image](#ready-to-go-docker-image)
+    * [Docker Compose example](#docker-compose-example)
+- [Install](#install)
+- [Configuration](#configuration)
+- [Available operations](#available-operations)
+    * [Fit position](#fit-position)
+- [Using standalone entry point](#using-standalone-entry-point)
+- [Using as a library inside your projects](#using-as-a-library-inside-your-projects)
+- [Use URL rewriting](#use-url-rewriting)
+    * [Shortcuts](#shortcuts)
+- [Use pass-through cache](#use-pass-through-cache)
+- [Convert to webp](#convert-to-webp)
+- [Force garbage collection](#force-garbage-collection)
+    * [Using command-line](#using-command-line)
+- [Extend Intervention Request](#extend-intervention-request)
+    * [Add custom event subscribers](#add-custom-event-subscribers)
+        + [Available events](#available-events)
+        + [Listener examples](#listener-examples)
+- [Performances](#performances)
+- [Optimization](#optimization)
+    * [jpegoptim](#jpegoptim)
+    * [pngquant](#pngquant)
+    * [oxipng](#oxipng)
+    * [pingo](#pingo)
+    * [kraken.io](#krakenio)
+    * [tinyjpg.com](#tinyjpgcom)
+    * [jpegtran](#jpegtran)
+    * [Optimization benchmark](#optimization-benchmark)
+- [License](#license)
+- [Testing](#testing)
 
 ## Ready-to-go *Docker* image
 
@@ -144,7 +148,7 @@ You can edit each configuration parameters using their corresponding *setters*:
 | crop | [Crop an image](http://image.intervention.io/api/crop) It needs a `width` and a `height` in pixels | `…&crop=300x300` |
 | width | [Resize image proportionally to given width](http://image.intervention.io/api/widen) It needs a `width` in pixels | `…&width=300` |
 | height | [Resize image proportionally to given height](http://image.intervention.io/api/heighten) It needs a `height` in pixels | `…&height=300` |
-| crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
+| crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
 | background | [Matte a png file with a background color](http://image.intervention.io/api/limitColors) | `…&background=ff0000` |
 | greyscale/grayscale | [Turn an image into a greyscale version](http://image.intervention.io/api/greyscale) | `…&greyscale=1` |
 | blur | [Blurs an image](http://image.intervention.io/api/blur) | `…&blur=20` |
