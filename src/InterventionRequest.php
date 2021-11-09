@@ -253,7 +253,18 @@ class InterventionRequest
             $this->response->setMaxAge($this->configuration->getResponseTtl());
             $this->response->setSharedMaxAge($this->configuration->getResponseTtl());
             $this->response->setCharset('UTF-8');
-
+            $this->response->headers->set(
+                'access-control-allow-headers',
+                'DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
+            );
+            $this->response->headers->set(
+                'access-control-allow-methods',
+                'GET, OPTIONS'
+            );
+            $this->response->headers->set(
+                'access-control-allow-origin',
+                '*'
+            );
             $responseEvent = new ResponseEvent($this->response);
             $this->dispatcher->dispatch($responseEvent);
             $this->response = $responseEvent->getResponse();

@@ -43,7 +43,11 @@ class CropResizedProcessor implements Processor
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('crop') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop') ?? '', $crop) &&
+            1 === preg_match(
+                '#^([0-9]+)[x\:]([0-9]+)$#',
+                (string) $request->query->get('crop') ?? '',
+                $crop
+            ) &&
             ($request->query->has('width') || $request->query->has('height'))) {
             $fitRatio = (float) $crop[1] / (float) $crop[2];
 

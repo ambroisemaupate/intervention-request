@@ -48,7 +48,7 @@ class LimitColorsProcessor implements Processor
                                         $request->query->get('background') :
                                         $request->query->get('limit_color');
 
-            if (1 === preg_match('#^([0-9a-f]{6})$#', $background ?? '')) {
+            if (1 === preg_match('#^([0-9a-f]{6})$#', (string) $background ?? '')) {
                 // count higher than 256 does not trigger palette creation
                 $image->limitColors(257, '#' . $background);
             }
