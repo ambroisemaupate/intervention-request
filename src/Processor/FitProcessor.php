@@ -46,7 +46,11 @@ class FitProcessor extends AbstractPositionableProcessor
         if ($request->query->has('fit') &&
             !$request->query->has('width') &&
             !$request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('fit') ?? '', $fit)) {
+            1 === preg_match(
+                '#^([0-9]+)[x\:]([0-9]+)$#',
+                (string) $request->query->get('fit') ?? '',
+                $fit
+            )) {
             $image->fit($fit[1], $fit[2], function (Constraint $constraint) {
                 $constraint->upsize();
             }, $this->parsePosition($request));

@@ -44,7 +44,11 @@ class WidenProcessor implements Processor
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('width') &&
-            1 === preg_match('#^([0-9]+)$#', $request->query->get('width') ?? '', $width)) {
+            1 === preg_match(
+                '#^([0-9]+)$#',
+                (string) $request->query->get('width') ?? '',
+                $width
+            )) {
             $image->widen($width[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });
