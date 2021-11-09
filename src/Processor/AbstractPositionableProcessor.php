@@ -37,7 +37,7 @@ abstract class AbstractPositionableProcessor implements Processor
     {
         $alignment = 'center';
         if ($request->query->has('align')) {
-            $alignment = $request->query->get('align', 'c') ?? 'c';
+            $alignment = (string) $request->query->get('align', 'c') ?? 'c';
             $availablePosition = [
                 'tl' => 'top-left',
                 't' => 'top',

@@ -45,7 +45,7 @@ class CropProcessor implements Processor
         if ($request->query->has('crop') &&
             !$request->query->has('width') &&
             !$request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $request->query->get('crop') ?? '', $crop)) {
+            1 === preg_match('#^([0-9]+)[x\:]([0-9]+)$#', (string) $request->query->get('crop') ?? '', $crop)) {
             $image->crop($crop[1], $crop[2]);
         }
     }

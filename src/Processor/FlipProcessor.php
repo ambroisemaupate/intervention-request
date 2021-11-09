@@ -43,7 +43,7 @@ class FlipProcessor implements Processor
     public function process(Image $image, Request $request)
     {
         if ($request->query->has('flip') &&
-            1 === preg_match('#^(h|v)$#', $request->query->get('flip') ?? '', $fit)) {
+            1 === preg_match('#^(h|v)$#', (string) $request->query->get('flip') ?? '', $fit)) {
             $image->flip($fit[1]);
         }
     }
