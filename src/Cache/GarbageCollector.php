@@ -108,7 +108,7 @@ class GarbageCollector
             if (!$file->isDir()) {
                 $this->fs->remove($file->getPathName());
                 if (null !== $this->logger) {
-                    $this->logger->info('Purge file.', ['file' => $file->getPathname()]);
+                    $this->logger->debug('Purge file.', ['file' => $file->getPathname()]);
                 }
             }
         }
@@ -143,7 +143,7 @@ class GarbageCollector
                 if (iterator_count($fileFinder) === 0) {
                     $this->fs->remove($dir->getPathname());
                     if (null !== $this->logger) {
-                        $this->logger->info('Delete empty folder.', ['folder' => $dir->getPathname()]);
+                        $this->logger->debug('Delete empty folder.', ['folder' => $dir->getPathname()]);
                     }
                 }
 
@@ -179,7 +179,7 @@ class GarbageCollector
     {
         $msg = sprintf("GC started");
         if (null !== $this->logger) {
-            $this->logger->info($msg);
+            $this->logger->debug($msg);
         } else {
             error_log($msg);
         }
@@ -203,7 +203,7 @@ class GarbageCollector
         if ($successful) {
             $msg = sprintf("GC completed");
             if (null !== $this->logger) {
-                $this->logger->info($msg);
+                $this->logger->debug($msg);
             } else {
                 error_log($msg);
             }
