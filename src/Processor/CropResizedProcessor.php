@@ -33,7 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Class CropResizedProcessor
  * @package AM\InterventionRequest\Processor
  */
-class CropResizedProcessor implements Processor
+class CropResizedProcessor extends AbstractPositionableProcessor
 {
     /**
      * @param Image $image
@@ -66,7 +66,7 @@ class CropResizedProcessor implements Processor
             if (isset($realFitSize)) {
                 $image->fit($realFitSize[0], $realFitSize[1], function (Constraint $constraint) {
                     $constraint->upsize();
-                });
+                }, $this->parsePosition($request));
             }
         }
     }
