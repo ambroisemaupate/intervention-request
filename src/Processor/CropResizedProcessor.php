@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file CropResizedProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
@@ -30,35 +32,36 @@ use Intervention\Image\Constraint;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class CropResizedProcessor
  * @package AM\InterventionRequest\Processor
  */
-class CropResizedProcessor extends AbstractPositionableProcessor
+final class CropResizedProcessor extends AbstractPositionableProcessor
 {
     /**
      * @param Image $image
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('crop') &&
+        if (
+            $request->query->has('crop') &&
             1 === preg_match(
                 '#^([0-9]+)[x\:]([0-9]+)$#',
-                (string) $request->query->get('crop') ?? '',
+                (string) ($request->query->get('crop') ?? ''),
                 $crop
             ) &&
-            ($request->query->has('width') || $request->query->has('height'))) {
+            ($request->query->has('width') || $request->query->has('height'))
+        ) {
             $fitRatio = (float) $crop[1] / (float) $crop[2];
 
             if ($request->query->has('width')) {
                 $realFitSize = [
                     (int) $request->query->get('width'),
-                    (int) round($request->query->get('width') / $fitRatio),
+                    (int) round(floatval($request->query->get('width')) / $fitRatio),
                 ];
             } elseif ($request->query->has('height')) {
                 $realFitSize = [
-                    (int) round($request->query->get('height') * $fitRatio),
+                    (int) round(floatval($request->query->get('height')) * $fitRatio),
                     (int) $request->query->get('height'),
                 ];
             }

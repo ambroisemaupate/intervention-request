@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2016, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file KrakenListener.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
@@ -31,36 +33,20 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
- * Class KrakenListener
- *
  * @package AM\InterventionRequest\Listener
  */
-class KrakenListener implements ImageFileEventSubscriberInterface
+final class KrakenListener implements ImageFileEventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $apiKey;
-    /**
-     * @var string
-     */
-    private $apiSecret;
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
-    /**
-     * @var bool
-     */
-    private $lossy;
+    private string $apiKey;
+    private string $apiSecret;
+    private ?LoggerInterface $logger;
+    private bool $lossy;
     /**
      * @var \Kraken
      */
     private $kraken;
 
     /**
-     * KrakenListener constructor.
-     *
      * @param string $apiKey
      * @param string $apiSecret
      * @param bool $lossy
@@ -82,7 +68,7 @@ class KrakenListener implements ImageFileEventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ImageSavedEvent::class => 'onImageSaved',
@@ -94,7 +80,7 @@ class KrakenListener implements ImageFileEventSubscriberInterface
      * @param ResponseEvent $event
      * @return void
      */
-    public function onResponse(ResponseEvent $event)
+    public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         if ($this->supports() && (bool) $response->headers->get('X-IR-First-Gen')) {
@@ -107,7 +93,7 @@ class KrakenListener implements ImageFileEventSubscriberInterface
      * @param ImageSavedEvent $event
      * @return void
      */
-    public function onImageSaved(ImageSavedEvent $event)
+    public function onImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {
             $params = array(
@@ -133,7 +119,7 @@ class KrakenListener implements ImageFileEventSubscriberInterface
      * @param File|null $image
      * @return bool
      */
-    public function supports(File $image = null)
+    public function supports(File $image = null): bool
     {
         return null !== $this->kraken &&
             '' !== $this->apiKey &&
@@ -147,7 +133,7 @@ class KrakenListener implements ImageFileEventSubscriberInterface
      * @param string $krakedUrl
      * @return void
      */
-    protected function overrideImageFile(string $localPath, string $krakedUrl)
+    protected function overrideImageFile(string $localPath, string $krakedUrl): void
     {
         /**
          * Initialize the cURL session

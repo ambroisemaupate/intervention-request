@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2019, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file AbstractProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -33,11 +35,11 @@ abstract class AbstractPositionableProcessor implements Processor
      * @param Request $request
      * @return string
      */
-    protected function parsePosition(Request $request)
+    protected function parsePosition(Request $request): string
     {
         $alignment = 'center';
         if ($request->query->has('align')) {
-            $alignment = (string) $request->query->get('align', 'c') ?? 'c';
+            $alignment = (string) ($request->query->get('align', 'c') ?? 'c');
             $availablePosition = [
                 'tl' => 'top-left',
                 't' => 'top',

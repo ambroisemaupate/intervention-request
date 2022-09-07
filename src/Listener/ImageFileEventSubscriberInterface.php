@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file ImageEventSubscriberInterface.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Listener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -36,5 +38,5 @@ interface ImageFileEventSubscriberInterface extends EventSubscriberInterface
      * @param File|null $image
      * @return bool
      */
-    public function supports(File $image = null);
+    public function supports(File $image = null): bool;
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AM\InterventionRequest;
@@ -7,36 +8,15 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class NextGenFile extends File
 {
-    /**
-     * @var string
-     */
-    protected $requestedPath;
+    protected string $requestedPath;
+    protected ?File $requestedFile;
+    protected bool $isNextGen = false;
+    protected ?string $nextGenMimeType = null;
+    protected ?string $nextGenExtension = null;
 
-    /**
-     * @var File|null
-     */
-    protected $requestedFile;
-
-    /**
-     * @var bool
-     */
-    protected $isNextGen = false;
-
-    /**
-     * @var string|null
-     */
-    protected $nextGenMimeType;
-    /**
-     * @var string|null
-     */
-    protected $nextGenExtension;
-
-    /**
-     * @inheritDoc
-     */
-    public function __construct($path, $checkPath = true)
+    public function __construct(string $path, bool $checkPath = true)
     {
-        if (preg_match('#\.(heic|heif)\.jpg$#', $path) > 0) {
+        if (preg_match('#\.(heic|heif|avif)\.jpg$#', $path) > 0) {
             /*
              * Convert HEIC format back to JPEG
              */
@@ -88,7 +68,7 @@ class NextGenFile extends File
     /**
      * @return string
      */
-    public function getRequestedPath()
+    public function getRequestedPath(): string
     {
         return $this->requestedPath;
     }

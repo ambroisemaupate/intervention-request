@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file ImageProcessEvent.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Event;
 
 /**
@@ -36,9 +38,9 @@ class ImageProcessEvent extends ImageEvent
     /**
      * @deprecated
      */
-    const BEFORE_PROCESS = ImageBeforeProcessEvent::class;
+    public const BEFORE_PROCESS = ImageBeforeProcessEvent::class;
     /**
      * @deprecated
      */
-    const AFTER_PROCESS = ImageAfterProcessEvent::class;
+    public const AFTER_PROCESS = ImageAfterProcessEvent::class;
 }

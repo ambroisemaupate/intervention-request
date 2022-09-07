@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,24 +24,24 @@
  * @file GreyscaleProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- *
- */
-class GreyscaleProcessor implements Processor
+final class GreyscaleProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('greyscale') ||
-            $request->query->has('grayscale')) {
+        if (
+            $request->query->has('greyscale') ||
+            $request->query->has('grayscale')
+        ) {
             $image->greyscale();
         }
     }

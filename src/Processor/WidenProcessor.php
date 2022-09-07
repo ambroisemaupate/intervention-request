@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,32 +24,30 @@
  * @file WidenProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Intervention\Image\Constraint;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class WidenProcessor
- *
- * @package AM\InterventionRequest\Processor
- */
-class WidenProcessor implements Processor
+final class WidenProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('width') &&
+        if (
+            $request->query->has('width') &&
             1 === preg_match(
                 '#^([0-9]+)$#',
-                (string) $request->query->get('width') ?? '',
+                (string) ($request->query->get('width') ?? ''),
                 $width
-            )) {
+            )
+        ) {
             $image->widen($width[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });

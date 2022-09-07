@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file UnlockGarbageCollectorCommand.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Command;
 
 use AM\InterventionRequest\Cache\GarbageCollector;
@@ -36,7 +38,7 @@ class UnlockGarbageCollectorCommand extends Command
     /**
      * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('gc:unlock')
@@ -55,7 +57,7 @@ class UnlockGarbageCollectorCommand extends Command
      *
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $cacheDir = $input->getArgument('cache');
         $text = "";

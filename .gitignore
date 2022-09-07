@@ -109,3 +109,4 @@ fabric.properties
 
 report.txt
 project_env.sh
+.phpcs-cache

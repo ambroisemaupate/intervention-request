@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file ImageEventSubscriberInterface.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Listener;
 
 use Intervention\Image\Image;
@@ -36,5 +38,5 @@ interface ImageEventSubscriberInterface extends EventSubscriberInterface
      * @param Image|null $image
      * @return bool
      */
-    public function supports(Image $image = null);
+    public function supports(Image $image = null): bool;
 }
