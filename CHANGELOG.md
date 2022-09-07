@@ -1,3 +1,9 @@
+## [v3.3.1](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.0...v3.3.1) (2022-09-07)
+
+### Bug Fixes
+
+* Allow converting AVIF/HEIC back to webp or jpg ([29f7843](https://github.com/ambroisemaupate/intervention-request/commit/29f7843b0d5b710d7269a7b774202b4701017416))
+
 ## [v3.3.0](https://github.com/ambroisemaupate/intervention-request/compare/v3.2.3...v3.3.0) (2022-09-07)
 
 * Added support for next files formats when using Imagick driver: AVIF, HEIF/HEIC
