@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2020, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file InterventionRequest.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
@@ -50,26 +52,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InterventionRequest
 {
-    /**
-     * @var Response|null
-     */
-    protected $response;
-    /**
-     * @var null|LoggerInterface
-     */
-    protected $logger;
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    protected ?Response $response = null;
+    protected ?LoggerInterface $logger = null;
+    protected Configuration $configuration;
+    protected EventDispatcherInterface $dispatcher;
 
     /**
-     * Create a new InterventionRequest object.
-     *
      * @param Configuration        $configuration
      * @param LoggerInterface|null $logger
      * @param array|null           $processors

@@ -11,6 +11,6 @@ install:
     - php composer.phar install --dev --no-interaction
 
 script:
-    - php -d memory_limit=-1 vendor/bin/phpcs --report=full --report-file=./report.txt --extensions=php --warning-severity=0 --standard=PSR2 -p ./src
+    - php -d memory_limit=-1 vendor/bin/phpcs --report=full --report-file=./report.txt --extensions=php --warning-severity=0 --standard=PSR12 -p ./src
     - php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon
 

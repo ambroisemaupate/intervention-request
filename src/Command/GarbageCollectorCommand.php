@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file GarbageCollectorCommand.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Command;
 
 use AM\InterventionRequest\Cache\GarbageCollector;
@@ -35,8 +37,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class GarbageCollectorCommand
- *
  * @package AM\InterventionRequest\Command
  */
 class GarbageCollectorCommand extends Command
@@ -44,7 +44,7 @@ class GarbageCollectorCommand extends Command
     /**
      * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('gc:launch')
@@ -78,7 +78,7 @@ class GarbageCollectorCommand extends Command
      * @return int
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $cacheDir = $input->getArgument('cache');
         $logFile = $input->getOption('log');
@@ -93,9 +93,9 @@ class GarbageCollectorCommand extends Command
         if (is_string($cacheDir) && !empty($cacheDir) && file_exists($cacheDir)) {
             $gc = new GarbageCollector($cacheDir, $log);
             if ($ttl = $input->getOption('ttl')) {
-                $gc->setTtl($ttl);
+                $gc->setTtl(intval($ttl));
             }
-            $text .= "<info>Garbage collection started on ".$cacheDir." for TTL ".$gc->getTtl().".</info>" . PHP_EOL;
+            $text .= "<info>Garbage collection started on " . $cacheDir . " for TTL " . $gc->getTtl() . ".</info>" . PHP_EOL;
             $gc->launch();
             $text .= "<info>Garbage collection finished.</info>" . PHP_EOL;
         } else {

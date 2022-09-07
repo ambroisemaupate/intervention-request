@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file ImageProcessEvent.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Event;
 
 /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Maxime Bérard
  *
@@ -23,21 +24,19 @@
  * @file BlurProcessor.php
  * @author Maxime Bérard
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- *
- */
-class BlurProcessor implements Processor
+final class BlurProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
         if ($request->query->has('blur')) {
             $image->blur((int) $request->query->get('blur'));

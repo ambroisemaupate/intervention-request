@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AM\InterventionRequest\Processor;
@@ -13,28 +14,18 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class ChainProcessor
- *
  * @package AM\InterventionRequest\Processor
  */
 final class ChainProcessor
 {
-    /**
-     * @var Configuration
-     */
-    private $configuration;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private Configuration $configuration;
+    private EventDispatcherInterface $dispatcher;
     /**
      * @var Processor[]
      */
-    private $processors;
+    private array $processors;
 
     /**
-     * ChainProcessor constructor.
-     *
      * @param Configuration            $configuration
      * @param EventDispatcherInterface $dispatcher
      * @param Processor[]              $processors

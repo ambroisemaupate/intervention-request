@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2018  Ambroise Maupate
  *
@@ -58,7 +59,11 @@ final class PassThroughFileCache extends FileCache
         /*
          * Check that cache folder is really used in request
          */
-        $documentRoot = realpath($request->server->get('DOCUMENT_ROOT'));
+        $documentRoot = $request->server->get('DOCUMENT_ROOT');
+        if (!is_string($documentRoot)) {
+            throw new \RuntimeException('DOCUMENT_ROOT server param is not set.');
+        }
+        $documentRoot = realpath($documentRoot);
         if (false === $documentRoot) {
             throw new \RuntimeException($request->server->get('DOCUMENT_ROOT') . ' path does not exist.');
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,78 +24,31 @@
  * @file Configuration.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest;
 
 class Configuration
 {
-    /**
-     * @var bool
-     */
-    protected $caching = true;
-    /**
-     * @var bool
-     */
-    protected $usePassThroughCache = false;
-    /**
-     * @var string
-     */
-    protected $cachePath;
-    /**
-     * @var string
-     */
-    protected $imagesPath;
+    protected bool $caching = true;
+    protected bool $usePassThroughCache = false;
+    protected string $cachePath;
+    protected string $imagesPath;
     /**
      * @var string [gd or imagick]
      */
-    protected $driver = 'gd';
-    /**
-     * @var int Garbage collector ttl
-     */
-    protected $ttl = 604800; // 7*24*60*60
-    /**
-     * @var int
-     */
-    protected $gcProbability = 400;
-    /**
-     * @var string
-     */
-    protected $timezone = "UTC";
-    /**
-     * @var int
-     */
-    protected $defaultQuality = 90;
-    /**
-     * @var bool
-     */
-    protected $useFileChecksum = false;
-    /**
-     * @var string|null
-     */
-    protected $pngquantPath;
-    /**
-     * @var bool
-     */
-    protected $lossyPng = false;
-    /**
-     * @var string|null
-     */
-    protected $pingoPath;
-    /**
-     * @var bool
-     */
-    protected $noAlphaPingo = false;
-    /**
-     * @var string|null
-     */
-    protected $oxipngPath;
-    /**
-     * @var string|null
-     */
-    protected $jpegoptimPath;
-    /**
-     * @var int
-     */
-    protected $responseTtl = 31536000; // 365*24*60*60
+    protected string $driver = 'gd';
+    protected int $ttl = 604800; // 7*24*60*60
+    protected int $gcProbability = 400;
+    protected string $timezone = "UTC";
+    protected int $defaultQuality = 90;
+    protected bool $useFileChecksum = false;
+    protected ?string $pngquantPath = null;
+    protected bool $lossyPng = false;
+    protected ?string $pingoPath = null;
+    protected bool $noAlphaPingo = false;
+    protected ?string $oxipngPath = null;
+    protected ?string $jpegoptimPath = null;
+    protected int $responseTtl = 31536000; // 365*24*60*60
 
     /**
      * @return string|null
@@ -150,7 +104,7 @@ class Configuration
      */
     public function setCaching(bool $caching): Configuration
     {
-        $this->caching = (boolean) $caching;
+        $this->caching = (bool) $caching;
 
         return $this;
     }
@@ -242,7 +196,7 @@ class Configuration
      */
     public function setTtl(int $ttl): Configuration
     {
-        $this->ttl = (int) $ttl;
+        $this->ttl = $ttl;
 
         return $this;
     }

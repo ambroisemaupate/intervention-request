@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2016, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file ImageSavedEvent.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
@@ -40,30 +42,25 @@ class ImageSavedEvent extends ImageEvent
      */
     const NAME = ImageSavedEvent::class;
 
-    /**
-     * @var File
-     */
-    protected $imageFile;
-    /**
-     * @var int
-     */
-    protected $quality;
+    protected File $imageFile;
+    protected int $quality;
 
     /**
-     * ImageSavedEvent constructor.
      * @param Image|null $image
      * @param File $imageFile
+     * @param int $quality
      */
-    public function __construct(?Image $image, File $imageFile)
+    public function __construct(?Image $image, File $imageFile, int $quality = 90)
     {
         parent::__construct($image);
         $this->imageFile = $imageFile;
+        $this->quality = $quality;
     }
 
     /**
      * @return File
      */
-    public function getImageFile()
+    public function getImageFile(): File
     {
         return $this->imageFile;
     }

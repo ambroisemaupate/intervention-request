@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2020, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file FileCache.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Cache;
 
 use AM\InterventionRequest\Encoder\ImageEncoder;
@@ -42,34 +44,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileCache implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    protected $cachePath;
-    /**
-     * @var null|LoggerInterface
-     */
-    protected $logger;
-    /**
-     * @var int
-     */
-    protected $ttl;
-    /**
-     * @var int
-     */
-    protected $gcProbability;
-    /**
-     * @var bool
-     */
-    protected $useFileChecksum;
-    /**
-     * @var ChainProcessor
-     */
-    protected $chainProcessor;
-    /**
-     * @var ImageEncoder
-     */
-    private $imageEncoder;
+    protected string $cachePath;
+    protected ?LoggerInterface $logger = null;
+    protected int $ttl;
+    protected int $gcProbability;
+    protected bool $useFileChecksum;
+    protected ChainProcessor $chainProcessor;
+    private ImageEncoder $imageEncoder;
 
     /**
      * @param ChainProcessor       $chainProcessor
@@ -137,7 +118,7 @@ class FileCache implements EventSubscriberInterface
      */
     private function garbageCollectionShouldRun(Request $request): bool
     {
-        if (true === (boolean) $request->get('force_gc', false)) {
+        if (true === (bool) $request->get('force_gc', false)) {
             return true;
         }
 
@@ -202,7 +183,7 @@ class FileCache implements EventSubscriberInterface
                     $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
                 }
                 // create the ImageSavedEvent and dispatch it
-                $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile));
+                $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile, $requestEvent->getQuality()));
                 $firstGen = true;
             }
 

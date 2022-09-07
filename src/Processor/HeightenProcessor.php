@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,28 +24,26 @@
  * @file HeightenProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Intervention\Image\Constraint;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class HeightenProcessor
- *
- * @package AM\InterventionRequest\Processor
- */
-class HeightenProcessor implements Processor
+final class HeightenProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('height') &&
-            1 === preg_match('#^([0-9]+)$#', (string) $request->query->get('height') ?? '', $height)) {
+        if (
+            $request->query->has('height') &&
+            1 === preg_match('#^([0-9]+)$#', (string) ($request->query->get('height') ?? ''), $height)
+        ) {
             $image->heighten($height[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,24 +24,20 @@
  * @file RotateProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class RotateProcessor
- *
- * @package AM\InterventionRequest\Processor
- */
-class RotateProcessor implements Processor
+final class RotateProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
         if ($request->query->has('rotate')) {
             $image->rotate((float) $request->query->get('rotate'));

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file JpegTranListener.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
@@ -31,16 +33,11 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
 /**
- * Class JpegTranListener
- *
  * @package AM\InterventionRequest\Listener
  */
-class JpegTranListener implements ImageFileEventSubscriberInterface
+final class JpegTranListener implements ImageFileEventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    protected $jpegtranPath;
+    protected string $jpegtranPath;
 
     /**
      * @param string $jpegtranPath
@@ -53,7 +50,7 @@ class JpegTranListener implements ImageFileEventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ImageSavedEvent::class => 'onJpegImageSaved',
@@ -65,12 +62,14 @@ class JpegTranListener implements ImageFileEventSubscriberInterface
      * @param ResponseEvent $event
      * @return void
      */
-    public function onResponse(ResponseEvent $event)
+    public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
-        if ($this->jpegtranPath !== '' &&
+        if (
+            $this->jpegtranPath !== '' &&
             $response->headers->get('Content-Type') === 'image/jpeg' &&
-            (bool) $response->headers->get('X-IR-First-Gen')) {
+            (bool) $response->headers->get('X-IR-First-Gen')
+        ) {
             $response->headers->add(['X-IR-JpegTran' => '1']);
             $event->setResponse($response);
         }
@@ -80,7 +79,7 @@ class JpegTranListener implements ImageFileEventSubscriberInterface
      * @param File|null $image
      * @return bool
      */
-    public function supports(File $image = null)
+    public function supports(File $image = null): bool
     {
         return null !== $image && $image->getMimeType() === 'image/jpeg' && $this->jpegtranPath !== '';
     }
@@ -89,7 +88,7 @@ class JpegTranListener implements ImageFileEventSubscriberInterface
      * @param ImageSavedEvent $event
      * @return void
      */
-    public function onJpegImageSaved(ImageSavedEvent $event)
+    public function onJpegImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {
             $process = new Process([
