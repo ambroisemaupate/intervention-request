@@ -38,9 +38,9 @@ class ImageProcessEvent extends ImageEvent
     /**
      * @deprecated
      */
-    const BEFORE_PROCESS = ImageBeforeProcessEvent::class;
+    public const BEFORE_PROCESS = ImageBeforeProcessEvent::class;
     /**
      * @deprecated
      */
-    const AFTER_PROCESS = ImageAfterProcessEvent::class;
+    public const AFTER_PROCESS = ImageAfterProcessEvent::class;
 }

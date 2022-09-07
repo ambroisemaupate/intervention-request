@@ -1,16 +1,16 @@
 language: php
-sudo: required
 php:
-    - 7.2
-    - 7.3
-    - 7.4
-    - 8.0
-
+    - '7.4'
+    - '8.0'
+    - '8.1'
+    - 'nightly'
+jobs:
+    allow_failures:
+        - php: 'nightly'
 install:
-    - curl -s http://getcomposer.org/installer | php
-    - php composer.phar install --dev --no-interaction
+    - composer install --dev --no-scripts --no-suggest
 
 script:
-    - php -d memory_limit=-1 vendor/bin/phpcs --report=full --report-file=./report.txt --extensions=php --warning-severity=0 --standard=PSR12 -p ./src
-    - php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon
+    - vendor/bin/phpcs --report=full --report-file=./report.txt -p
+    - vendor/bin/phpstan analyse -c phpstan.neon
 

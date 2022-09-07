@@ -35,7 +35,7 @@ final class ResponseEvent extends ImageEvent
     /**
      * @deprecated ResponseEvent::class
      */
-    const NAME = ResponseEvent::class;
+    public const NAME = ResponseEvent::class;
 
     private Response $response;
 

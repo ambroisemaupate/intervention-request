@@ -40,7 +40,7 @@ class ImageSavedEvent extends ImageEvent
     /**
      * @deprecated Use ImageSavedEvent::class
      */
-    const NAME = ImageSavedEvent::class;
+    public const NAME = ImageSavedEvent::class;
 
     protected File $imageFile;
     protected int $quality;
