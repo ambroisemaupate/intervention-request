@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,32 +24,30 @@
  * @file LimitColorsProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class LimitColorsProcessor
- *
- * @package AM\InterventionRequest\Processor
- */
-class LimitColorsProcessor implements Processor
+final class LimitColorsProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('background') ||
-            $request->query->has('limit_color')) {
+        if (
+            $request->query->has('background') ||
+            $request->query->has('limit_color')
+        ) {
             $background = $request->query->has('background') ?
                                         $request->query->get('background') :
                                         $request->query->get('limit_color');
 
-            if (1 === preg_match('#^([0-9a-f]{6})$#', (string) $background ?? '')) {
+            if (1 === preg_match('#^([0-9a-f]{6})$#', (string) ($background ?? ''))) {
                 // count higher than 256 does not trigger palette creation
                 $image->limitColors(257, '#' . $background);
             }

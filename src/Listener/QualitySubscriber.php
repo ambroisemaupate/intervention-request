@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AM\InterventionRequest\Listener;
@@ -10,15 +11,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class QualitySubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var int
-     */
-    private $quality;
+    private int $quality;
 
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RequestEvent::class => ['onRequest', 100],
@@ -31,7 +29,7 @@ final class QualitySubscriber implements EventSubscriberInterface
      * @param ResponseEvent $event
      * @return void
      */
-    public function onResponse(ResponseEvent $event)
+    public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         $response->headers->set('X-IR-Quality', (string) $this->quality);
@@ -42,12 +40,12 @@ final class QualitySubscriber implements EventSubscriberInterface
      * @param RequestEvent $requestEvent
      * @return void
      */
-    public function onRequest(RequestEvent $requestEvent)
+    public function onRequest(RequestEvent $requestEvent): void
     {
-        $this->quality = (int) $requestEvent->getRequest()->get(
+        $this->quality = intval($requestEvent->getRequest()->get(
             'quality',
             $requestEvent->getInterventionRequest()->getConfiguration()->getDefaultQuality()
-        );
+        ));
 
         if ($requestEvent->getRequest()->query->has('no_process')) {
             // Do not alter quality at image file save. but allow post-process optimizer to use quality info.
@@ -67,7 +65,7 @@ final class QualitySubscriber implements EventSubscriberInterface
      * @param ImageSavedEvent $imageSavedEvent
      * @return void
      */
-    public function onImageSaved(ImageSavedEvent $imageSavedEvent)
+    public function onImageSaved(ImageSavedEvent $imageSavedEvent): void
     {
         if ($this->quality <= 100 && $this->quality > 0) {
             $imageSavedEvent->setQuality($this->quality);

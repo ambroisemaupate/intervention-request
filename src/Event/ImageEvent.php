@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file ImageEvent.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
@@ -33,15 +35,12 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 abstract class ImageEvent extends Event
 {
-    /**
-     * @var Image|null
-     */
-    protected $image;
+    protected ?Image $image;
 
     /**
      * @param Image|null $image
      */
-    public function __construct(Image $image = null)
+    public function __construct(?Image $image = null)
     {
         $this->image = $image;
     }
@@ -58,7 +57,7 @@ abstract class ImageEvent extends Event
      * @param Image $image
      * @return ImageEvent
      */
-    public function setImage(Image $image)
+    public function setImage(Image $image): ImageEvent
     {
         $this->image = $image;
         return $this;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2016, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file KrakenListener.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
@@ -31,26 +33,18 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
- * Class TinifyListener
- *
  * @package AM\InterventionRequest\Listener
  */
-class TinifyListener implements ImageFileEventSubscriberInterface
+final class TinifyListener implements ImageFileEventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $apiKey;
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
+    private string $apiKey = '';
+    private ?LoggerInterface $logger;
 
     /**
      * @param string $apiKey
      * @param LoggerInterface|null $logger
      */
-    public function __construct($apiKey, LoggerInterface $logger = null)
+    public function __construct(string $apiKey, LoggerInterface $logger = null)
     {
         if (!class_exists('\Tinify\Tinify')) {
             throw new \RuntimeException('tinify/tinify library is required to use TinifyListener');
@@ -62,7 +56,7 @@ class TinifyListener implements ImageFileEventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ImageSavedEvent::class => 'onImageSaved',
@@ -74,7 +68,7 @@ class TinifyListener implements ImageFileEventSubscriberInterface
      * @param ResponseEvent $event
      * @return void
      */
-    public function onResponse(ResponseEvent $event)
+    public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         if ($this->supports() && (bool) $response->headers->get('X-IR-First-Gen')) {
@@ -88,7 +82,7 @@ class TinifyListener implements ImageFileEventSubscriberInterface
      * @return void
      * @throws \Tinify\AccountException
      */
-    public function onImageSaved(ImageSavedEvent $event)
+    public function onImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {
             \Tinify\Tinify::setKey($this->apiKey);
@@ -108,7 +102,7 @@ class TinifyListener implements ImageFileEventSubscriberInterface
      * @param File|null $image
      * @return bool
      */
-    public function supports(File $image = null)
+    public function supports(File $image = null): bool
     {
         return ('' !== $this->apiKey && null !== $image && $image->getPathname() !== '');
     }
@@ -118,7 +112,7 @@ class TinifyListener implements ImageFileEventSubscriberInterface
      * @param \Tinify\Source $source
      * @return void
      */
-    protected function overrideImageFile($localPath, \Tinify\Source $source)
+    protected function overrideImageFile($localPath, \Tinify\Source $source): void
     {
         $source->toFile($localPath);
     }

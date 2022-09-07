@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file WatermarkListener.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageAfterProcessEvent;
@@ -31,44 +33,25 @@ use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 
 /**
- * Class WatermarkListener
- *
  * @package AM\InterventionRequest\Listener
  */
-class WatermarkListener implements ImageEventSubscriberInterface
+final class WatermarkListener implements ImageEventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $watermarkText;
-    /**
-     * @var int
-     */
-    private $size;
+    private string $watermarkText;
+    private int $size;
     /**
      * @var array|string
      */
     private $color;
-    /**
-     * @var string
-     */
-    private $align;
-    /**
-     * @var string
-     */
-    private $valign;
-    /**
-     * @var int
-     */
-    private $angle;
+    private string $align;
+    private string $valign;
+    private int $angle;
     /**
      * @var int|string
      */
     private $fontFile;
 
     /**
-     * Add a watermark text on image center.
-     *
      * @param string $watermarkText The text string that will be written to the image.
      * @param int|string $fontFile Set path to a True Type Font file or a integer value between 1 and 5 for one of the GD library internal fonts. Default: 1
      * @param int $size Set font size in pixels. Font sizing is only available if a font file is set and will be ignored otherwise. Default: 12
@@ -78,13 +61,13 @@ class WatermarkListener implements ImageEventSubscriberInterface
      * @param int $angle Set rotation angle of text in degrees. Text will be rotated counter-clockwise around the vertical and horizontal aligned point. Rotation is only available if a font file is set and will be ignored otherwise. Default: no rotation
      */
     public function __construct(
-        $watermarkText,
+        string $watermarkText,
         $fontFile = 1,
-        $size = 24,
+        int $size = 24,
         $color = '#FFFFFF',
-        $align = 'center',
-        $valign = 'center',
-        $angle = 0
+        string $align = 'center',
+        string $valign = 'center',
+        int $angle = 0
     ) {
         $this->watermarkText = $watermarkText;
         $this->size = $size;
@@ -98,7 +81,7 @@ class WatermarkListener implements ImageEventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ImageAfterProcessEvent::class => 'watermarkImage',
@@ -110,7 +93,7 @@ class WatermarkListener implements ImageEventSubscriberInterface
      * @param ResponseEvent $event
      * @return void
      */
-    public function onResponse(ResponseEvent $event)
+    public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         if ((bool) $response->headers->get('X-IR-First-Gen')) {
@@ -123,15 +106,15 @@ class WatermarkListener implements ImageEventSubscriberInterface
      * @param ImageAfterProcessEvent $event
      * @return void
      */
-    public function watermarkImage(ImageAfterProcessEvent $event)
+    public function watermarkImage(ImageAfterProcessEvent $event): void
     {
         $image = $event->getImage();
         if (null !== $image && $this->supports($image)) {
             // use callback to define details
             $image->text(
                 $this->watermarkText,
-                $image->getWidth()/2,
-                $image->getHeight()/2,
+                $image->getWidth() / 2,
+                $image->getHeight() / 2,
                 function (AbstractFont $font) {
                     $font->file((string) $this->fontFile);
                     $font->size($this->size);
@@ -147,10 +130,10 @@ class WatermarkListener implements ImageEventSubscriberInterface
     }
 
     /**
-     * @param Image $image
+     * @param Image|null $image
      * @return bool
      */
-    public function supports(Image $image = null)
+    public function supports(Image $image = null): bool
     {
         return null !== $image;
     }

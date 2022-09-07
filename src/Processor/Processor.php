@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AM\InterventionRequest\Processor;
@@ -13,5 +14,5 @@ interface Processor
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request);
+    public function process(Image $image, Request $request): void;
 }

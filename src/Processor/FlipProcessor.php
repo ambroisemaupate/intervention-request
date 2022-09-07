@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,27 +24,25 @@
  * @file FitProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class FlipProcessor
- *
- * @package AM\InterventionRequest\Processor
- */
-class FlipProcessor implements Processor
+final class FlipProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('flip') &&
-            1 === preg_match('#^(h|v)$#', (string) $request->query->get('flip') ?? '', $fit)) {
+        if (
+            $request->query->has('flip') &&
+            1 === preg_match('#^(h|v)$#', (string) ($request->query->get('flip') ?? ''), $fit)
+        ) {
             $image->flip($fit[1]);
         }
     }

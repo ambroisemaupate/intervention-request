@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -25,6 +26,7 @@
  * @file GarbageCollector.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Cache;
 
 use Psr\Log\LoggerInterface;
@@ -32,42 +34,23 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
 /**
- * Class GarbageCollector
- *
  * @package AM\InterventionRequest\Cache
  */
 class GarbageCollector
 {
-    /**
-     * @var string
-     */
-    protected $cacheDirectory;
-    /**
-     * @var string
-     */
-    protected $lockPath;
-    /**
-     * @var LoggerInterface|null
-     */
-    protected $logger;
-    /**
-     * @var Filesystem
-     */
-    protected $fs;
-    /**
-     * @var int
-     */
-    protected $ttl = 604800;
+    protected string $cacheDirectory;
+    protected string $lockPath;
+    protected ?LoggerInterface $logger = null;
+    protected Filesystem $fs;
+    protected int $ttl = 604800;
 
     /**
-     * Garbage collector.
-     *
      * Clears out old files from the cache
      *
      * @param string $cacheDirectory
-     * @param LoggerInterface $logger
+     * @param ?LoggerInterface $logger
      */
-    public function __construct($cacheDirectory, LoggerInterface $logger = null)
+    public function __construct(string $cacheDirectory, LoggerInterface $logger = null)
     {
         $this->cacheDirectory = $cacheDirectory;
         $this->lockPath = $this->cacheDirectory . '/garbageCollector.tmp';
@@ -78,7 +61,7 @@ class GarbageCollector
     /**
      * @return void
      */
-    public function launch()
+    public function launch(): void
     {
         if (!$this->isRunning()) {
             $this->start();
@@ -96,7 +79,7 @@ class GarbageCollector
      * @param string $path Directory to delete stale files from
      * @return void
      */
-    private function deleteStaleFilesFromDirectory($path)
+    private function deleteStaleFilesFromDirectory(string $path): void
     {
         $finder = new Finder();
         $finder->files()
@@ -124,7 +107,7 @@ class GarbageCollector
      * @param string $path Directory to delete empty directories from
      * @return void
      */
-    private function deleteEmptyDirectory($path)
+    private function deleteEmptyDirectory(string $path): void
     {
         $finder = new Finder();
         $dirs = iterator_to_array($finder->directories()->in($path), true);
@@ -157,12 +140,14 @@ class GarbageCollector
     /**
      * Checks to see if the garbage collector is currently running.
      *
-     * @return boolean
+     * @return bool
      */
-    private function isRunning()
+    private function isRunning(): bool
     {
-        if ($this->fs->exists($this->lockPath) &&
-            filemtime($this->lockPath) > time() - 86400) {
+        if (
+            $this->fs->exists($this->lockPath) &&
+            filemtime($this->lockPath) > time() - 86400
+        ) {
             // If the file is more than 1 day old, something probably went wrong and we should run again anyway
             return true;
         } else {
@@ -175,7 +160,7 @@ class GarbageCollector
      *
      * @return void
      */
-    private function start()
+    private function start(): void
     {
         $msg = sprintf("GC started");
         if (null !== $this->logger) {
@@ -192,10 +177,10 @@ class GarbageCollector
     /**
      * Removes the file that signifies that the garbage collector is currently running.
      *
-     * @param boolean $successful
+     * @param bool $successful
      * @return void
      */
-    private function finish($successful = true)
+    private function finish(bool $successful = true): void
     {
         // Delete the file that tells Intervention Request that the garbage collector is running
         $this->fs->remove($this->lockPath);
@@ -213,9 +198,9 @@ class GarbageCollector
     /**
      * Gets the value of lockPath.
      *
-     * @return mixed
+     * @return string
      */
-    public function getLockPath()
+    public function getLockPath(): string
     {
         return $this->lockPath;
     }
@@ -223,9 +208,9 @@ class GarbageCollector
     /**
      * Gets the value of ttl.
      *
-     * @return mixed
+     * @return int
      */
-    public function getTtl()
+    public function getTtl(): int
     {
         return $this->ttl;
     }
@@ -233,11 +218,11 @@ class GarbageCollector
     /**
      * Sets the value of ttl.
      *
-     * @param mixed $ttl the ttl
+     * @param int $ttl the ttl
      *
      * @return self
      */
-    public function setTtl($ttl)
+    public function setTtl(int $ttl): GarbageCollector
     {
         $this->ttl = $ttl;
 

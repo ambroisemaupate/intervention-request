@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file AbstractProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
@@ -41,8 +43,8 @@ abstract class AbstractProcessor implements Processor
     /**
      * Execute image intervention operations.
      *
-     * @param  Image $image
+     * @param Image $image
      * @param Request $request
      */
-    abstract public function process(Image $image, Request $request);
+    abstract public function process(Image $image, Request $request): void;
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2017, Ambroise Maupate
  *
@@ -23,6 +24,7 @@
  * @file ResponseEvent.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
@@ -33,17 +35,13 @@ final class ResponseEvent extends ImageEvent
     /**
      * @deprecated ResponseEvent::class
      */
-    const NAME = ResponseEvent::class;
+    public const NAME = ResponseEvent::class;
+
+    private Response $response;
 
     /**
-     * @var Response
-     */
-    private $response;
-
-    /**
-     * ResponseEvent constructor.
      * @param Response $response
-     * @param Image $image Read-only image
+     * @param Image|null $image Read-only image
      */
     public function __construct(Response $response, Image $image = null)
     {
@@ -54,7 +52,7 @@ final class ResponseEvent extends ImageEvent
     /**
      * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }
@@ -63,7 +61,7 @@ final class ResponseEvent extends ImageEvent
      * @param Response $response
      * @return ResponseEvent
      */
-    public function setResponse($response)
+    public function setResponse(Response $response): ResponseEvent
     {
         $this->response = $response;
         return $this;

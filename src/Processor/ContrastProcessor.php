@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,25 +24,25 @@
  * @file ContrastProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- *
- */
-class ContrastProcessor implements Processor
+final class ContrastProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('contrast') &&
+        if (
+            $request->query->has('contrast') &&
             $request->query->get('contrast') >= -100 &&
-            $request->query->get('contrast') <= 100) {
+            $request->query->get('contrast') <= 100
+        ) {
             $image->contrast((int) $request->query->get('contrast'));
         }
     }

@@ -10,7 +10,7 @@ class ImageEncoder
     /**
      * @var array<string>
      */
-    public static $allowedExtensions = [
+    public static array $allowedExtensions = [
         'jpeg', 'jpg', 'gif', 'png', 'webp', 'avif', 'tiff', 'tif', 'bmp', 'svg', 'ico'
     ];
 
@@ -20,7 +20,7 @@ class ImageEncoder
      * @param int $quality
      * @return Image
      */
-    public function encode(Image $image, $path, $quality)
+    public function encode(Image $image, string $path, int $quality): Image
     {
         return $image->encode($this->getImageAllowedExtension($path), $quality);
     }
@@ -31,7 +31,7 @@ class ImageEncoder
      * @param int $quality
      * @return Image
      */
-    public function save(Image $image, $path, $quality)
+    public function save(Image $image, string $path, int $quality): Image
     {
         $path = empty($path) ? $image->basePath() : $path;
 
@@ -60,7 +60,7 @@ class ImageEncoder
      * @param string $path
      * @return string
      */
-    public function getImageAllowedExtension($path)
+    public function getImageAllowedExtension(string $path): string
     {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         if (!in_array($extension, static::$allowedExtensions)) {

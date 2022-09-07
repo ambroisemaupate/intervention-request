@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AM\InterventionRequest\Listener;
@@ -9,16 +10,11 @@ use AM\InterventionRequest\Processor\ChainProcessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class NoCacheImageRequestSubscriber implements EventSubscriberInterface
+final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ChainProcessor
-     */
-    private $processor;
+    private ChainProcessor $processor;
 
     /**
-     * NoCacheImageRequestSubscriber constructor.
-     *
      * @param ChainProcessor $processor
      */
     public function __construct(ChainProcessor $processor)
@@ -29,7 +25,7 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
     /**
      * @return array The event names to listen to
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RequestEvent::class => ['onRequest', 0]
@@ -40,7 +36,7 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
      * @param RequestEvent $requestEvent
      * @return void
      */
-    public function onRequest(RequestEvent $requestEvent)
+    public function onRequest(RequestEvent $requestEvent): void
     {
         if (false === $requestEvent->getInterventionRequest()->getConfiguration()->hasCaching()) {
             $request = $requestEvent->getRequest();
@@ -49,7 +45,7 @@ class NoCacheImageRequestSubscriber implements EventSubscriberInterface
             $nativeImage = new NextGenFile($nativePath);
             $image = $this->processor->process($nativeImage, $request);
 
-            if ($nativeImage instanceof NextGenFile && $nativeImage->isNextGen()) {
+            if ($nativeImage->isNextGen()) {
                 $response = new Response(
                     (string) $image->encode($nativeImage->getNextGenExtension(), $requestEvent->getQuality()),
                     Response::HTTP_OK,

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,32 +24,30 @@
  * @file ProgressiveProcessor.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest\Processor;
 
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class ProgressiveProcessor
- *
- * @package AM\InterventionRequest\Processor
- */
-class ProgressiveProcessor implements Processor
+final class ProgressiveProcessor implements Processor
 {
     /**
      * @param Image $image
      * @param Request $request
      * @return void
      */
-    public function process(Image $image, Request $request)
+    public function process(Image $image, Request $request): void
     {
-        if ($request->query->has('progressive') ||
-            $request->query->has('interlace')) {
+        if (
+            $request->query->has('progressive') ||
+            $request->query->has('interlace')
+        ) {
             $process = $request->query->has('progressive') ?
                                         $request->query->get('progressive') :
                                         $request->query->get('interlace');
 
-            $image->interlace((boolean) $process);
+            $image->interlace((bool) $process);
         }
     }
 }

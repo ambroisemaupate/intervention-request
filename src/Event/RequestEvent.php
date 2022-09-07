@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AM\InterventionRequest\Event;
@@ -10,33 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class RequestEvent extends Event
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-    /**
-     * @var InterventionRequest
-     */
-    protected $interventionRequest;
-    /**
-     * @var Response
-     */
-    protected $response;
-    /**
-     * @var int
-     */
-    protected $quality;
+    protected Request $request;
+    protected InterventionRequest $interventionRequest;
+    protected ?Response $response = null;
+    protected int $quality;
 
-    /**
-     * RequestEvent constructor.
-     *
-     * @param Request             $request
-     * @param InterventionRequest $interventionRequest
-     */
-    public function __construct(Request $request, InterventionRequest $interventionRequest)
+    public function __construct(Request $request, InterventionRequest $interventionRequest, int $quality = 90)
     {
         $this->request = $request;
         $this->interventionRequest = $interventionRequest;
+        $this->quality = $quality;
     }
 
     /**

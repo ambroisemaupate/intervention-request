@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © 2018, Ambroise Maupate
  *
@@ -23,29 +24,20 @@
  * @file ShortUrlExpander.php
  * @author Ambroise Maupate
  */
+
 namespace AM\InterventionRequest;
 
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- *
- */
 class ShortUrlExpander
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var string
-     */
-    protected $ignorePath;
+    protected Request $request;
+    protected string $ignorePath;
 
     /**
      * @var string[]
      */
-    protected static $operations = [
+    protected static array $operations = [
         'a' => 'align',
         'c' => 'crop',
         'w' => 'width',
@@ -91,7 +83,7 @@ class ShortUrlExpander
      *
      * @return array|null
      */
-    public function parsePathInfo()
+    public function parsePathInfo(): ?array
     {
         $pathInfo = $this->request->getPathInfo();
 
@@ -100,11 +92,13 @@ class ShortUrlExpander
             $pathInfo = preg_replace($ignoreRegex, '', $pathInfo);
         }
 
-        if (preg_match(
-            '#(?P<queryString>[a-zA-Z:0-9\\-]+)/(?P<filename>[a-zA-Z0-9\\-_\\./]+)$#s',
-            $pathInfo ?? '',
-            $matches
-        )) {
+        if (
+            preg_match(
+                '#(?P<queryString>[a-zA-Z:0-9\\-]+)/(?P<filename>[a-zA-Z0-9\\-_\\./]+)$#s',
+                $pathInfo ?? '',
+                $matches
+            )
+        ) {
             return $matches;
         } else {
             return null;
@@ -112,21 +106,23 @@ class ShortUrlExpander
     }
 
     /**
-     * Convert param shortcuts to full request GET params.
+     * Convert param shortcuts to full request GET params.
      *
      * @param string $queryString
      * @param string $filename
      * @return void
      */
-    public function injectParamsToRequest($queryString, $filename)
+    public function injectParamsToRequest(string $queryString, string $filename): void
     {
         $this->request->query->set('image', $filename);
         $params = explode('-', $queryString);
 
         foreach ($params as $param) {
             preg_match("/(?P<operation>[a-z])(?P<value>[\S]*)/", $param, $matches);
-            if (isset($matches['operation']) &&
-                isset(static::$operations[$matches['operation']])) {
+            if (
+                isset($matches['operation']) &&
+                isset(static::$operations[$matches['operation']])
+            ) {
                 $this->request->query->set(
                     static::$operations[$matches['operation']],
                     $matches['value']
@@ -139,7 +135,7 @@ class ShortUrlExpander
      * @param string $ignorePath
      * @return ShortUrlExpander
      */
-    public function setIgnorePath($ignorePath)
+    public function setIgnorePath(string $ignorePath): self
     {
         $this->ignorePath = $ignorePath;
         return $this;
