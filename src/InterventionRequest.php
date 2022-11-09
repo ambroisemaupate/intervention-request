@@ -94,7 +94,7 @@ class InterventionRequest
         }
 
         $this->addSubscriber(new StripExifListener());
-        $this->addSubscriber(new QualitySubscriber());
+        $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
         $this->addSubscriber(new FileCache(
             $chainProcessor,
             $this->configuration->getCachePath(),
