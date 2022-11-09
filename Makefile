@@ -5,7 +5,8 @@ test:
 	vendor/bin/phpstan analyse -c phpstan.neon;
 
 dev-server:
-	php -S 0.0.0.0:8080 test/router.php
+	# http://0.0.0.0:8080/dev.php/cache/w1000/rhino.jpg
+	cd web && php -S 0.0.0.0:8080
 
 buildx:
 	docker run --privileged --rm tonistiigi/binfmt --install all

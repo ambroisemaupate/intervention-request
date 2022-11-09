@@ -1,3 +1,9 @@
+## [3.3.3](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.2...v3.3.3) (2022-11-09)
+
+### Bug Fixes
+
+* Initialize QualitySubscriber with default configured quality ([a3f344c](https://github.com/ambroisemaupate/intervention-request/commit/a3f344c6635420b4494dfcde78a911391c7b2235))
+
 ## [v3.3.2](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.1...v3.3.2) (2022-11-09)
 
 ### Features
