@@ -1,3 +1,9 @@
+## [v3.3.2](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.1...v3.3.2) (2022-11-09)
+
+### Features
+
+* Added default script to build and push Docker image for AMD64 / ARM64 ([02092db](https://github.com/ambroisemaupate/intervention-request/commit/02092dbc0adc607063b467cafe411a99403ce2ca))
+
 ## [v3.3.1](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.0...v3.3.1) (2022-09-07)
 
 ### Bug Fixes
