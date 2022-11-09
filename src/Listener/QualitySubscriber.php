@@ -14,6 +14,14 @@ final class QualitySubscriber implements EventSubscriberInterface
     private int $quality;
 
     /**
+     * @param int $quality
+     */
+    public function __construct(int $quality)
+    {
+        $this->setQuality($quality);
+    }
+
+    /**
      * @inheritDoc
      */
     public static function getSubscribedEvents(): array
@@ -23,6 +31,19 @@ final class QualitySubscriber implements EventSubscriberInterface
             ImageSavedEvent::class => ['onImageSaved', 100],
             ResponseEvent::class => 'onResponse',
         ];
+    }
+
+    /**
+     * @param int $quality
+     * @return QualitySubscriber
+     */
+    public function setQuality(int $quality): QualitySubscriber
+    {
+        if ($quality > 100 || $quality <= 0) {
+            throw new \InvalidArgumentException('Quality must be between 1 and 100');
+        }
+        $this->quality = $quality;
+        return $this;
     }
 
     /**
@@ -42,22 +63,16 @@ final class QualitySubscriber implements EventSubscriberInterface
      */
     public function onRequest(RequestEvent $requestEvent): void
     {
-        $this->quality = intval($requestEvent->getRequest()->get(
-            'quality',
-            $requestEvent->getInterventionRequest()->getConfiguration()->getDefaultQuality()
-        ));
-
         if ($requestEvent->getRequest()->query->has('no_process')) {
-            // Do not alter quality at image file save. but allow post-process optimizer to use quality info.
+            // Do not alter quality at image file save. but allow to post-process optimizer to use quality info.
+            $this->setQuality(100);
             $requestEvent->setQuality(100);
         } else {
-            if ($this->quality <= 100 && $this->quality > 0) {
-                $requestEvent->setQuality($this->quality);
-            } else {
-                $requestEvent->setQuality(
-                    $requestEvent->getInterventionRequest()->getConfiguration()->getDefaultQuality()
-                );
-            }
+            $this->setQuality(intval($requestEvent->getRequest()->get(
+                'quality',
+                $this->quality
+            )));
+            $requestEvent->setQuality($this->quality);
         }
     }
 
@@ -67,8 +82,6 @@ final class QualitySubscriber implements EventSubscriberInterface
      */
     public function onImageSaved(ImageSavedEvent $imageSavedEvent): void
     {
-        if ($this->quality <= 100 && $this->quality > 0) {
-            $imageSavedEvent->setQuality($this->quality);
-        }
+        $imageSavedEvent->setQuality($this->quality);
     }
 }
