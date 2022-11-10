@@ -270,6 +270,9 @@ class Configuration
      */
     public function setDefaultQuality(int $defaultQuality): Configuration
     {
+        if ($defaultQuality > 100 || $defaultQuality <= 0) {
+            throw new \InvalidArgumentException('Quality must be between 1 and 100');
+        }
         $this->defaultQuality = $defaultQuality;
 
         return $this;

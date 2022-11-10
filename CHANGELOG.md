@@ -1,4 +1,10 @@
-## [3.3.3](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.2...v3.3.3) (2022-11-09)
+## [v3.3.4](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.3...v3.3.4) (2022-11-10)
+
+### Bug Fixes
+
+* Wrong type casting on default quality ([a2a00ec](https://github.com/ambroisemaupate/intervention-request/commit/a2a00ec0d5b5bacd4ec2186813bbf69f6a65fe41))
+
+## [v3.3.3](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.2...v3.3.3) (2022-11-09)
 
 ### Bug Fixes
 

@@ -2,6 +2,9 @@ FROM roadiz/php81-nginx-alpine:latest
 MAINTAINER Ambroise Maupate <ambroise@rezo-zero.com>
 ARG USER_UID=1000
 
+ENV IR_DEFAULT_QUALITY 90
+ENV IR_DRIVER "gd"
+
 ADD docker/etc /etc
 ADD docker/etc/before_launch.sh /before_launch.sh
 COPY --chown=www-data:www-data . /var/www/html/
