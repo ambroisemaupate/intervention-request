@@ -44,7 +44,9 @@ final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
     {
         if (false === $requestEvent->getInterventionRequest()->getConfiguration()->hasCaching()) {
             $request = $requestEvent->getRequest();
-            $nativeImage = $this->fileResolver->resolveFile($request->get('image'));
+            $nativeImage = $this->fileResolver->resolveFile(
+                $this->fileResolver->assertRequestedFilePath($request->get('image'))
+            );
             $image = $this->processor->process($nativeImage, $request);
 
             if ($nativeImage->isNextGen()) {

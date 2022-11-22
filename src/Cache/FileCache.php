@@ -31,6 +31,7 @@ use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
+use AM\InterventionRequest\FileWithResourceInterface;
 use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use AM\InterventionRequest\ShortUrlExpander;
@@ -159,6 +160,19 @@ class FileCache implements EventSubscriberInterface
         return $config->hasCaching() && !$config->isUsingPassThroughCache();
     }
 
+    protected function copyToCache(File $nativeFile, File $cachedFile): void
+    {
+        $fileSystem = new Filesystem();
+        if (
+            $nativeFile instanceof FileWithResourceInterface &&
+            $nativeFile->getResource() !== null
+        ) {
+            $fileSystem->dumpFile($cachedFile, $nativeFile->getResource());
+        } else {
+            $fileSystem->copy($nativeFile, $cachedFile);
+        }
+    }
+
     /**
      * @param RequestEvent             $requestEvent
      * @param string                   $eventName
@@ -170,7 +184,9 @@ class FileCache implements EventSubscriberInterface
     {
         if ($this->supports($requestEvent)) {
             $request = $requestEvent->getRequest();
-            $nativeImage = $this->fileResolver->resolveFile($request->get('image'));
+            $nativeImage = $this->fileResolver->resolveFile(
+                $this->fileResolver->assertRequestedFilePath($request->get('image'))
+            );
             $cacheFilePath = $this->getCacheFilePath($request, $nativeImage);
             $cacheFile = new File($cacheFilePath, false);
             $firstGen = false;
@@ -180,7 +196,7 @@ class FileCache implements EventSubscriberInterface
             if (!is_file($cacheFilePath)) {
                 if ($request->query->has('no_process')) {
                     $image = null;
-                    (new Filesystem())->copy($nativeImage, $cacheFile);
+                    $this->copyToCache($nativeImage, $cacheFile);
                 } else {
                     $image = $this->chainProcessor->process($nativeImage, $request);
                     $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());

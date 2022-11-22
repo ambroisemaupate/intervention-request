@@ -5,41 +5,35 @@ declare(strict_types=1);
 namespace AM\InterventionRequest;
 
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemException;
-use League\Flysystem\Local\LocalFilesystemAdapter;
-use League\Flysystem\UnableToReadFile;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 final class FlysystemFileResolver extends LocalFileResolver
 {
     private Filesystem $filesystem;
-    private Filesystem $localFilesystem;
-    private string $tempFilePath;
+    private LoggerInterface $logger;
 
-    public function __construct(Filesystem $filesystem, string $tempFilePath)
+    public function __construct(Filesystem $filesystem, LoggerInterface $logger, string $tempFilePath)
     {
         parent::__construct($tempFilePath);
         $this->filesystem = $filesystem;
-        $this->tempFilePath = $tempFilePath;
-
-        // The internal adapter
-        $adapter = new LocalFilesystemAdapter(
-            $this->tempFilePath,
-        );
-        $this->localFilesystem = new Filesystem($adapter);
+        $this->logger = $logger;
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     public function resolveFile(string $relativePath): NextGenFile
     {
-//        try {
-            if (!$this->localFilesystem->fileExists($relativePath)) {
-                $this->localFilesystem->writeStream($relativePath, $this->filesystem->readStream($relativePath));
-            }
-//        } catch (FilesystemException | UnableToReadFile $exception) {
-//            // handle the error
-//            throw new FileNotFoundException($relativePath);
-//        }
-
-        return parent::resolveFile($relativePath);
+        /*
+         * Use a next-gen file to resolve real pathname
+         * if file extension contain 2 extensions
+         */
+        $nextgenFile = new NextGenFile($relativePath, false, $this->logger);
+        /*
+         * Use resource based NextGenFile to avoid storing data on disk
+         */
+        $nextgenFile->setFilesystem($this->filesystem);
+        return $nextgenFile;
     }
 }
