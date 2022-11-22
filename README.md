@@ -7,6 +7,7 @@
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 
 - [Ready-to-go *Docker* image](#ready-to-go-docker-image)
+    * [Use local file-system or a distant one](#use-local-file-system-or-a-distant-one)
     * [Docker Compose example](#docker-compose-example)
 - [Install](#install)
 - [Configuration](#configuration)
@@ -52,7 +53,7 @@ docker run -v "/my/images/folder:/var/www/html/web/images:ro" -p 8080:80/tcp amb
 
 Garbage collector runs every hour as a `crontab` job and will purge cache files created more than `$IR_GC_TTL` seconds ago.
 
-## Use local file-system or a distant one
+### Use local file-system or a distant one
 
 _InterventionRequest_ is built on [*Flysystem*](https://flysystem.thephpleague.com/docs/) library to abstract access to your native images.
 Then you can store all your images on an _AWS_ bucket or a _Scaleway_ Object Storage and process them on the fly. Processed images are still
