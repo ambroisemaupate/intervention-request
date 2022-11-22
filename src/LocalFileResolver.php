@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest;
 
-final class LocalFileResolver implements FileResolverInterface
+class LocalFileResolver implements FileResolverInterface
 {
     private string $localImagesPath;
 

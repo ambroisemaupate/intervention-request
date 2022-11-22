@@ -51,10 +51,10 @@ final class ChainProcessor
         ]);
 
         if ($request->query->has('no_process')) {
-            return $manager->make($nativeImage->getPathname());
+            return $manager->make($nativeImage);
         }
 
-        $beforeProcessEvent = new ImageBeforeProcessEvent($manager->make($nativeImage->getPathname()));
+        $beforeProcessEvent = new ImageBeforeProcessEvent($manager->make($nativeImage));
         $this->dispatcher->dispatch($beforeProcessEvent);
 
         /*
