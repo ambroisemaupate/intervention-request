@@ -30,6 +30,7 @@ namespace AM\InterventionRequest\Cache;
 use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
+use AM\InterventionRequest\FileResolverInterface;
 use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use AM\InterventionRequest\ShortUrlExpander;
@@ -51,17 +52,20 @@ class FileCache implements EventSubscriberInterface
     protected bool $useFileChecksum;
     protected ChainProcessor $chainProcessor;
     private ImageEncoder $imageEncoder;
+    private FileResolverInterface $fileResolver;
 
     /**
-     * @param ChainProcessor       $chainProcessor
-     * @param string               $cachePath
+     * @param ChainProcessor $chainProcessor
+     * @param FileResolverInterface $fileResolver
+     * @param string $cachePath
      * @param LoggerInterface|null $logger
-     * @param int                  $ttl
-     * @param int                  $gcProbability
-     * @param bool                 $useFileChecksum
+     * @param int $ttl
+     * @param int $gcProbability
+     * @param bool $useFileChecksum
      */
     public function __construct(
         ChainProcessor $chainProcessor,
+        FileResolverInterface $fileResolver,
         string $cachePath,
         LoggerInterface $logger = null,
         int $ttl = 604800,
@@ -79,6 +83,7 @@ class FileCache implements EventSubscriberInterface
         $this->imageEncoder = new ImageEncoder();
         $this->useFileChecksum = $useFileChecksum;
         $this->chainProcessor = $chainProcessor;
+        $this->fileResolver = $fileResolver;
     }
 
     /**
@@ -165,9 +170,7 @@ class FileCache implements EventSubscriberInterface
     {
         if ($this->supports($requestEvent)) {
             $request = $requestEvent->getRequest();
-            $nativePath = $requestEvent->getInterventionRequest()->getConfiguration()->getImagesPath() .
-                '/' . $request->get('image');
-            $nativeImage = new NextGenFile($nativePath);
+            $nativeImage = $this->fileResolver->resolveFile($request->get('image'));
             $cacheFilePath = $this->getCacheFilePath($request, $nativeImage);
             $cacheFile = new File($cacheFilePath, false);
             $firstGen = false;

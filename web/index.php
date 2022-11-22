@@ -28,6 +28,7 @@ $conf->setImagesPath((string) getenv('IR_IMAGES_PATH'));
 $conf->setUseFileChecksum((bool) getenv('IR_USE_FILECHECKSUM'));
 $conf->setDriver((string) getenv('IR_DRIVER'));
 $conf->setDefaultQuality((int) getenv('IR_DEFAULT_QUALITY'));
+$fileResolver = new \AM\InterventionRequest\LocalFileResolver($conf->getImagesPath());
 
 /*
  * Handle short url with Url rewriting
@@ -46,6 +47,7 @@ if (null !== $params) {
  */
 $iRequest = new InterventionRequest(
     $conf,
+    $fileResolver,
     $log
 );
 
