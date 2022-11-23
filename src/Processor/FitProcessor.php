@@ -53,7 +53,7 @@ final class FitProcessor extends AbstractPositionableProcessor
                 $fit
             )
         ) {
-            $image->fit($fit[1], $fit[2], function (Constraint $constraint) {
+            $image->fit((int) $fit[1], (int) $fit[2], function (Constraint $constraint) {
                 $constraint->upsize();
             }, $this->parsePosition($request));
         }
