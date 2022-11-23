@@ -1,7 +1,14 @@
 <?php
 use AM\InterventionRequest\Configuration;
+use AM\InterventionRequest\FlysystemFileResolver;
 use AM\InterventionRequest\InterventionRequest;
+use AM\InterventionRequest\LocalFileResolver;
 use AM\InterventionRequest\ShortUrlExpander;
+use AsyncAws\S3\S3Client;
+use League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter;
+use League\Flysystem\AsyncAwsS3\PortableVisibilityConverter;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Visibility;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Symfony\Component\Dotenv\Dotenv;
@@ -29,6 +36,32 @@ $conf->setUseFileChecksum((bool) getenv('IR_USE_FILECHECKSUM'));
 $conf->setDriver((string) getenv('IR_DRIVER'));
 $conf->setDefaultQuality((int) getenv('IR_DEFAULT_QUALITY'));
 
+if (
+    false !== getenv('IR_AWS_ACCESS_KEY_ID') &&
+    false !== getenv('IR_AWS_ACCESS_KEY_SECRET')
+) {
+    $adapter = new AsyncAwsS3Adapter(
+        new S3Client([
+            'accessKeyId' => (string) getenv('IR_AWS_ACCESS_KEY_ID'),
+            'accessKeySecret' => (string) getenv('IR_AWS_ACCESS_KEY_SECRET'),
+            'endpoint' => (string) getenv('IR_AWS_ENDPOINT'),
+            'region' => (string) getenv('IR_AWS_REGION'),
+        ]),
+        (string) getenv('IR_AWS_BUCKET'),
+        (string) (getenv('IR_AWS_PATH_PREFIX') ?: ''),
+        new PortableVisibilityConverter(
+            Visibility::PRIVATE
+        )
+    );
+    $fileResolver = new FlysystemFileResolver(
+        new Filesystem($adapter),
+        $log,
+        $conf->getImagesPath()
+    );
+} else {
+    $fileResolver = new LocalFileResolver($conf->getImagesPath());
+}
+
 /*
  * Handle short url with Url rewriting
  */
@@ -46,6 +79,7 @@ if (null !== $params) {
  */
 $iRequest = new InterventionRequest(
     $conf,
+    $fileResolver,
     $log
 );
 

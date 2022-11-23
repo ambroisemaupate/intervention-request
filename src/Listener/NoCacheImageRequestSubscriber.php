@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\RequestEvent;
+use AM\InterventionRequest\FileResolverInterface;
 use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,13 +14,16 @@ use Symfony\Component\HttpFoundation\Response;
 final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
 {
     private ChainProcessor $processor;
+    private FileResolverInterface $fileResolver;
 
     /**
      * @param ChainProcessor $processor
+     * @param FileResolverInterface $fileResolver
      */
-    public function __construct(ChainProcessor $processor)
+    public function __construct(ChainProcessor $processor, FileResolverInterface $fileResolver)
     {
         $this->processor = $processor;
+        $this->fileResolver = $fileResolver;
     }
 
     /**
@@ -40,9 +44,9 @@ final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
     {
         if (false === $requestEvent->getInterventionRequest()->getConfiguration()->hasCaching()) {
             $request = $requestEvent->getRequest();
-            $nativePath = $requestEvent->getInterventionRequest()->getConfiguration()->getImagesPath() .
-                '/' . $request->get('image');
-            $nativeImage = new NextGenFile($nativePath);
+            $nativeImage = $this->fileResolver->resolveFile(
+                $this->fileResolver->assertRequestedFilePath($request->get('image'))
+            );
             $image = $this->processor->process($nativeImage, $request);
 
             if ($nativeImage->isNextGen()) {

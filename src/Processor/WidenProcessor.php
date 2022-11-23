@@ -48,7 +48,7 @@ final class WidenProcessor implements Processor
                 $width
             )
         ) {
-            $image->widen($width[1], function (Constraint $constraint) {
+            $image->widen((int) $width[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });
         }

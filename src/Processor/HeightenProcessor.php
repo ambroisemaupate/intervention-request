@@ -44,7 +44,7 @@ final class HeightenProcessor implements Processor
             $request->query->has('height') &&
             1 === preg_match('#^([0-9]+)$#', (string) ($request->query->get('height') ?? ''), $height)
         ) {
-            $image->heighten($height[1], function (Constraint $constraint) {
+            $image->heighten((int) $height[1], function (Constraint $constraint) {
                 $constraint->upsize();
             });
         }

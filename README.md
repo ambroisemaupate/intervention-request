@@ -7,6 +7,7 @@
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 
 - [Ready-to-go *Docker* image](#ready-to-go-docker-image)
+    * [Use local file-system or a distant one](#use-local-file-system-or-a-distant-one)
     * [Docker Compose example](#docker-compose-example)
 - [Install](#install)
 - [Configuration](#configuration)
@@ -52,6 +53,20 @@ docker run -v "/my/images/folder:/var/www/html/web/images:ro" -p 8080:80/tcp amb
 
 Garbage collector runs every hour as a `crontab` job and will purge cache files created more than `$IR_GC_TTL` seconds ago.
 
+### Use local file-system or a distant one
+
+_InterventionRequest_ is built on [*Flysystem*](https://flysystem.thephpleague.com/docs/) library to abstract access to your native images.
+Then you can store all your images on an _AWS_ bucket or a _Scaleway_ Object Storage and process them on the fly. Processed images are still
+cached on _InterventionRequest_ local storage. This new file system abstraction layer allows multiple *InterventionRequest* docker
+containers to run in parallel but still use the same storage as image backend, or simply detach your media storage logic from
+_InterventionRequest_ application.
+
+`InterventionRequest` object requires a `FileResolverInterface` which can be a `LocalFileResolver` or `FlysystemFileResolver`, then
+`FlysystemFileResolver` must be provided a `League\Flysystem\Filesystem` object configured with any _Flysystem_ adapter.
+
+If you prefer to use `ambroisemaupate/intervention-request` Docker image, environment variables are available for
+_AWS_ adapter only.
+
 ### Docker Compose example
 
 ```yaml
@@ -72,9 +87,17 @@ services:
             IR_USE_PASSTHROUGH_CACHE: 1
             IR_DRIVER: gd
             IR_CACHE_PATH: /var/www/html/web/assets
-            IR_IMAGES_PATH: /var/www/html/web/images
             IR_IGNORE_PATH: /assets
             IR_DEFAULT_QUALITY: 80
+            ## If using local storage file system
+            IR_IMAGES_PATH: /var/www/html/web/images
+            ## If using an AWS or Scaleway Object storage file system 
+            IR_AWS_ACCESS_KEY_ID: 'changeme'
+            IR_AWS_ACCESS_KEY_SECRET: 'changeme'
+            IR_AWS_ENDPOINT: 'https://s3.fr-par.scw.cloud'
+            IR_AWS_REGION: 'fr-par'
+            IR_AWS_BUCKET: 'my-bucket'
+            IR_AWS_PATH_PREFIX: 'images'
         ports:
             - 8080:80/tcp
         # Uncomment lines below for Traefik usage
