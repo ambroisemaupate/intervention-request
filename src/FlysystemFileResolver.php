@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest;
 
-use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 final class FlysystemFileResolver extends LocalFileResolver
 {
-    private Filesystem $filesystem;
+    private FilesystemOperator $filesystem;
     private LoggerInterface $logger;
 
-    public function __construct(Filesystem $filesystem, LoggerInterface $logger, string $tempFilePath)
+    public function __construct(FilesystemOperator $filesystem, LoggerInterface $logger, string $tempFilePath)
     {
         parent::__construct($tempFilePath);
         $this->filesystem = $filesystem;

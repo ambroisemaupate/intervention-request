@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest;
 
-use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -22,7 +22,7 @@ class NextGenFile extends File implements FileWithResourceInterface
      * @var resource|null
      */
     protected $resource = null;
-    protected ?Filesystem $filesystem = null;
+    protected ?FilesystemOperator $filesystem = null;
     private LoggerInterface $logger;
 
     public function __construct(string $path, bool $checkPath = true, LoggerInterface $logger = null)
@@ -98,7 +98,7 @@ class NextGenFile extends File implements FileWithResourceInterface
         return $this->resource;
     }
 
-    public function setFilesystem(Filesystem $filesystem): FileWithResourceInterface
+    public function setFilesystem(FilesystemOperator $filesystem): FileWithResourceInterface
     {
         $this->filesystem = $filesystem;
         return $this;
