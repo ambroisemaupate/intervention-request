@@ -85,7 +85,7 @@ class NextGenFile extends File implements FileWithResourceInterface
     {
         if (null === $this->resource) {
             if (null === $this->filesystem) {
-                throw new \InvalidArgumentException('Cannot read stream from a null filesystem');
+                return null;
             }
             try {
                 $this->logger->info('Read stream from ' . $this->getPathname());
