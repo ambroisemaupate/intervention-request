@@ -1,5 +1,6 @@
 /web/dev.php
 web/cache
+web/local
 web/assets
 
 ### Composer ###

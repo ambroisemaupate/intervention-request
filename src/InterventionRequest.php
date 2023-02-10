@@ -52,24 +52,28 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InterventionRequest
 {
+    protected FileResolverInterface $fileResolver;
     protected ?Response $response = null;
     protected ?LoggerInterface $logger = null;
     protected Configuration $configuration;
     protected EventDispatcherInterface $dispatcher;
 
     /**
-     * @param Configuration        $configuration
+     * @param Configuration $configuration
+     * @param FileResolverInterface $fileResolver
      * @param LoggerInterface|null $logger
-     * @param array|null           $processors
+     * @param array|null $processors
      */
     public function __construct(
         Configuration $configuration,
+        FileResolverInterface $fileResolver,
         LoggerInterface $logger = null,
         ?array $processors = null
     ) {
         $this->dispatcher = new EventDispatcher();
         $this->logger = $logger;
         $this->configuration = $configuration;
+        $this->fileResolver = $fileResolver;
         $chainProcessor = $this->getChainProcessor($processors);
 
         if (null !== $this->configuration->getPingoPath()) {
@@ -97,6 +101,7 @@ class InterventionRequest
         $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
         $this->addSubscriber(new FileCache(
             $chainProcessor,
+            $this->fileResolver,
             $this->configuration->getCachePath(),
             $this->logger,
             $this->configuration->getTtl(),
@@ -105,6 +110,7 @@ class InterventionRequest
         ));
         $this->addSubscriber(new PassThroughFileCache(
             $chainProcessor,
+            $this->fileResolver,
             $this->configuration->getCachePath(),
             $this->logger,
             $this->configuration->getTtl(),
@@ -112,7 +118,8 @@ class InterventionRequest
             $this->configuration->getUseFileChecksum()
         ));
         $this->addSubscriber(new NoCacheImageRequestSubscriber(
-            $chainProcessor
+            $chainProcessor,
+            $this->fileResolver
         ));
 
         $this->defineTimezone();
@@ -198,7 +205,7 @@ class InterventionRequest
      * @param string $message
      * @return Response
      */
-    protected function getNotFoundResponse($message = ""): Response
+    protected function getNotFoundResponse(string $message = ""): Response
     {
         $body = '<h1>404 Error: File not found</h1>';
         if ($message != '') {
@@ -216,7 +223,7 @@ class InterventionRequest
      * @param string $message
      * @return Response
      */
-    protected function getBadRequestResponse($message = ""): Response
+    protected function getBadRequestResponse(string $message = ""): Response
     {
         $body = '<h1>400 Error: Bad Request</h1>';
         if ($message != '') {

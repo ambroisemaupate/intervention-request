@@ -1,0 +1,41 @@
+name: Static analysis and code style
+
+on:
+    push:
+        branches:
+            - develop
+            - 'release/**'
+            - 'hotfix/**'
+        tags: ['**']
+    pull_request:
+        types:
+            - opened
+            - reopened
+            - synchronize
+            - ready_for_review
+
+jobs:
+    static-analysis-tests:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-version: ['8.0', '8.1']
+        steps:
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+            - uses: actions/checkout@v3
+            - name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v3
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-${{ matrix.php-version }}-
+            - name: Install Dependencies
+              run: composer install --no-scripts --no-ansi --no-interaction --no-progress
+            - name: Run PHP Code Sniffer
+              run: vendor/bin/phpcs -p ./src
+            - name: Run PHPStan
+              run: vendor/bin/phpstan analyse --no-progress -c phpstan.neon

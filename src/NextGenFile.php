@@ -4,18 +4,30 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 
-class NextGenFile extends File
+class NextGenFile extends File implements FileWithResourceInterface
 {
     protected string $requestedPath;
     protected ?File $requestedFile;
     protected bool $isNextGen = false;
     protected ?string $nextGenMimeType = null;
     protected ?string $nextGenExtension = null;
+    /**
+     * @var resource|null
+     */
+    protected $resource = null;
+    protected ?FilesystemOperator $filesystem = null;
+    private LoggerInterface $logger;
 
-    public function __construct(string $path, bool $checkPath = true)
+    public function __construct(string $path, bool $checkPath = true, LoggerInterface $logger = null)
     {
+        $this->logger = $logger ?? new NullLogger();
         if (preg_match('#\.(webp|heic|heif|avif)\.jpg$#', $path) > 0) {
             /*
              * Convert HEIC format back to JPEG
@@ -63,6 +75,33 @@ class NextGenFile extends File
         } else {
             parent::__construct($path, $checkPath);
         }
+    }
+
+    /**
+     * @return resource|null
+     * @throws FileNotFoundException
+     */
+    public function getResource()
+    {
+        if (null === $this->resource) {
+            if (null === $this->filesystem) {
+                return null;
+            }
+            try {
+                $this->logger->info('Read stream from ' . $this->getPathname());
+                $this->resource = $this->filesystem->readStream($this->getPathname());
+            } catch (FilesystemException $exception) {
+                $this->logger->error($exception);
+                throw new FileNotFoundException($this->getPathname());
+            }
+        }
+        return $this->resource;
+    }
+
+    public function setFilesystem(FilesystemOperator $filesystem): FileWithResourceInterface
+    {
+        $this->filesystem = $filesystem;
+        return $this;
     }
 
     /**

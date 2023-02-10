@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || >=8.0",
+        "php": ">=8.0",
         "ext-gd": "*",
         "ext-curl": "*",
         "intervention/image": "^2.5.1",
@@ -29,7 +29,9 @@
         "symfony/event-dispatcher": "^4.4 || ^5.0.7",
         "symfony/process": "^4.4 || ^5.0.7",
         "monolog/monolog": "^1.22 || ^2.1.1",
-        "symfony/mime": "^4.4 || ^5.1"
+        "symfony/mime": "^4.4 || ^5.1",
+        "league/flysystem": "^3.0",
+        "league/flysystem-memory": "^3.0"
     },
     "suggest" : {
         "ext-imagick": "Allow TIFF images to be implicitly converted to jpeg.",
@@ -49,6 +51,8 @@
         "symfony/var-dumper": "^4.4",
         "symfony/dotenv": "^4.4 || ^5.1",
         "kraken-io/kraken-php": "^1.6",
-        "tinify/tinify": "^1.5"
+        "tinify/tinify": "^1.5",
+        "league/flysystem-aws-s3-v3": "^3.0",
+        "league/flysystem-async-aws-s3": "^3.0"
     }
 }
