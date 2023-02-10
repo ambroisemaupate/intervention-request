@@ -214,6 +214,7 @@ very easy to integrate it in your *Symfony* controller scheme:
 ```php
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\InterventionRequest;
+use AM\InterventionRequest\LocalFileResolver;
 
 /*
  * A test configuration
@@ -226,13 +227,15 @@ $conf->setJpegoptimPath('/usr/local/bin/jpegoptim');
 // Comment this line if pngquant is not available on your server
 $conf->setPngquantPath('/usr/local/bin/pngquant');
 
+$fileResolver = new LocalFileResolver($conf->getImagesPath());
+
 /*
  * InterventionRequest constructor asks 2 objects:
  *
  * - AM\InterventionRequest\Configuration
- * - Symfony\Component\HttpFoundation\Request
+ * - AM\InterventionRequest\FileResolverInterface
  */
-$intRequest = new InterventionRequest($conf);
+$intRequest = new InterventionRequest($conf, $fileResolver);
 // Handle request and process image
 $intRequest->handleRequest($request);
 
@@ -361,6 +364,7 @@ to your `InterventionRequest` object.
  */
 $iRequest = new InterventionRequest(
     $conf,
+    $fileResolver,
     $log,
     [
         new Processor\WidenProcessor(),
