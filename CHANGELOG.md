@@ -1,3 +1,9 @@
+## [v4.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.0...v) (2023-02-10)
+
+### Bug Fixes
+
+* Updated README constructor examples ([531f7db](https://github.com/ambroisemaupate/intervention-request/commit/531f7dbd76d31739a9d5ef0c842d1cc8b2fad9dc))
+
 ## [v4.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v3.3.4...v) (2023-02-10)
 
 ### ⚠ BREAKING CHANGES
