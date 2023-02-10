@@ -3,6 +3,11 @@
 ### ⚠ BREAKING CHANGES
 
 * Requires php80 minimum
+* `InterventionRequest` constructor signature changed:
+    It requires now 2 objects:
+
+    - AM\InterventionRequest\Configuration
+    - AM\InterventionRequest\FileResolverInterface
 
 ### Features
 
