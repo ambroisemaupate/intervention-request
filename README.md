@@ -544,7 +544,7 @@ Copy `index.php` to `dev.php` then launch PHP server command using `router.php` 
 php -S 0.0.0.0:8088 -t web router.php 
 ```
 
-Then open `http://0.0.0.0:8088/w300/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
+Then open `http://0.0.0.0:8088/dev.php/w300/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
 
-If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8088/cache/w300/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
+If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8088/dev.php/cache/w300/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
 
