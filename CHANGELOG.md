@@ -1,3 +1,9 @@
+## [v4.0.2](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.1...v4.0.2) (2023-04-26)
+
+### Bug Fixes
+
+* Fixes [#23](https://github.com/ambroisemaupate/intervention-request/issues/23) - Allows *Symfony 6* components ([62a3c2c](https://github.com/ambroisemaupate/intervention-request/commit/62a3c2c4b44ec2e5851a033f54b72b5decdaedd3))
+
 ## [v4.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.0...v) (2023-02-10)
 
 ### Bug Fixes
