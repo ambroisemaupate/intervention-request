@@ -190,6 +190,16 @@ class FileCache implements EventSubscriberInterface
             $cacheFilePath = $this->getCacheFilePath($request, $nativeImage);
             $cacheFile = new File($cacheFilePath, false);
             $firstGen = false;
+
+            /**
+             * Also check date, if cached date is lower then original date -> Remove cached file
+             */
+            $mtime_original_file = $nativeImage->getRequestedFile()->getMTime();
+            $mtime_cached_file = $cacheFile->getMTime();
+            if ($mtime_cached_file < $mtime_original_file) {
+                unlink($cacheFilePath);
+            }
+            
             /*
              * First render cached image file.
              */
