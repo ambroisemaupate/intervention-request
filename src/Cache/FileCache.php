@@ -196,12 +196,13 @@ class FileCache implements EventSubscriberInterface
              */
             $mtime_original_file = $nativeImage->getRequestedFile()->getMTime();
             $mtime_cached_file = $cacheFile->getMTime();
-            if ($mtime_original_file !== false && $mtime_cached_file !== false) {
-                if ($mtime_cached_file < $mtime_original_file) {
-                    unlink($cacheFilePath);
-                }
+            if (
+                ($mtime_original_file !== false) && 
+                ($mtime_cached_file !== false) &&
+                ($mtime_cached_file < $mtime_original_file)
+            ) {
+                unlink($cacheFilePath);
             }
-            
             
             /*
              * First render cached image file.
