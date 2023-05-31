@@ -191,17 +191,22 @@ class FileCache implements EventSubscriberInterface
             $cacheFile = new File($cacheFilePath, false);
             $firstGen = false;
 
-            /**
+           /**
              * Also check date, if cached date is lower then original date -> Remove cached file
              */
-            $mtime_original_file = $nativeImage->getRequestedFile()->getMTime();
-            $mtime_cached_file = $cacheFile->getMTime();
-            if (
-                ($mtime_original_file !== false) && 
-                ($mtime_cached_file !== false) &&
-                ($mtime_cached_file < $mtime_original_file)
-            ) {
-                unlink($cacheFilePath);
+            if (is_file($cacheFilePath)) {
+                $mtime_original_file = $nativeImage->getRequestedFile()->getMTime();
+                $mtime_cached_file = $cacheFile->getMTime();
+                
+                if (
+                    (($mtime_original_file !== false) && is_numeric($mtime_original_file))
+                    && 
+                    (($mtime_cached_file !== false) && is_numeric($mtime_cached_file))
+                    && 
+                    ($mtime_cached_file < $mtime_original_file)
+                ) {
+                    unlink($cacheFilePath);
+                }
             }
             
             /*
