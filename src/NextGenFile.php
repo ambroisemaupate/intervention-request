@@ -88,7 +88,7 @@ class NextGenFile extends File implements FileWithResourceInterface
                 return null;
             }
             try {
-                $this->logger->info('Read stream from ' . $this->getPathname());
+                $this->logger->debug('Read stream from ' . $this->getPathname());
                 $this->resource = $this->filesystem->readStream($this->getPathname());
             } catch (FilesystemException $exception) {
                 $this->logger->error($exception);
