@@ -1,3 +1,10 @@
+## [v4.0.4](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.3...v4.0.4) (2023-11-13)
+
+
+### Bug Fixes
+
+* Use logger debug instead of info ([a03f46a](https://github.com/ambroisemaupate/intervention-request/commit/a03f46a002aaf208e8b251382ffbe76f1b29de63))
+
 ## [v4.0.3](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.2...v4.0.3) (2023-04-26)
 
 ## [v4.0.2](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.1...v4.0.2) (2023-04-26)
