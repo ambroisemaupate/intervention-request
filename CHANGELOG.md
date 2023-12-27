@@ -1,3 +1,10 @@
+## [v4.0.5](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.4...v4.0.5) (2023-12-27)
+
+### Bug Fixes
+
+- Cache file bug fix: https://github.com/ambroisemaupate/intervention-request/pull/24
+- Some code style fixes
+
 ## [v4.0.4](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.3...v4.0.4) (2023-11-13)
 
 
