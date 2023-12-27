@@ -68,11 +68,14 @@ final class QualitySubscriber implements EventSubscriberInterface
             $this->setQuality(100);
             $requestEvent->setQuality(100);
         } else {
-            $this->setQuality(intval($requestEvent->getRequest()->get(
+            $quality = $requestEvent->getRequest()->get(
                 'quality',
                 $this->quality
-            )));
-            $requestEvent->setQuality($this->quality);
+            );
+            if (\is_numeric($quality)) {
+                $this->setQuality(intval($quality));
+                $requestEvent->setQuality($this->quality);
+            }
         }
     }
 

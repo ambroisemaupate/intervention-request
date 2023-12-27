@@ -82,6 +82,7 @@ class GarbageCollectorCommand extends Command
     {
         $cacheDir = $input->getArgument('cache');
         $logFile = $input->getOption('log');
+        $ttl = $input->getOption('ttl');
         $text = "";
         $log = null;
 
@@ -92,7 +93,7 @@ class GarbageCollectorCommand extends Command
 
         if (is_string($cacheDir) && !empty($cacheDir) && file_exists($cacheDir)) {
             $gc = new GarbageCollector($cacheDir, $log);
-            if ($ttl = $input->getOption('ttl')) {
+            if (\is_numeric($ttl)) {
                 $gc->setTtl(intval($ttl));
             }
             $text .= "<info>Garbage collection started on " . $cacheDir . " for TTL " . $gc->getTtl() . ".</info>" . PHP_EOL;
