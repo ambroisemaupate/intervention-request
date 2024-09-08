@@ -1,5 +1,6 @@
 !vendor
 !composer.lock
+!bin/intervention
 
 web/cache
 web/assets
@@ -12,8 +13,12 @@ web/dev.php
 Makefile
 README.md
 docker-compose.yml
+compose.yml
+compose.override.yml
 phpstan.neon
 report.txt
 router.php
 supervisord.pid
 project_env.sh
+cliff.toml
+CHANGELOG.md

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\FlysystemFileResolver;
 use AM\InterventionRequest\InterventionRequest;

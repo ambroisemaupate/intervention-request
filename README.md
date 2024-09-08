@@ -40,7 +40,11 @@
 
 ## Ready-to-go *Docker* image
 
-Intervention Request is now available as a standalone Docker server to use with whatever CMS or language you need:
+Intervention Request is now available as a standalone Docker server to use with whatever CMS or language you need.
+It declares two volumes: one for your images storage and one for cached files.
+
+- /var/www/html/web/images: you can set it as read-only to prevent any write operation
+- /var/www/html/web/assets: you must set it as read-write to allow cache files to be written
 
 ```php
 docker pull ambroisemaupate/intervention-request;
@@ -52,12 +56,13 @@ docker run -v "/my/images/folder:/var/www/html/web/images:ro" -p 8080:80/tcp amb
 - Then try http://localhost:8080/assets/f300x300-s5/images/your-image.png.webp
 
 Garbage collector runs every hour as a `crontab` job and will purge cache files created more than `$IR_GC_TTL` seconds ago.
+You still can execute it manually using `docker compose exec -u www-data intervention bin/intervention gc:launch` command.
 
 ### Use local file-system or a distant one
 
 _InterventionRequest_ is built on [*Flysystem*](https://flysystem.thephpleague.com/docs/) library to abstract access to your native images.
-Then you can store all your images on an _AWS_ bucket or a _Scaleway_ Object Storage and process them on the fly. Processed images are still
-cached on _InterventionRequest_ local storage. This new file system abstraction layer allows multiple *InterventionRequest* docker
+Then you can store all your images on an _AWS_ bucket or a _Scaleway_ Object Storage and process them on the fly. **Processed images are still
+cached on _InterventionRequest_ local storage.** This new file system abstraction layer allows multiple *InterventionRequest* docker
 containers to run in parallel but still use the same storage as image backend, or simply detach your media storage logic from
 _InterventionRequest_ application.
 
