@@ -1,10 +1,9 @@
-version: '3'
 services:
     intervention:
         build: .
         image: ambroisemaupate/intervention-request:latest
         volumes:
-            - ./web/cache:/var/www/html/web/assets:delegated
+            - ./web/assets:/var/www/html/web/assets:delegated
             - ./web/images:/var/www/html/web/images:ro
         environment:
             IR_GC_PROBABILITY: ${IR_GC_PROBABILITY}

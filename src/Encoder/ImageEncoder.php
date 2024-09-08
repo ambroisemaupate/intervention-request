@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AM\InterventionRequest\Encoder;
 
 use Intervention\Image\Exception\NotWritableException;
