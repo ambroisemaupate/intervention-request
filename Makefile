@@ -1,4 +1,4 @@
-TAG=latest
+TAG=4.1.0
 
 .PHONY: test dev-server
 test:
