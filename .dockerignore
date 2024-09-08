@@ -20,3 +20,5 @@ report.txt
 router.php
 supervisord.pid
 project_env.sh
+cliff.toml
+CHANGELOG.md

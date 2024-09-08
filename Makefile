@@ -1,3 +1,4 @@
+TAG=latest
 
 .PHONY: test dev-server
 test:
@@ -8,6 +9,10 @@ dev-server:
 	# http://0.0.0.0:8080/dev.php/cache/w1000/rhino.jpg
 	cd web && php -S 0.0.0.0:8080
 
-buildx:
+buildx_tag:
 	docker run --privileged --rm tonistiigi/binfmt --install all
-	docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ambroisemaupate/intervention-request:latest .
+	docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ambroisemaupate/intervention-request:$TAG .
+
+buildx_latest:
+	docker run --privileged --rm tonistiigi/binfmt --install all
+	docker buildx build --push --platform linux/arm64/v8,linux/amd64 --tag ambroisemaupate/intervention-request:latest --tag ambroisemaupate/intervention-request:$TAG .
