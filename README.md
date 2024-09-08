@@ -43,8 +43,8 @@
 Intervention Request is now available as a standalone Docker server to use with whatever CMS or language you need.
 It declares two volumes: one for your images storage and one for cached files.
 
-- /var/www/html/web/images: you can set it as read-only to prevent any write operation
-- /var/www/html/web/assets: you must set it as read-write to allow cache files to be written
+- `/var/www/html/web/images`: you can set it as read-only to prevent any write operation
+- `/var/www/html/web/assets`: you must set it as read-write to allow cache files to be written
 
 ```php
 docker pull ambroisemaupate/intervention-request;
