@@ -12,14 +12,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 abstract class ImageEvent extends Event
 {
-    protected ?Image $image;
-
-    /**
-     * @param Image|null $image
-     */
-    public function __construct(?Image $image = null)
+    public function __construct(protected ?Image $image = null)
     {
-        $this->image = $image;
     }
 
     /**

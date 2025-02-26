@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ShortUrlExpander
 {
-    protected Request $request;
     protected string $ignorePath;
 
     /**
@@ -33,9 +32,8 @@ class ShortUrlExpander
         'n' => 'no_process',
     ];
 
-    public function __construct(Request $request)
+    public function __construct(protected readonly Request $request)
     {
-        $this->request = $request;
         $this->ignorePath = '';
     }
 

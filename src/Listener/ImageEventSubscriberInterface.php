@@ -15,5 +15,5 @@ interface ImageEventSubscriberInterface extends EventSubscriberInterface
      * @param Image|null $image
      * @return bool
      */
-    public function supports(Image $image = null): bool;
+    public function supports(?Image $image = null): bool;
 }

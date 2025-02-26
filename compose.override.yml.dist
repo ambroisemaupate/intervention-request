@@ -1,0 +1,10 @@
+services:
+    intervention:
+        build:
+            context: .
+            target: php-dev
+        volumes:
+            - ./:/var/www/html
+        ports:
+            - "8080:80"
+

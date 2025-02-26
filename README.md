@@ -80,19 +80,11 @@ services:
     intervention:
         image: ambroisemaupate/intervention-request:latest
         volumes:
-            # You can store cache in a volume too
-            #- cache:/var/www/html/web/assets
+            - cache:/var/www/html/web/assets
+            ## If using local storage file system
             - ./my/images/folder:/var/www/html/web/images:ro
         # You can override some defaults below
         environment:
-            IR_GC_PROBABILITY: 400
-            IR_GC_TTL: 604800
-            IR_RESPONSE_TTL: 31557600
-            IR_USE_FILECHECKSUM: 0
-            IR_USE_PASSTHROUGH_CACHE: 1
-            IR_DRIVER: gd
-            IR_CACHE_PATH: /var/www/html/web/assets
-            IR_IGNORE_PATH: /assets
             IR_DEFAULT_QUALITY: 80
             ## If using local storage file system
             IR_IMAGES_PATH: /var/www/html/web/images
@@ -118,6 +110,8 @@ services:
         #networks:
         #    - default
         #    - frontproxynet
+volumes:
+    cache:
 ```
 
 You don’t need to read further if you do not plan to embed this library in your PHP application.

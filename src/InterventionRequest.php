@@ -29,28 +29,19 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InterventionRequest
 {
-    protected FileResolverInterface $fileResolver;
     protected ?Response $response = null;
-    protected ?LoggerInterface $logger = null;
-    protected Configuration $configuration;
     protected EventDispatcherInterface $dispatcher;
 
     /**
-     * @param Configuration $configuration
-     * @param FileResolverInterface $fileResolver
-     * @param LoggerInterface|null $logger
-     * @param array|null $processors
+     * @param \AM\InterventionRequest\Processor\Processor[]|null $processors
      */
     public function __construct(
-        Configuration $configuration,
-        FileResolverInterface $fileResolver,
-        LoggerInterface $logger = null,
+        protected readonly Configuration $configuration,
+        protected readonly FileResolverInterface $fileResolver,
+        protected readonly ?LoggerInterface $logger = null,
         ?array $processors = null
     ) {
         $this->dispatcher = new EventDispatcher();
-        $this->logger = $logger;
-        $this->configuration = $configuration;
-        $this->fileResolver = $fileResolver;
         $chainProcessor = $this->getChainProcessor($processors);
 
         if (null !== $this->configuration->getPingoPath()) {
@@ -123,7 +114,7 @@ class InterventionRequest
     }
 
     /**
-     * @param array|null $processors
+     * @param \AM\InterventionRequest\Processor\Processor[]|null $processors
      *
      * @return Processor\ChainProcessor
      */

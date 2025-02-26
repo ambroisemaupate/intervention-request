@@ -6,11 +6,8 @@ namespace AM\InterventionRequest;
 
 class LocalFileResolver implements FileResolverInterface
 {
-    private string $localImagesPath;
-
-    public function __construct(string $localImagesPath)
+    public function __construct(private readonly string $localImagesPath)
     {
-        $this->localImagesPath = $localImagesPath;
     }
 
     public function resolveFile(string $relativePath): NextGenFile

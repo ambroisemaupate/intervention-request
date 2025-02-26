@@ -25,7 +25,7 @@ class NextGenFile extends File implements FileWithResourceInterface
     protected ?FilesystemOperator $filesystem = null;
     private LoggerInterface $logger;
 
-    public function __construct(string $path, bool $checkPath = true, LoggerInterface $logger = null)
+    public function __construct(string $path, bool $checkPath = true, ?LoggerInterface $logger = null)
     {
         $this->logger = $logger ?? new NullLogger();
         if (preg_match('#\.(webp|heic|heif|avif)\.jpg$#', $path) > 0) {

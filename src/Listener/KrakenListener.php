@@ -14,10 +14,6 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 final class KrakenListener implements ImageFileEventSubscriberInterface
 {
-    private string $apiKey;
-    private string $apiSecret;
-    private ?LoggerInterface $logger;
-    private bool $lossy;
     /**
      * @var \Kraken
      */
@@ -29,15 +25,15 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
      * @param bool $lossy
      * @param LoggerInterface|null $logger
      */
-    public function __construct(string $apiKey, string $apiSecret, bool $lossy = true, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        private readonly string $apiKey,
+        private readonly string $apiSecret,
+        private readonly bool $lossy = true,
+        private readonly ?LoggerInterface $logger = null
+    ) {
         if (!class_exists('\Kraken')) {
             throw new \RuntimeException('kraken-io/kraken-php library is required to use KrakenListener');
         }
-        $this->apiKey = $apiKey;
-        $this->apiSecret = $apiSecret;
-        $this->logger = $logger;
-        $this->lossy = $lossy;
 
         $this->kraken = new \Kraken($this->apiKey, $this->apiSecret);
     }
@@ -81,22 +77,21 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
 
             $data = $this->kraken->upload($params);
 
-            if (isset($data["success"]) && !empty($data['kraked_url'])) {
+            if (!is_array($data)) {
+                return;
+            }
+
+            if (isset($data["success"]) && is_string($data['kraked_url']) && !empty($data['kraked_url'])) {
                 if (null !== $this->logger) {
                     $this->logger->debug("Used kraken.io to minify file.", $data);
                 }
                 $this->overrideImageFile($event->getImageFile()->getPathname(), $data['kraked_url']);
-            } else {
-                return;
             }
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+
+    public function supports(?File $image = null): bool
     {
         return null !== $this->kraken &&
             '' !== $this->apiKey &&
@@ -107,7 +102,7 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
 
     /**
      * @param string $localPath
-     * @param string $krakedUrl
+     * @param non-empty-string $krakedUrl
      * @return void
      */
     protected function overrideImageFile(string $localPath, string $krakedUrl): void

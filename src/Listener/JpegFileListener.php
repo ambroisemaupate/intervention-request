@@ -12,16 +12,10 @@ use Symfony\Component\Process\Process;
 /**
  * @package AM\InterventionRequest\Listener
  */
-final class JpegFileListener implements ImageFileEventSubscriberInterface
+final readonly class JpegFileListener implements ImageFileEventSubscriberInterface
 {
-    protected string $jpegoptimPath;
-
-    /**
-     * @param string $jpegoptimPath
-     */
-    public function __construct(string $jpegoptimPath)
+    public function __construct(private string $jpegoptimPath)
     {
-        $this->jpegoptimPath = $jpegoptimPath;
     }
 
     /**
@@ -52,11 +46,7 @@ final class JpegFileListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+    public function supports(?File $image = null): bool
     {
         return $this->jpegoptimPath !== '' && null !== $image && $image->getMimeType() === 'image/jpeg';
     }

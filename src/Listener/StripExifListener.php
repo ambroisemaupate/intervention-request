@@ -21,7 +21,7 @@ final class StripExifListener implements ImageEventSubscriberInterface
      *
      * @return bool
      */
-    public function supports(Image $image = null): bool
+    public function supports(?Image $image = null): bool
     {
         return null !== $image && class_exists('\Imagick') && $image->getCore() instanceof \Imagick;
     }

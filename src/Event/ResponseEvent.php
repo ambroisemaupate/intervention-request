@@ -14,16 +14,12 @@ final class ResponseEvent extends ImageEvent
      */
     public const NAME = ResponseEvent::class;
 
-    private Response $response;
-
     /**
-     * @param Response $response
      * @param Image|null $image Read-only image
      */
-    public function __construct(Response $response, Image $image = null)
+    public function __construct(private Response $response, ?Image $image = null)
     {
         parent::__construct($image);
-        $this->response = $response;
     }
 
     /**

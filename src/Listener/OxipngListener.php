@@ -9,16 +9,10 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-final class OxipngListener implements ImageFileEventSubscriberInterface
+final readonly class OxipngListener implements ImageFileEventSubscriberInterface
 {
-    protected string $oxipngPath;
-
-    /**
-     * @param string $oxipngPath
-     */
-    public function __construct(string $oxipngPath)
+    public function __construct(private string $oxipngPath)
     {
-        $this->oxipngPath = $oxipngPath;
     }
 
     /**
@@ -51,11 +45,7 @@ final class OxipngListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+    public function supports(?File $image = null): bool
     {
         return $this->oxipngPath !== '' &&
             null !== $image &&

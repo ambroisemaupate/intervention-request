@@ -9,19 +9,10 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-final class PngquantListener implements ImageFileEventSubscriberInterface
+final readonly class PngquantListener implements ImageFileEventSubscriberInterface
 {
-    protected string $pngquantPath;
-    protected bool $lossy = false;
-
-    /**
-     * @param string $pngquantPath
-     * @param bool $lossy
-     */
-    public function __construct(string $pngquantPath, bool $lossy = false)
+    public function __construct(private string $pngquantPath, private bool $lossy = false)
     {
-        $this->pngquantPath = $pngquantPath;
-        $this->lossy = $lossy;
     }
 
     /**
@@ -53,11 +44,7 @@ final class PngquantListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+    public function supports(?File $image = null): bool
     {
         return $this->pngquantPath !== '' && null !== $image && $image->getMimeType() === 'image/png';
     }

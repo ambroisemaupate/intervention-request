@@ -9,22 +9,10 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-final class PingoListener implements ImageFileEventSubscriberInterface
+final readonly class PingoListener implements ImageFileEventSubscriberInterface
 {
-    protected string $pingoPath;
-    protected bool $noAlpha = false;
-    private bool $lossy = false;
-
-    /**
-     * @param string $pingoPath
-     * @param bool $lossy
-     * @param bool $noAlpha
-     */
-    public function __construct(string $pingoPath, bool $lossy = false, bool $noAlpha = false)
+    public function __construct(private string $pingoPath, private bool $lossy = false, private bool $noAlpha = false)
     {
-        $this->pingoPath = $pingoPath;
-        $this->noAlpha = $noAlpha;
-        $this->lossy = $lossy;
     }
 
     /**
@@ -56,11 +44,7 @@ final class PingoListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+    public function supports(?File $image = null): bool
     {
         return $this->pingoPath !== '' &&
             null !== $image &&

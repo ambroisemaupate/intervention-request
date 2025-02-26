@@ -1,106 +1,150 @@
-FROM php:8.3-fpm-alpine
-MAINTAINER Ambroise Maupate <ambroise@rezo-zero.com>
-LABEL org.opencontainers.image.authors="Ambroise Maupate <ambroise@rezo-zero.com>"
+ARG UID=1000
+ARG GID=${UID}
 
-ARG USER_UID=1000
-ENV IR_DEFAULT_QUALITY 90
-ENV IR_DRIVER "gd"
-ARG IMAGICK_VERSION=3.7.0
+ARG PHP_VERSION=8.4.4
 
-# Add PHP extensions for image manipulation
-RUN apk --no-cache update \
-    && apk --no-cache upgrade \
-    && apk add --no-cache --virtual \
-        .build-deps \
-        $PHPIZE_DEPS \
-        autoconf \
-        g++ \
-        gcc \
-        git \
-        imagemagick-dev \
-        libtool \
-        tar \
-    && export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" NPROC=$(getconf _NPROCESSORS_ONLN) \
-    && apk add --no-cache \
-        aspell-dev \
-        bash \
-        ca-certificates \
-        curl \
-        dcron \
-        freetds-dev \
-        freetype \
-        freetype-dev \
-        imagemagick \
-        imagemagick-libs \
-        jpegoptim \
-        libavif \
-        libavif-dev \
-        libjpeg-turbo \
-        libjpeg-turbo-dev \
-        libpng \
-        libpng-dev \
-        libwebp-dev \
-        libzip-dev \
-        oniguruma-dev \
-        pngquant \
-        shadow \
-        sudo \
-        supervisor \
-        zip \
-    && apk add --no-cache \
-        nginx \
-    && phpModules=" \
-        apcu \
-        exif \
-        gd \
-        opcache \
-        zip \
-    " \
-    && docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp --with-avif \
-    # Install APCU
-    # @see https://github.com/docker-library/php/issues/1029
-    && mkdir -p /usr/src/php/ext/apcu  \
-    && curl -fsSL https://pecl.php.net/get/apcu/stable | tar xvz -C "/usr/src/php/ext/apcu" --strip 1 \
-    && docker-php-ext-install -j${NPROC} $phpModules \
-    && docker-php-ext-enable --ini-name 20-apcu.ini apcu \
-# Imagick is installed from the archive because regular installation fails
-# See: https://github.com/Imagick/imagick/issues/643#issuecomment-1834361716 \
-    && cd /tmp \
-    && curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz \
-    && tar --strip-components=1 -xf /tmp/imagick.tar.gz \
-    && phpize \
-    && ./configure \
-    && make \
-    && make install \
-    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/20-imagick.ini \
-    && rm -rf /tmp/* \
-# <<< End of Imagick installation
-    && apk del --no-cache gcc g++ git freetype-dev libpng-dev libjpeg-turbo-dev .build-deps $PHPIZE_DEPS
+#######
+# PHP #
+#######
 
-ADD docker/etc/php/php.ini /usr/local/etc/php/php.ini
-ADD docker/etc/php/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
-ADD docker/etc/nginx /etc/nginx
+FROM php:${PHP_VERSION}-fpm-bookworm AS php
 
-ADD docker/etc/supervisord.ini /etc/supervisor.d/services.ini
-ADD docker/etc/before_launch.ini /etc/supervisor.d/before_launch.ini
-ADD docker/etc/before_launch.sh /before_launch.sh
+LABEL org.opencontainers.image.authors="ambroise@rezo-zero.com"
 
-COPY --chown=www-data:www-data . /var/www/html/
-COPY docker/crontab.txt /crontab.txt
+ARG UID
+ARG GID
 
-RUN apk add --no-cache shadow \
-    && curl -sS https://getcomposer.org/installer | \
-       php -- --install-dir=/usr/bin/ --filename=composer \
-    && composer install --no-plugins --no-scripts --prefer-dist \
-    # Need to autoload dev dependencies for AWS S3 filesystem
-    && composer dump-autoload --classmap-authoritative --apcu --dev \
-    && usermod -u ${USER_UID} www-data \
-    && groupmod -g ${USER_UID} www-data \
-    && mkdir -p /var/www/html/web/assets \
-    && mkdir -p /var/www/html/web/images \
-    && chmod +x /before_launch.sh \
-    && /usr/bin/crontab -u www-data /crontab.txt
+ARG COMPOSER_VERSION=2.8.2
+ARG PHP_EXTENSION_INSTALLER_VERSION=2.6.0
+
+ENV IR_GC_PROBABILITY=400
+ENV IR_GC_TTL=604800
+# 1 year
+ENV IR_RESPONSE_TTL=31557600
+ENV IR_USE_FILECHECKSUM=0
+ENV IR_USE_PASSTHROUGH_CACHE=1
+ENV IR_DRIVER="gd"
+ENV IR_CACHE_PATH=/var/www/html/web/assets
+ENV IR_IGNORE_PATH=/assets
+ENV IR_DEFAULT_QUALITY=80
+ENV IR_IMAGES_PATH=/var/www/html/web/images
+ENV IR_JPEGOPTIM_PATH=/usr/bin/jpegoptim
+ENV IR_PNGQUANT_PATH=/usr/bin/pngquant
+
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
+
+COPY --link docker/crontab.txt /crontab.txt
+
+RUN <<EOF
+apt-get --quiet update
+apt-get --quiet --yes --purge --autoremove upgrade
+# Packages - System
+apt-get --quiet --yes --no-install-recommends --verbose-versions install \
+    less \
+    nginx \
+    cron \
+    pngquant \
+    supervisor \
+    jpegoptim \
+    sudo
+rm -rf /var/lib/apt/lists/*
+
+# User
+addgroup --gid ${UID} php
+adduser --home /home/php --shell /bin/bash --uid ${GID} --gecos php --ingroup php --disabled-password php
+echo "php ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/php
+
+# App
+install --verbose --owner php --group php --mode 0755 --directory /var/www/html
+
+/usr/bin/crontab -u php /crontab.txt
+chown -R php:php /var/www/html
+
+# Php extensions
+curl -sSLf  https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions \
+    --output /usr/local/bin/install-php-extensions
+chmod +x /usr/local/bin/install-php-extensions
+install-php-extensions \
+    @composer-${COMPOSER_VERSION} \
+    apcu \
+    exif \
+    gd \
+    imagick \
+    opcache \
+    zip
+
+install --verbose --owner php --group php --mode 0755 --directory /var/lib/nginx --directory /var/log/nginx
+chown -R php:php /var/log/nginx
+EOF
+
+COPY --link docker/etc/php/zz-docker.conf              /usr/local/etc/php-fpm.d/zz-docker.conf
+COPY --link docker/etc/nginx/nginx.conf                /etc/nginx/nginx.conf
+COPY --link docker/etc/nginx/mime.types                /etc/nginx/mime.types
+COPY --link docker/etc/nginx/conf.d/_gzip.conf         /etc/nginx/conf.d/_gzip.conf
+COPY --link docker/etc/nginx/conf.d/_security.conf     /etc/nginx/conf.d/_security.conf
+COPY --link docker/etc/nginx/conf.d/default.conf       /etc/nginx/conf.d/default.conf
+COPY --link docker/etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY --link docker/etc/supervisor/conf.d/services.conf /etc/supervisor/conf.d/services.conf
+
+COPY --link --chmod=755 docker/docker-php-entrypoint /usr/local/bin/docker-php-entrypoint
+
+WORKDIR /var/www/html
+
+
+##################
+# PHP Production #
+##################
+
+FROM php AS php-prod
+
+ENV APP_ENV=prod
+ENV APP_RUNTIME_ENV=prod
+ENV APP_DEBUG=0
+
+RUN ln -sf ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
+COPY --link docker/etc/php/conf.d/php.prod.ini ${PHP_INI_DIR}/conf.d/zz-app.ini
+
+# Composer
+COPY --link --chown=php:php composer.* ./
+
+RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+
+COPY --link --chown=php:php . .
+
+RUN composer dump-autoload --classmap-authoritative --no-dev
+
+# Declare volumes with the correct user
+USER php
+
+VOLUME /var/www/html/web/images \
+       /var/www/html/web/assets
+
+USER root
+
+CMD [ "supervisord", "-n",  "-u", "root", "-c", "/etc/supervisor/supervisord.conf" ]
 
 EXPOSE 80
-VOLUME /var/www/html/web/images /var/www/html/web/assets
-ENTRYPOINT exec /usr/bin/supervisord -n -c /etc/supervisord.conf
+
+###########
+# PHP Dev #
+###########
+
+FROM php AS php-dev
+
+ENV APP_ENV=dev
+ENV APP_RUNTIME_ENV=dev
+ENV APP_DEBUG=0
+
+RUN ln -sf ${PHP_INI_DIR}/php.ini-development ${PHP_INI_DIR}/php.ini
+
+# Declare volumes with the correct user
+USER php
+
+VOLUME /var/www/html
+
+USER root
+
+CMD [ "supervisord", "-n",  "-u", "root", "-c", "/etc/supervisor/supervisord.conf" ]
+
+EXPOSE 80
+

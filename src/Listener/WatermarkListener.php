@@ -9,25 +9,8 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 
-/**
- * @package AM\InterventionRequest\Listener
- */
-final class WatermarkListener implements ImageEventSubscriberInterface
+final readonly class WatermarkListener implements ImageEventSubscriberInterface
 {
-    private string $watermarkText;
-    private int $size;
-    /**
-     * @var array|string
-     */
-    private $color;
-    private string $align;
-    private string $valign;
-    private int $angle;
-    /**
-     * @var int|string
-     */
-    private $fontFile;
-
     /**
      * @param string $watermarkText The text string that will be written to the image.
      * @param int|string $fontFile Set path to a True Type Font file or a integer value between 1 and 5 for one of the GD library internal fonts. Default: 1
@@ -38,21 +21,14 @@ final class WatermarkListener implements ImageEventSubscriberInterface
      * @param int $angle Set rotation angle of text in degrees. Text will be rotated counter-clockwise around the vertical and horizontal aligned point. Rotation is only available if a font file is set and will be ignored otherwise. Default: no rotation
      */
     public function __construct(
-        string $watermarkText,
-        $fontFile = 1,
-        int $size = 24,
-        $color = '#FFFFFF',
-        string $align = 'center',
-        string $valign = 'center',
-        int $angle = 0
+        private string $watermarkText,
+        private int|string $fontFile = 1,
+        private int $size = 24,
+        private array|string $color = '#FFFFFF',
+        private string $align = 'center',
+        private string $valign = 'center',
+        private int $angle = 0
     ) {
-        $this->watermarkText = $watermarkText;
-        $this->size = $size;
-        $this->color = $color;
-        $this->align = $align;
-        $this->valign = $valign;
-        $this->angle = $angle;
-        $this->fontFile = $fontFile;
     }
 
     /**
@@ -110,7 +86,7 @@ final class WatermarkListener implements ImageEventSubscriberInterface
      * @param Image|null $image
      * @return bool
      */
-    public function supports(Image $image = null): bool
+    public function supports(?Image $image = null): bool
     {
         return null !== $image;
     }

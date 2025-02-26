@@ -13,9 +13,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @package AM\InterventionRequest\Command
- */
 class GarbageCollectorCommand extends Command
 {
     /**

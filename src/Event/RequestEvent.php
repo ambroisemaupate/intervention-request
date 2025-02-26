@@ -11,16 +11,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class RequestEvent extends Event
 {
-    protected Request $request;
-    protected InterventionRequest $interventionRequest;
     protected ?Response $response = null;
-    protected int $quality;
 
-    public function __construct(Request $request, InterventionRequest $interventionRequest, int $quality = 90)
-    {
-        $this->request = $request;
-        $this->interventionRequest = $interventionRequest;
-        $this->quality = $quality;
+    public function __construct(
+        protected readonly Request $request,
+        protected readonly InterventionRequest $interventionRequest,
+        protected int $quality = 90
+    ) {
     }
 
     /**

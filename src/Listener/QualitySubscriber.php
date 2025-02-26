@@ -13,9 +13,6 @@ final class QualitySubscriber implements EventSubscriberInterface
 {
     private int $quality;
 
-    /**
-     * @param int $quality
-     */
     public function __construct(int $quality)
     {
         $this->setQuality($quality);

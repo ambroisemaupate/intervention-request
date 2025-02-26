@@ -24,44 +24,23 @@ use Symfony\Component\HttpFoundation\Response;
 class FileCache implements EventSubscriberInterface
 {
     protected string $cachePath;
-    protected ?LoggerInterface $logger = null;
-    protected int $ttl;
-    protected int $gcProbability;
-    protected bool $useFileChecksum;
-    protected ChainProcessor $chainProcessor;
     private ImageEncoder $imageEncoder;
-    private FileResolverInterface $fileResolver;
 
-    /**
-     * @param ChainProcessor $chainProcessor
-     * @param FileResolverInterface $fileResolver
-     * @param string $cachePath
-     * @param LoggerInterface|null $logger
-     * @param int $ttl
-     * @param int $gcProbability
-     * @param bool $useFileChecksum
-     */
     public function __construct(
-        ChainProcessor $chainProcessor,
-        FileResolverInterface $fileResolver,
+        protected readonly ChainProcessor $chainProcessor,
+        protected readonly FileResolverInterface $fileResolver,
         string $cachePath,
-        LoggerInterface $logger = null,
-        int $ttl = 604800,
-        int $gcProbability = 300,
-        bool $useFileChecksum = false
+        protected readonly ?LoggerInterface $logger = null,
+        protected readonly int $ttl = 604800,
+        protected readonly int $gcProbability = 300,
+        protected readonly bool $useFileChecksum = false
     ) {
         $cachePath = realpath($cachePath);
         if (false === $cachePath) {
             throw new \InvalidArgumentException('Cache path does not exist.');
         }
         $this->cachePath = $cachePath;
-        $this->logger = $logger;
-        $this->ttl = $ttl;
-        $this->gcProbability = $gcProbability;
         $this->imageEncoder = new ImageEncoder();
-        $this->useFileChecksum = $useFileChecksum;
-        $this->chainProcessor = $chainProcessor;
-        $this->fileResolver = $fileResolver;
     }
 
     /**

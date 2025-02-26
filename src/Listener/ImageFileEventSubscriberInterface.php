@@ -11,9 +11,6 @@ interface ImageFileEventSubscriberInterface extends EventSubscriberInterface
 {
     /**
      * Return true if current subscriber can be used for current image.
-     *
-     * @param File|null $image
-     * @return bool
      */
-    public function supports(File $image = null): bool;
+    public function supports(?File $image = null): bool;
 }
