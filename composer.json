@@ -39,9 +39,7 @@
         "tinify/tinify": "^1.5"
     },
     "suggest" : {
-        "ext-imagick": "Allow TIFF images to be implicitly converted to jpeg.",
-        "kraken-io/kraken-php": "Allow Kraken.io listener to optimize images",
-        "tinify/tinify": "Allow Tinify API listener to optimize images"
+        "ext-imagick": "Allow TIFF images to be implicitly converted to jpeg."
     },
     "autoload": {
         "psr-4": {
@@ -54,6 +52,7 @@
         "phpstan/phpdoc-parser": "<2",
         "squizlabs/php_codesniffer": "^3.5",
         "symfony/debug": "^4.4 || ^5.0.7 || ^6.4",
-        "symfony/var-dumper": "^4.4 || ^5.0.7 || ^6.4"
+        "symfony/var-dumper": "^4.4 || ^5.0.7 || ^6.4",
+        "friendsofphp/php-cs-fixer": "^3.70"
     }
 }

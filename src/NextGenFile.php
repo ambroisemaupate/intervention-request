@@ -21,7 +21,7 @@ class NextGenFile extends File implements FileWithResourceInterface
     /**
      * @var resource|null
      */
-    protected $resource = null;
+    protected $resource;
     protected ?FilesystemOperator $filesystem = null;
     private LoggerInterface $logger;
 
@@ -79,6 +79,7 @@ class NextGenFile extends File implements FileWithResourceInterface
 
     /**
      * @return resource|null
+     *
      * @throws FileNotFoundException
      */
     public function getResource()
@@ -88,57 +89,44 @@ class NextGenFile extends File implements FileWithResourceInterface
                 return null;
             }
             try {
-                $this->logger->debug('Read stream from ' . $this->getPathname());
+                $this->logger->debug('Read stream from '.$this->getPathname());
                 $this->resource = $this->filesystem->readStream($this->getPathname());
             } catch (FilesystemException $exception) {
                 $this->logger->error($exception);
                 throw new FileNotFoundException($this->getPathname());
             }
         }
+
         return $this->resource;
     }
 
     public function setFilesystem(FilesystemOperator $filesystem): FileWithResourceInterface
     {
         $this->filesystem = $filesystem;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getRequestedPath(): string
     {
         return $this->requestedPath;
     }
 
-    /**
-     * @return File
-     */
     public function getRequestedFile(): File
     {
         return $this->requestedFile ?? $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isNextGen(): bool
     {
         return $this->isNextGen;
     }
 
-    /**
-     * @return string|null
-     */
     public function getNextGenMimeType(): ?string
     {
         return $this->nextGenMimeType;
     }
 
-    /**
-     * @return string|null
-     */
     public function getNextGenExtension(): ?string
     {
         return $this->nextGenExtension;

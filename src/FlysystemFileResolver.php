@@ -13,7 +13,7 @@ final class FlysystemFileResolver extends LocalFileResolver
     public function __construct(
         private readonly FilesystemOperator $filesystem,
         private readonly LoggerInterface $logger,
-        string $tempFilePath
+        string $tempFilePath,
     ) {
         parent::__construct($tempFilePath);
     }
@@ -32,6 +32,7 @@ final class FlysystemFileResolver extends LocalFileResolver
          * Use resource based NextGenFile to avoid storing data on disk
          */
         $nextgenFile->setFilesystem($this->filesystem);
+
         return $nextgenFile;
     }
 }

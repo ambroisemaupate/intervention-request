@@ -18,9 +18,6 @@ final readonly class TinifyListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -29,10 +26,6 @@ final readonly class TinifyListener implements ImageFileEventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ResponseEvent $event
-     * @return void
-     */
     public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
@@ -43,8 +36,6 @@ final readonly class TinifyListener implements ImageFileEventSubscriberInterface
     }
 
     /**
-     * @param ImageSavedEvent $event
-     * @return void
      * @throws \Tinify\AccountException
      */
     public function onImageSaved(ImageSavedEvent $event): void
@@ -57,8 +48,8 @@ final readonly class TinifyListener implements ImageFileEventSubscriberInterface
             $source = \Tinify\fromFile($event->getImageFile()->getPathname());
             $this->overrideImageFile($event->getImageFile()->getPathname(), $source);
             if (null !== $this->logger) {
-                $this->logger->debug("Used tinify.io to minify file.", [
-                    'path' => $event->getImageFile()->getPathname()
+                $this->logger->debug('Used tinify.io to minify file.', [
+                    'path' => $event->getImageFile()->getPathname(),
                 ]);
             }
         }
@@ -66,13 +57,11 @@ final readonly class TinifyListener implements ImageFileEventSubscriberInterface
 
     public function supports(?File $image = null): bool
     {
-        return ('' !== $this->apiKey && null !== $image && $image->getPathname() !== '');
+        return '' !== $this->apiKey && null !== $image && '' !== $image->getPathname();
     }
 
     /**
      * @param string $localPath
-     * @param \Tinify\Source $source
-     * @return void
      */
     protected function overrideImageFile($localPath, \Tinify\Source $source): void
     {

@@ -214,6 +214,7 @@ very easy to integrate it in your *Symfony* controller scheme:
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\InterventionRequest;
 use AM\InterventionRequest\LocalFileResolver;
+use Monolog\Logger;
 
 /*
  * A test configuration
@@ -234,7 +235,7 @@ $fileResolver = new LocalFileResolver($conf->getImagesPath());
  * - AM\InterventionRequest\Configuration
  * - AM\InterventionRequest\FileResolverInterface
  */
-$intRequest = new InterventionRequest($conf, $fileResolver);
+$intRequest = new InterventionRequest($conf, $fileResolver, new Logger('InterventionRequest'));
 // Handle request and process image
 $intRequest->handleRequest($request);
 
@@ -537,13 +538,28 @@ Have fun!
 
 ## Testing 
 
-Copy `index.php` to `dev.php` then launch PHP server command using `router.php` as router.
+This project uses Docker for development environment.
+Copy `compose.override.yml` to `compose.override.yml`, use `php-dev` target and declare a volume on your project root folder.
 
-```bash
-php -S 0.0.0.0:8088 -t web router.php 
+```yaml
+services:
+    intervention:
+        build:
+            context: .
+            target: php-dev
+        volumes:
+            - ./:/var/www/html
+        ports:
+            -   "8080:80/tcp"
+
 ```
 
-Then open `http://0.0.0.0:8088/dev.php/w300/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
+```bash
+docker compose build
+docker compose up
+```
 
-If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8088/dev.php/cache/w300/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
+Then open `http://0.0.0.0:8080/assets/w300/rhino.jpg` in your browser. 
+You should be able to test *intervention-request* with Passthrough cache and *ShortUrl* enabled.
+Set `IR_USE_PASSTHROUGH_CACHE=0` if you don't want cache to be served by *Nginx*.
 

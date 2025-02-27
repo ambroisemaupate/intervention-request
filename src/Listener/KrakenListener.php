@@ -9,27 +9,15 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
-/**
- * @package AM\InterventionRequest\Listener
- */
 final class KrakenListener implements ImageFileEventSubscriberInterface
 {
-    /**
-     * @var \Kraken
-     */
-    private $kraken;
+    private \Kraken $kraken;
 
-    /**
-     * @param string $apiKey
-     * @param string $apiSecret
-     * @param bool $lossy
-     * @param LoggerInterface|null $logger
-     */
     public function __construct(
         private readonly string $apiKey,
         private readonly string $apiSecret,
         private readonly bool $lossy = true,
-        private readonly ?LoggerInterface $logger = null
+        private readonly ?LoggerInterface $logger = null,
     ) {
         if (!class_exists('\Kraken')) {
             throw new \RuntimeException('kraken-io/kraken-php library is required to use KrakenListener');
@@ -38,9 +26,6 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
         $this->kraken = new \Kraken($this->apiKey, $this->apiSecret);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -49,10 +34,6 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ResponseEvent $event
-     * @return void
-     */
     public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
@@ -62,18 +43,14 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @param ImageSavedEvent $event
-     * @return void
-     */
     public function onImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {
-            $params = array(
-                "file" => $event->getImageFile()->getPathname(),
-                "wait" => true,
-                "lossy" => $this->lossy,
-            );
+            $params = [
+                'file' => $event->getImageFile()->getPathname(),
+                'wait' => true,
+                'lossy' => $this->lossy,
+            ];
 
             $data = $this->kraken->upload($params);
 
@@ -81,55 +58,51 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
                 return;
             }
 
-            if (isset($data["success"]) && is_string($data['kraked_url']) && !empty($data['kraked_url'])) {
+            if (isset($data['success']) && is_string($data['kraked_url']) && !empty($data['kraked_url'])) {
                 if (null !== $this->logger) {
-                    $this->logger->debug("Used kraken.io to minify file.", $data);
+                    $this->logger->debug('Used kraken.io to minify file.', $data);
                 }
                 $this->overrideImageFile($event->getImageFile()->getPathname(), $data['kraked_url']);
             }
         }
     }
 
-
     public function supports(?File $image = null): bool
     {
-        return null !== $this->kraken &&
-            '' !== $this->apiKey &&
-            '' !== $this->apiSecret &&
-            null !== $image &&
-            $image->getPathname() !== '';
+        return '' !== $this->apiKey
+            && '' !== $this->apiSecret
+            && null !== $image
+            && '' !== $image->getPathname();
     }
 
     /**
-     * @param string $localPath
      * @param non-empty-string $krakedUrl
-     * @return void
      */
     protected function overrideImageFile(string $localPath, string $krakedUrl): void
     {
         /**
-         * Initialize the cURL session
+         * Initialize the cURL session.
          */
         $ch = curl_init();
-        /**
+        /*
          * Set the URL of the page or file to download.
          */
         curl_setopt($ch, CURLOPT_URL, $krakedUrl);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         /**
-         * Create a new file
+         * Create a new file.
          */
         $fp = fopen($localPath, 'w');
         if (false !== $fp) {
-            /**
+            /*
              * Ask cURL to write the contents to a file
              */
             curl_setopt($ch, CURLOPT_FILE, $fp);
-            /**
+            /*
              * Execute the cURL session
              */
             curl_exec($ch);
-            /**
+            /*
              * Close cURL session and file
              */
             curl_close($ch);

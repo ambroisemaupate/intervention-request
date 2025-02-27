@@ -12,28 +12,16 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * PassThroughFileCache acts as FileCache but uses the real request path
  * to be able to serve cache images without PHP.
- *
- * @package AM\InterventionRequest\Cache
  */
 final class PassThroughFileCache extends FileCache
 {
-    /**
-     * @param RequestEvent $requestEvent
-     *
-     * @return bool
-     */
     protected function supports(RequestEvent $requestEvent): bool
     {
         $config = $requestEvent->getInterventionRequest()->getConfiguration();
+
         return $config->hasCaching() && $config->isUsingPassThroughCache();
     }
 
-    /**
-     * @param Request $request
-     * @param File    $nativeImage
-     *
-     * @return string
-     */
     protected function getCacheFilePath(Request $request, File $nativeImage): string
     {
         /*
@@ -48,9 +36,9 @@ final class PassThroughFileCache extends FileCache
             throw new \RuntimeException('DOCUMENT_ROOT path does not exist.');
         }
         $cacheFolder = str_replace($documentRoot, '', $this->cachePath);
-        $cacheFolderRegex = '#^' . preg_quote($cacheFolder) . '#';
+        $cacheFolderRegex = '#^'.preg_quote($cacheFolder).'#';
         if (0 === preg_match($cacheFolderRegex, $request->getPathInfo())) {
-            if ($this->logger !== null) {
+            if (null !== $this->logger) {
                 $this->logger->error('Cache path was not found in your request path info.', [
                     'pathInfo' => $request->getPathInfo(),
                     'cacheRegex' => $cacheFolderRegex,
@@ -59,6 +47,6 @@ final class PassThroughFileCache extends FileCache
             throw new FileNotFoundException($request->getPathInfo());
         }
 
-        return $documentRoot . $request->getPathInfo();
+        return $documentRoot.$request->getPathInfo();
     }
 }

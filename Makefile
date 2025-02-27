@@ -1,7 +1,7 @@
 
 .PHONY: test dev-server
 test:
-	php -d memory_limit=-1 vendor/bin/phpcs --report=full --report-file=./report.txt -p;
+	php -d "memory_limit=-1" vendor/bin/php-cs-fixer fix --ansi -vvv
 	php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon;
 
 dev-server:

@@ -22,14 +22,10 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
     public static function getSubscribedEvents(): array
     {
         return [
-            RequestEvent::class => ['onRequest', 0]
+            RequestEvent::class => ['onRequest', 0],
         ];
     }
 
-    /**
-     * @param RequestEvent $requestEvent
-     * @return void
-     */
     public function onRequest(RequestEvent $requestEvent): void
     {
         if (false === $requestEvent->getInterventionRequest()->getConfiguration()->hasCaching()) {
@@ -45,7 +41,7 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $nativeImage->getNextGenMimeType(),
-                        'Content-Disposition' => 'filename="' . $nativeImage->getRequestedFile()->getFilename() . '"',
+                        'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
                         'X-IR-Cached' => '0',
                         'X-IR-First-Gen' => '1',
                     ]
@@ -56,7 +52,7 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $image->mime(),
-                        'Content-Disposition' => 'filename="' . $nativeImage->getFilename() . '"',
+                        'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
                         'X-IR-Cached' => '0',
                         'X-IR-First-Gen' => '1',
                     ]

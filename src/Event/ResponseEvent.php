@@ -22,21 +22,15 @@ final class ResponseEvent extends ImageEvent
         parent::__construct($image);
     }
 
-    /**
-     * @return Response
-     */
     public function getResponse(): Response
     {
         return $this->response;
     }
 
-    /**
-     * @param Response $response
-     * @return ResponseEvent
-     */
     public function setResponse(Response $response): ResponseEvent
     {
         $this->response = $response;
+
         return $this;
     }
 }

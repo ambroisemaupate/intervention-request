@@ -15,9 +15,6 @@ final readonly class OxipngListener implements ImageFileEventSubscriberInterface
     {
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -26,19 +23,15 @@ final readonly class OxipngListener implements ImageFileEventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ResponseEvent $event
-     * @return void
-     */
     public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         $contentType = $response->headers->get('Content-Type', '');
         if (
-            $this->oxipngPath !== '' &&
-            null !== $contentType &&
-            strtolower($contentType) === 'image/png' &&
-            (bool) $response->headers->get('X-IR-First-Gen')
+            '' !== $this->oxipngPath
+            && null !== $contentType
+            && 'image/png' === strtolower($contentType)
+            && (bool) $response->headers->get('X-IR-First-Gen')
         ) {
             $response->headers->add(['X-IR-Oxipng' => '1']);
             $event->setResponse($response);
@@ -47,16 +40,12 @@ final readonly class OxipngListener implements ImageFileEventSubscriberInterface
 
     public function supports(?File $image = null): bool
     {
-        return $this->oxipngPath !== '' &&
-            null !== $image &&
-            null !== $image->getMimeType() &&
-            strtolower($image->getMimeType()) === 'image/png';
+        return '' !== $this->oxipngPath
+            && null !== $image
+            && null !== $image->getMimeType()
+            && 'image/png' === strtolower($image->getMimeType());
     }
 
-    /**
-     * @param ImageSavedEvent $event
-     * @return void
-     */
     public function onPngImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {

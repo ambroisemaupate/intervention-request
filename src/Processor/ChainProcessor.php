@@ -22,7 +22,7 @@ final readonly class ChainProcessor
     public function __construct(
         private Configuration $configuration,
         private EventDispatcherInterface $dispatcher,
-        private array $processors
+        private array $processors,
     ) {
     }
 
@@ -33,19 +33,13 @@ final readonly class ChainProcessor
             'driver' => $this->configuration->getDriver(),
         ]);
 
-        if ($nativeFile instanceof FileWithResourceInterface && $nativeFile->getResource() !== null) {
+        if ($nativeFile instanceof FileWithResourceInterface && null !== $nativeFile->getResource()) {
             return $manager->make($nativeFile->getResource());
         }
 
         return $manager->make($nativeFile);
     }
 
-    /**
-     * @param File    $nativeImage
-     * @param Request $request
-     *
-     * @return Image
-     */
     public function process(File $nativeImage, Request $request): Image
     {
         if ($request->query->has('no_process')) {

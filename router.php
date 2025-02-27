@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * This file implements rewrite rules for PHP built-in web server.
  *

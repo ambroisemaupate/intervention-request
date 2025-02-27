@@ -30,10 +30,10 @@ class FileCache implements EventSubscriberInterface
         protected readonly ChainProcessor $chainProcessor,
         protected readonly FileResolverInterface $fileResolver,
         string $cachePath,
-        protected readonly ?LoggerInterface $logger = null,
+        protected readonly LoggerInterface $logger,
         protected readonly int $ttl = 604800,
         protected readonly int $gcProbability = 300,
-        protected readonly bool $useFileChecksum = false
+        protected readonly bool $useFileChecksum = false,
     ) {
         $cachePath = realpath($cachePath);
         if (false === $cachePath) {
@@ -51,32 +51,22 @@ class FileCache implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            RequestEvent::class => ['onRequest', -100]
+            RequestEvent::class => ['onRequest', -100],
         ];
     }
 
-    /**
-     * @param Image  $image
-     * @param string $cacheFilePath
-     * @param int    $quality
-     *
-     * @return Image
-     */
     protected function saveImage(Image $image, string $cacheFilePath, int $quality): Image
     {
         $path = dirname($cacheFilePath);
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
+
         return $this->imageEncoder->save($image, $cacheFilePath, $quality);
     }
 
     /**
      * Determines if the garbage collector should run for this request.
-     *
-     * @param Request $request
-     *
-     * @return bool
      */
     private function garbageCollectionShouldRun(Request $request): bool
     {
@@ -93,26 +83,19 @@ class FileCache implements EventSubscriberInterface
 
     /**
      * Checks to see if the garbage collector should be initialized, and if it should, initializes it.
-     *
-     * @param Request $request
-     * @return void
      */
     protected function initializeGarbageCollection(Request $request): void
     {
         if ($this->garbageCollectionShouldRun($request)) {
-            $garbageCollector = new GarbageCollector($this->cachePath, $this->logger);
-            $garbageCollector->setTtl($this->ttl);
+            $garbageCollector = new GarbageCollector($this->cachePath, $this->logger, $this->ttl);
             $garbageCollector->launch();
         }
     }
 
-    /**
-     * @param RequestEvent $requestEvent
-     * @return bool
-     */
     protected function supports(RequestEvent $requestEvent): bool
     {
         $config = $requestEvent->getInterventionRequest()->getConfiguration();
+
         return $config->hasCaching() && !$config->isUsingPassThroughCache();
     }
 
@@ -120,8 +103,8 @@ class FileCache implements EventSubscriberInterface
     {
         $fileSystem = new Filesystem();
         if (
-            $nativeFile instanceof FileWithResourceInterface &&
-            $nativeFile->getResource() !== null
+            $nativeFile instanceof FileWithResourceInterface
+            && null !== $nativeFile->getResource()
         ) {
             $fileSystem->dumpFile((string) $cachedFile, $nativeFile->getResource());
         } else {
@@ -130,11 +113,7 @@ class FileCache implements EventSubscriberInterface
     }
 
     /**
-     * @param RequestEvent             $requestEvent
-     * @param string                   $eventName
-     * @param EventDispatcherInterface $dispatcher
      * @throws \Exception
-     * @return void
      */
     public function onRequest(RequestEvent $requestEvent, string $eventName, EventDispatcherInterface $dispatcher): void
     {
@@ -147,17 +126,17 @@ class FileCache implements EventSubscriberInterface
             $cacheFile = new File($cacheFilePath, false);
             $firstGen = false;
 
-           /**
+            /*
              * Also check date, if cached date is lower than original date -> Remove cached file
              */
             if (\is_file($cacheFilePath)) {
-                $mtime_original_file = $nativeImage->getRequestedFile()->getMTime();
+                $mtime_original_file = $nativeImage->getMTime();
                 $mtime_cached_file = $cacheFile->getMTime();
 
                 if (
-                    ($mtime_original_file !== false && \is_numeric($mtime_original_file)) &&
-                    ($mtime_cached_file !== false && \is_numeric($mtime_cached_file)) &&
-                    ($mtime_cached_file < $mtime_original_file)
+                    (false !== $mtime_original_file && \is_numeric($mtime_original_file))
+                    && (false !== $mtime_cached_file && \is_numeric($mtime_cached_file))
+                    && ($mtime_cached_file < $mtime_original_file)
                 ) {
                     unlink($cacheFilePath);
                 }
@@ -186,12 +165,12 @@ class FileCache implements EventSubscriberInterface
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $cacheFile->getMimeType(),
-                        'Content-Disposition' => 'filename="' . $nativeImage->getRequestedFile()->getFilename() . '"',
+                        'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
                         'X-IR-Cached' => '1',
-                        'X-IR-First-Gen' => (int) $firstGen
+                        'X-IR-First-Gen' => (int) $firstGen,
                     ]
                 );
-                $response->setLastModified(new \DateTime(date("Y-m-d H:i:s", $cacheFile->getMTime())));
+                $response->setLastModified(new \DateTime(date('Y-m-d H:i:s', $cacheFile->getMTime())));
             } else {
                 $response = new Response(
                     null,
@@ -204,18 +183,12 @@ class FileCache implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Request $request
-     * @param File    $nativeImage
-     *
-     * @return string
-     */
     protected function getCacheFilePath(Request $request, File $nativeImage): string
     {
         /*
          * Get file MD5 to check real image integrity
          */
-        if ($this->useFileChecksum === true) {
+        if (true === $this->useFileChecksum) {
             $fileMd5 = hash_file('adler32', $nativeImage->getPathname());
         } else {
             $fileMd5 = $nativeImage->getPathname();
@@ -245,10 +218,10 @@ class FileCache implements EventSubscriberInterface
             }
             $extension = $this->imageEncoder->getImageAllowedExtension($nativeImage->getRealPath());
         }
-        $cacheHash = hash('sha1', serialize($cacheParams) . $fileMd5);
+        $cacheHash = hash('sha1', serialize($cacheParams).$fileMd5);
 
-        return $this->cachePath .
-            '/' . substr($cacheHash, 0, 2) .
-            '/' . substr($cacheHash, 2) . '.' . $extension;
+        return $this->cachePath.
+            '/'.substr($cacheHash, 0, 2).
+            '/'.substr($cacheHash, 2).'.'.$extension;
     }
 }
