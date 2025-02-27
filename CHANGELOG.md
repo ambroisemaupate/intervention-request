@@ -2,6 +2,22 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [5.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v4.1.1...v5.0.0) - 2025-02-27
+
+### Bug Fixes
+
+- Do not check if file is an image in FileCache.php - ([a627625](https://github.com/ambroisemaupate/intervention-request/commit/a627625fd2db2a019172c58bb337c0b6acfd62fd)) - Ambroise Maupate
+
+### Features
+
+- Rewrote Dockerfile for Docker Bake, PHP 8.2 minimum and refactoring - ([e68cf22](https://github.com/ambroisemaupate/intervention-request/commit/e68cf2298e967ddd848928e0b8da39706a0eafa1)) - Ambroise Maupate
+- Added StreamNoProcessListener.php to avoid storing native files and image in cache folder - ([28a202a](https://github.com/ambroisemaupate/intervention-request/commit/28a202ab493d0cc367c8607482fbe99ac8b7fd39)) - Ambroise Maupate
+- Do not execute PassThroughFileCache when request is marked as stream no-process - ([2be082f](https://github.com/ambroisemaupate/intervention-request/commit/2be082f1063c0b865f77ed47bea9dd3f277cde0a)) - Ambroise Maupate
+
+### Refactor
+
+- Use php-cs-fixer instead of phpcs - ([4fd8e4a](https://github.com/ambroisemaupate/intervention-request/commit/4fd8e4a3d51a71e5d6faa22c7e716ddb3fa41453)) - Ambroise Maupate
+
 ## [4.1.0](https://github.com/ambroisemaupate/intervention-request/compare/v4.0.5...v4.1.0) - 2024-09-08
 
 ### Features

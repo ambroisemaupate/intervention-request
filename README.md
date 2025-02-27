@@ -537,7 +537,6 @@ AVIF conversion only supports custom compiled *ImageMagick* and only support los
 
 Have fun!
 
-
 ## Testing 
 
 This project uses Docker for development environment.
