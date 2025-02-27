@@ -13,17 +13,11 @@ final class QualitySubscriber implements EventSubscriberInterface
 {
     private int $quality;
 
-    /**
-     * @param int $quality
-     */
     public function __construct(int $quality)
     {
         $this->setQuality($quality);
     }
 
-    /**
-     * @inheritDoc
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -33,23 +27,16 @@ final class QualitySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param int $quality
-     * @return QualitySubscriber
-     */
     public function setQuality(int $quality): QualitySubscriber
     {
         if ($quality > 100 || $quality <= 0) {
             throw new \InvalidArgumentException('Quality must be between 1 and 100');
         }
         $this->quality = $quality;
+
         return $this;
     }
 
-    /**
-     * @param ResponseEvent $event
-     * @return void
-     */
     public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
@@ -57,10 +44,6 @@ final class QualitySubscriber implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    /**
-     * @param RequestEvent $requestEvent
-     * @return void
-     */
     public function onRequest(RequestEvent $requestEvent): void
     {
         if ($requestEvent->getRequest()->query->has('no_process')) {
@@ -79,10 +62,6 @@ final class QualitySubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ImageSavedEvent $imageSavedEvent
-     * @return void
-     */
     public function onImageSaved(ImageSavedEvent $imageSavedEvent): void
     {
         $imageSavedEvent->setQuality($this->quality);

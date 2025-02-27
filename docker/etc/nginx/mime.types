@@ -1,3 +1,4 @@
+
 types {
     text/html                                        html htm shtml;
     text/css                                         css;
@@ -14,12 +15,12 @@ types {
     text/vnd.wap.wml                                 wml;
     text/x-component                                 htc;
 
+    image/avif                                       avif;
     image/png                                        png;
     image/svg+xml                                    svg svgz;
     image/tiff                                       tif tiff;
     image/vnd.wap.wbmp                               wbmp;
     image/webp                                       webp;
-    image/avif                                       avif;
     image/x-icon                                     ico;
     image/x-jng                                      jng;
     image/x-ms-bmp                                   bmp;
@@ -44,10 +45,14 @@ types {
     application/vnd.oasis.opendocument.presentation  odp;
     application/vnd.oasis.opendocument.spreadsheet   ods;
     application/vnd.oasis.opendocument.text          odt;
-    application/vnd.openxmlformats-officedocument.presentationml.presentation   pptx;
-    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet           xlsx;
-    application/vnd.openxmlformats-officedocument.wordprocessingml.document     docx;
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                     pptx;
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                     xlsx;
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                                                     docx;
     application/vnd.wap.wmlc                         wmlc;
+    application/wasm                                 wasm;
     application/x-7z-compressed                      7z;
     application/x-cocoa                              cco;
     application/x-java-archive-diff                  jardiff;
@@ -92,21 +97,20 @@ types {
     video/x-ms-wmv                                   wmv;
     video/x-msvideo                                  avi;
 
-
-    # Other
     application/x-bb-appworld                        bbaw;
     application/x-bittorrent                         torrent;
     application/x-chrome-extension                   crx;
     application/x-opera-extension                    oex;
     application/xslt+xml                             xsl;
+    application/yaml                                 yaml yml;
+    image/heif                                       heic heif;
+    image/vnd.radiance                               hdr;
+    model/gltf+json                                  gltf;
+    model/gltf-binary                                glb;
     text/calendar                                    ics;
     text/csv                                         csv;
     text/markdown                                    md markdown;
     text/vcard                                       vcard vcf;
     text/vnd.rim.location.xloc                       xloc;
     text/vtt                                         vtt;
-
-    model/gltf-binary                                glb;
-    model/gltf+json                                  gltf;
-    image/vnd.radiance                               hdr;
 }

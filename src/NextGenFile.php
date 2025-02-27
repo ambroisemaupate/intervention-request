@@ -21,11 +21,11 @@ class NextGenFile extends File implements FileWithResourceInterface
     /**
      * @var resource|null
      */
-    protected $resource = null;
+    protected $resource;
     protected ?FilesystemOperator $filesystem = null;
     private LoggerInterface $logger;
 
-    public function __construct(string $path, bool $checkPath = true, LoggerInterface $logger = null)
+    public function __construct(string $path, bool $checkPath = true, ?LoggerInterface $logger = null)
     {
         $this->logger = $logger ?? new NullLogger();
         if (preg_match('#\.(webp|heic|heif|avif)\.jpg$#', $path) > 0) {
@@ -79,6 +79,7 @@ class NextGenFile extends File implements FileWithResourceInterface
 
     /**
      * @return resource|null
+     *
      * @throws FileNotFoundException
      */
     public function getResource()
@@ -88,59 +89,64 @@ class NextGenFile extends File implements FileWithResourceInterface
                 return null;
             }
             try {
-                $this->logger->debug('Read stream from ' . $this->getPathname());
+                $this->logger->debug('Read stream from '.$this->getPathname());
                 $this->resource = $this->filesystem->readStream($this->getPathname());
             } catch (FilesystemException $exception) {
                 $this->logger->error($exception);
                 throw new FileNotFoundException($this->getPathname());
             }
         }
+
         return $this->resource;
     }
 
     public function setFilesystem(FilesystemOperator $filesystem): FileWithResourceInterface
     {
         $this->filesystem = $filesystem;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getRequestedPath(): string
     {
         return $this->requestedPath;
     }
 
-    /**
-     * @return File
-     */
     public function getRequestedFile(): File
     {
         return $this->requestedFile ?? $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isNextGen(): bool
     {
         return $this->isNextGen;
     }
 
-    /**
-     * @return string|null
-     */
     public function getNextGenMimeType(): ?string
     {
         return $this->nextGenMimeType;
     }
 
-    /**
-     * @return string|null
-     */
     public function getNextGenExtension(): ?string
     {
         return $this->nextGenExtension;
+    }
+
+    public function getMTime(): int|false
+    {
+        if (null !== $this->filesystem) {
+            return $this->filesystem->lastModified($this->getPathname());
+        }
+
+        return parent::getMTime();
+    }
+
+    public function getMimeType(): ?string
+    {
+        if (null !== $this->filesystem) {
+            return $this->filesystem->mimeType($this->getPathname());
+        }
+
+        return parent::getMimeType();
     }
 }

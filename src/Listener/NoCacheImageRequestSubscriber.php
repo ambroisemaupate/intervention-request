@@ -6,24 +6,14 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
-use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
+final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInterface
 {
-    private ChainProcessor $processor;
-    private FileResolverInterface $fileResolver;
-
-    /**
-     * @param ChainProcessor $processor
-     * @param FileResolverInterface $fileResolver
-     */
-    public function __construct(ChainProcessor $processor, FileResolverInterface $fileResolver)
+    public function __construct(private ChainProcessor $processor, private FileResolverInterface $fileResolver)
     {
-        $this->processor = $processor;
-        $this->fileResolver = $fileResolver;
     }
 
     /**
@@ -32,14 +22,10 @@ final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            RequestEvent::class => ['onRequest', 0]
+            RequestEvent::class => ['onRequest', 0],
         ];
     }
 
-    /**
-     * @param RequestEvent $requestEvent
-     * @return void
-     */
     public function onRequest(RequestEvent $requestEvent): void
     {
         if (false === $requestEvent->getInterventionRequest()->getConfiguration()->hasCaching()) {
@@ -55,7 +41,7 @@ final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $nativeImage->getNextGenMimeType(),
-                        'Content-Disposition' => 'filename="' . $nativeImage->getRequestedFile()->getFilename() . '"',
+                        'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
                         'X-IR-Cached' => '0',
                         'X-IR-First-Gen' => '1',
                     ]
@@ -66,7 +52,7 @@ final class NoCacheImageRequestSubscriber implements EventSubscriberInterface
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $image->mime(),
-                        'Content-Disposition' => 'filename="' . $nativeImage->getFilename() . '"',
+                        'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
                         'X-IR-Cached' => '0',
                         'X-IR-First-Gen' => '1',
                     ]

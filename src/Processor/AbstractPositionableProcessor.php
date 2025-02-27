@@ -8,10 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractPositionableProcessor implements Processor
 {
-    /**
-     * @param Request $request
-     * @return string
-     */
     protected function parsePosition(Request $request): string
     {
         $alignment = 'center';

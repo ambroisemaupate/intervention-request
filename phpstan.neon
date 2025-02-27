@@ -12,3 +12,6 @@ parameters:
         - '#Instantiated class Memcached not found#'
         - '#Instantiated class Redis not found#'
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+
+

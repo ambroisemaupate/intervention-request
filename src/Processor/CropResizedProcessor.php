@@ -4,30 +4,22 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Processor;
 
-use Intervention\Image\Image;
 use Intervention\Image\Constraint;
+use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @package AM\InterventionRequest\Processor
- */
 final class CropResizedProcessor extends AbstractPositionableProcessor
 {
-    /**
-     * @param Image $image
-     * @param Request $request
-     * @return void
-     */
     public function process(Image $image, Request $request): void
     {
         if (
-            $request->query->has('crop') &&
-            1 === preg_match(
+            $request->query->has('crop')
+            && 1 === preg_match(
                 '#^([0-9]+)[x\:]([0-9]+)$#',
                 (string) ($request->query->get('crop') ?? ''),
                 $crop
-            ) &&
-            ($request->query->has('width') || $request->query->has('height'))
+            )
+            && ($request->query->has('width') || $request->query->has('height'))
         ) {
             $fitRatio = (float) $crop[1] / (float) $crop[2];
 

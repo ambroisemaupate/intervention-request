@@ -2,7 +2,7 @@
 
 **A customizable *Intervention Image* wrapper to use image simple re-sampling features over urls and a configurable cache.**
 
-[![Build Status](https://app.travis-ci.com/ambroisemaupate/intervention-request.svg?branch=master)](https://app.travis-ci.com/ambroisemaupate/intervention-request)
+[![Static analysis and code style](https://github.com/ambroisemaupate/intervention-request/actions/workflows/run-test.yml/badge.svg)](https://github.com/ambroisemaupate/intervention-request/actions/workflows/run-test.yml)
 [![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 
@@ -80,19 +80,12 @@ services:
     intervention:
         image: ambroisemaupate/intervention-request:latest
         volumes:
-            # You can store cache in a volume too
-            #- cache:/var/www/html/web/assets
+            - cache:/var/www/html/web/assets
+            ## If using local storage file system
             - ./my/images/folder:/var/www/html/web/images:ro
         # You can override some defaults below
         environment:
-            IR_GC_PROBABILITY: 400
-            IR_GC_TTL: 604800
-            IR_RESPONSE_TTL: 31557600
-            IR_USE_FILECHECKSUM: 0
-            IR_USE_PASSTHROUGH_CACHE: 1
-            IR_DRIVER: gd
-            IR_CACHE_PATH: /var/www/html/web/assets
-            IR_IGNORE_PATH: /assets
+            IR_DEBUG: 0
             IR_DEFAULT_QUALITY: 80
             ## If using local storage file system
             IR_IMAGES_PATH: /var/www/html/web/images
@@ -118,6 +111,8 @@ services:
         #networks:
         #    - default
         #    - frontproxynet
+volumes:
+    cache:
 ```
 
 You don’t need to read further if you do not plan to embed this library in your PHP application.
@@ -220,6 +215,7 @@ very easy to integrate it in your *Symfony* controller scheme:
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\InterventionRequest;
 use AM\InterventionRequest\LocalFileResolver;
+use Monolog\Logger;
 
 /*
  * A test configuration
@@ -240,7 +236,7 @@ $fileResolver = new LocalFileResolver($conf->getImagesPath());
  * - AM\InterventionRequest\Configuration
  * - AM\InterventionRequest\FileResolverInterface
  */
-$intRequest = new InterventionRequest($conf, $fileResolver);
+$intRequest = new InterventionRequest($conf, $fileResolver, new Logger('InterventionRequest'));
 // Handle request and process image
 $intRequest->handleRequest($request);
 
@@ -374,7 +370,8 @@ $iRequest = new InterventionRequest(
     [
         new Processor\WidenProcessor(),
         // add or replace with your own Processors
-    ]
+    ],
+    $debug
 );
 ```
 
@@ -543,13 +540,28 @@ Have fun!
 
 ## Testing 
 
-Copy `index.php` to `dev.php` then launch PHP server command using `router.php` as router.
+This project uses Docker for development environment.
+Copy `compose.override.yml` to `compose.override.yml`, use `php-dev` target and declare a volume on your project root folder.
 
-```bash
-php -S 0.0.0.0:8088 -t web router.php 
+```yaml
+services:
+    intervention:
+        build:
+            context: .
+            target: php-dev
+        volumes:
+            - ./:/var/www/html
+        ports:
+            -   "8080:80/tcp"
+
 ```
 
-Then open `http://0.0.0.0:8088/dev.php/w300/rhino.jpg` in your browser. You should be able to test *intervention-request* with *ShortUrl* enabled.
+```bash
+docker compose build
+docker compose up
+```
 
-If you want to test *pass-through* cache, uncomment `dev.php` lines 46 and 56 and open `http://0.0.0.0:8088/dev.php/cache/w300/rhino.jpg` instead. First time request will be serve by *PHP* (look up at response headers), then following requests will be handled directly by your server (no more *Intervention Request* headers).
+Then open `http://0.0.0.0:8080/assets/w300/rhino.jpg` in your browser. 
+You should be able to test *intervention-request* with Passthrough cache and *ShortUrl* enabled.
+Set `IR_USE_PASSTHROUGH_CACHE=0` if you don't want cache to be served by *Nginx*.
 

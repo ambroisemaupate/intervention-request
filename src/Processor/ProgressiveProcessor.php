@@ -9,16 +9,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ProgressiveProcessor implements Processor
 {
-    /**
-     * @param Image $image
-     * @param Request $request
-     * @return void
-     */
     public function process(Image $image, Request $request): void
     {
         if (
-            $request->query->has('progressive') ||
-            $request->query->has('interlace')
+            $request->query->has('progressive')
+            || $request->query->has('interlace')
         ) {
             $process = $request->query->has('progressive') ?
                                         $request->query->get('progressive') :

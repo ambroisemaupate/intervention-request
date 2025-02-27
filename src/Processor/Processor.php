@@ -9,10 +9,5 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface Processor
 {
-    /**
-     * @param Image   $image
-     * @param Request $request
-     * @return void
-     */
     public function process(Image $image, Request $request): void;
 }

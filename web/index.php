@@ -18,9 +18,9 @@ use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 
 // include composer autoload
-require dirname(__DIR__) . '/vendor/autoload.php';
+require dirname(__DIR__).'/vendor/autoload.php';
 
-(new Dotenv())->usePutenv(true)->loadEnv(dirname(__DIR__) .  '/.env');
+(new Dotenv())->usePutenv(true)->loadEnv(dirname(__DIR__).'/.env');
 
 $request = Request::createFromGlobals();
 $log = new Logger('InterventionRequest');
@@ -40,8 +40,8 @@ $conf->setDriver((string) getenv('IR_DRIVER'));
 $conf->setDefaultQuality((int) getenv('IR_DEFAULT_QUALITY'));
 
 if (
-    false !== getenv('IR_AWS_ACCESS_KEY_ID') &&
-    false !== getenv('IR_AWS_ACCESS_KEY_SECRET')
+    false !== getenv('IR_AWS_ACCESS_KEY_ID')
+    && false !== getenv('IR_AWS_ACCESS_KEY_SECRET')
 ) {
     $adapter = new AsyncAwsS3Adapter(
         new S3Client([
@@ -83,7 +83,9 @@ if (null !== $params) {
 $iRequest = new InterventionRequest(
     $conf,
     $fileResolver,
-    $log
+    $log,
+    null,
+    (bool) getenv('IR_DEBUG')
 );
 
 $iRequest->handleRequest($request);
