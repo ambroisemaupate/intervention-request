@@ -93,6 +93,12 @@ class ShortUrlExpander
                 && isset($matches['value'])
                 && isset(static::$operations[$matches['operation']])
             ) {
+                if (\is_numeric($matches['value'])) {
+                    $matches['value'] = (int) $matches['value'];
+                }
+                if (\is_string($matches['value']) && '' === $matches['value']) {
+                    $matches['value'] = true;
+                }
                 $this->request->query->set(
                     static::$operations[$matches['operation']],
                     $matches['value']

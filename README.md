@@ -85,6 +85,7 @@ services:
             - ./my/images/folder:/var/www/html/web/images:ro
         # You can override some defaults below
         environment:
+            IR_DEBUG: 0
             IR_DEFAULT_QUALITY: 80
             ## If using local storage file system
             IR_IMAGES_PATH: /var/www/html/web/images
@@ -369,7 +370,8 @@ $iRequest = new InterventionRequest(
     [
         new Processor\WidenProcessor(),
         // add or replace with your own Processors
-    ]
+    ],
+    $debug
 );
 ```
 

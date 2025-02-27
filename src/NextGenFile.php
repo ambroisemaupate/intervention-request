@@ -131,4 +131,22 @@ class NextGenFile extends File implements FileWithResourceInterface
     {
         return $this->nextGenExtension;
     }
+
+    public function getMTime(): int|false
+    {
+        if (null !== $this->filesystem) {
+            return $this->filesystem->lastModified($this->getPathname());
+        }
+
+        return parent::getMTime();
+    }
+
+    public function getMimeType(): ?string
+    {
+        if (null !== $this->filesystem) {
+            return $this->filesystem->mimeType($this->getPathname());
+        }
+
+        return parent::getMimeType();
+    }
 }

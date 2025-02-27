@@ -83,7 +83,9 @@ if (null !== $params) {
 $iRequest = new InterventionRequest(
     $conf,
     $fileResolver,
-    $log
+    $log,
+    null,
+    (bool) getenv('IR_DEBUG')
 );
 
 $iRequest->handleRequest($request);

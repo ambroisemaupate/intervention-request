@@ -35,4 +35,9 @@ final class FlysystemFileResolver extends LocalFileResolver
 
         return $nextgenFile;
     }
+
+    public function getFilesystem(): FilesystemOperator
+    {
+        return $this->filesystem;
+    }
 }

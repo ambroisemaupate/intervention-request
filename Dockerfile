@@ -97,9 +97,7 @@ WORKDIR /var/www/html
 
 FROM php AS php-prod
 
-ENV APP_ENV=prod
-ENV APP_RUNTIME_ENV=prod
-ENV APP_DEBUG=0
+ENV IR_DEBUG=0
 
 RUN ln -sf ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
 COPY --link docker/etc/php/conf.d/php.prod.ini ${PHP_INI_DIR}/conf.d/zz-app.ini
@@ -131,9 +129,7 @@ EXPOSE 80
 
 FROM php AS php-dev
 
-ENV APP_ENV=dev
-ENV APP_RUNTIME_ENV=dev
-ENV APP_DEBUG=0
+ENV IR_DEBUG=1
 
 RUN ln -sf ${PHP_INI_DIR}/php.ini-development ${PHP_INI_DIR}/php.ini
 

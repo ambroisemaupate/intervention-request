@@ -14,7 +14,9 @@ use AM\InterventionRequest\Listener\OxipngListener;
 use AM\InterventionRequest\Listener\PingoListener;
 use AM\InterventionRequest\Listener\PngquantListener;
 use AM\InterventionRequest\Listener\QualitySubscriber;
+use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -37,6 +39,7 @@ class InterventionRequest
         protected readonly FileResolverInterface $fileResolver,
         protected readonly LoggerInterface $logger,
         ?array $processors = null,
+        protected bool $debug = false,
     ) {
         $this->dispatcher = new EventDispatcher();
         $chainProcessor = $this->getChainProcessor($processors);
@@ -62,6 +65,9 @@ class InterventionRequest
             }
         }
 
+        $this->addSubscriber(new StreamNoProcessListener(
+            $this->fileResolver,
+        ));
         $this->addSubscriber(new StripExifListener());
         $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
         $this->addSubscriber(new FileCache(
@@ -144,53 +150,56 @@ class InterventionRequest
             $event = new RequestEvent($request, $this);
             $this->dispatcher->dispatch($event);
             if (null === $this->response = $event->getResponse()) {
-                $this->response = $this->getBadRequestResponse('No listener was configured for current request');
+                throw new \LogicException('No listener returned a Response for current request');
             }
-        } catch (FileNotFoundException $e) {
-            $this->response = $this->getNotFoundResponse($e->getMessage());
+        } catch (FileNotFoundException|UnableToRetrieveMetadata $e) {
+            $this->response = $this->getNotFoundResponse($e);
         } catch (\InvalidArgumentException $e) {
-            $this->response = $this->getBadRequestResponse($e->getMessage());
+            $this->response = $this->getBadRequestResponse($e);
         } catch (\RuntimeException $e) {
-            $this->response = $this->getServerErrorResponse($e->getMessage());
+            $this->response = $this->getServerErrorResponse($e);
         }
     }
 
-    protected function getNotFoundResponse(string $message = ''): JsonResponse
+    protected function getNotFoundResponse(\Exception $e): JsonResponse
     {
         return new JsonResponse(
             [
-                'error' => [
+                'error' => array_filter([
                     'code' => Response::HTTP_NOT_FOUND,
-                    'message' => $message,
-                ],
+                    'exception' => $this->debug ? $e::class : null,
+                    'message' => $e->getMessage(),
+                ]),
             ],
             Response::HTTP_NOT_FOUND,
             ['cache-control' => 'no-store']
         );
     }
 
-    protected function getBadRequestResponse(string $message = ''): JsonResponse
+    protected function getBadRequestResponse(\Exception $e): JsonResponse
     {
         return new JsonResponse(
             [
-                'error' => [
+                'error' => array_filter([
                     'code' => Response::HTTP_BAD_REQUEST,
-                    'message' => $message,
-                ],
+                    'exception' => $this->debug ? $e::class : null,
+                    'message' => $e->getMessage(),
+                ]),
             ],
             Response::HTTP_BAD_REQUEST,
             ['cache-control' => 'no-store']
         );
     }
 
-    protected function getServerErrorResponse(string $message = ''): JsonResponse
+    protected function getServerErrorResponse(\Exception $e): JsonResponse
     {
         return new JsonResponse(
             [
-                'error' => [
+                'error' => array_filter([
                     'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-                    'message' => $message,
-                ],
+                    'exception' => $this->debug ? $e::class : null,
+                    'message' => $e->getMessage(),
+                ]),
             ],
             Response::HTTP_INTERNAL_SERVER_ERROR,
             ['cache-control' => 'no-store']

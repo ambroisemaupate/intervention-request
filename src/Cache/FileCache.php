@@ -9,6 +9,7 @@ use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
 use AM\InterventionRequest\FileWithResourceInterface;
+use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use AM\InterventionRequest\ShortUrlExpander;
@@ -95,8 +96,9 @@ class FileCache implements EventSubscriberInterface
     protected function supports(RequestEvent $requestEvent): bool
     {
         $config = $requestEvent->getInterventionRequest()->getConfiguration();
+        $streamNoProcess = $requestEvent->getRequest()->attributes->get(StreamNoProcessListener::ATTRIBUTE, false);
 
-        return $config->hasCaching() && !$config->isUsingPassThroughCache();
+        return !$streamNoProcess && $config->hasCaching() && !$config->isUsingPassThroughCache();
     }
 
     protected function copyToCache(File $nativeFile, File $cachedFile): void
@@ -134,7 +136,7 @@ class FileCache implements EventSubscriberInterface
                 $mtime_cached_file = $cacheFile->getMTime();
 
                 if (
-                    (false !== $mtime_original_file && \is_numeric($mtime_original_file))
+                    (false !== $mtime_original_file)
                     && (false !== $mtime_cached_file && \is_numeric($mtime_cached_file))
                     && ($mtime_cached_file < $mtime_original_file)
                 ) {
@@ -166,11 +168,12 @@ class FileCache implements EventSubscriberInterface
                     [
                         'Content-Type' => $cacheFile->getMimeType(),
                         'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
+                        'Last-Modified' => $cacheFile->getMTime(),
                         'X-IR-Cached' => '1',
                         'X-IR-First-Gen' => (int) $firstGen,
                     ]
                 );
-                $response->setLastModified(new \DateTime(date('Y-m-d H:i:s', $cacheFile->getMTime())));
+                $response->setPublic();
             } else {
                 $response = new Response(
                     null,
