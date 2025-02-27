@@ -50,25 +50,28 @@ final readonly class WatermarkListener implements ImageEventSubscriberInterface
 
     public function watermarkImage(ImageAfterProcessEvent $event): void
     {
-        $image = $event->getImage();
-        if (null !== $image && $this->supports($image)) {
-            // use callback to define details
-            $image->text(
-                $this->watermarkText,
-                $image->getWidth() / 2,
-                $image->getHeight() / 2,
-                function (AbstractFont $font) {
-                    $font->file((string) $this->fontFile);
-                    $font->size($this->size);
-                    $font->color($this->color);
-                    $font->align($this->align);
-                    $font->valign($this->valign);
-                    $font->angle($this->angle);
-                }
-            );
-
-            $event->setImage($image);
+        if (!$this->supports($event->getImage())) {
+            return;
         }
+
+        /** @var Image $image */
+        $image = $event->getImage();
+        // use callback to define details
+        $image->text(
+            $this->watermarkText,
+            $image->getWidth() / 2,
+            $image->getHeight() / 2,
+            function (AbstractFont $font) {
+                $font->file((string) $this->fontFile);
+                $font->size($this->size);
+                $font->color($this->color);
+                $font->align($this->align);
+                $font->valign($this->valign);
+                $font->angle($this->angle);
+            }
+        );
+
+        $event->setImage($image);
     }
 
     public function supports(?Image $image = null): bool

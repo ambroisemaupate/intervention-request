@@ -44,10 +44,8 @@ final class StreamNoProcessListener implements EventSubscriberInterface
         $requestEvent->getRequest()->attributes->set('no_process', true);
         $requestEvent->getRequest()->attributes->set(self::ATTRIBUTE, true);
 
-        $filesystem = $this->fileResolver->getFilesystem();
-        $nativeImage = $this->fileResolver->resolveFile(
-            $this->fileResolver->assertRequestedFilePath($requestEvent->getRequest()->get('image'))
-        );
+        $filesystem = $this->fileResolver->getSourceFilesystem();
+        $nativeImage = $this->fileResolver->resolveFile($requestEvent->getRequest()->get('image'));
 
         $response = new StreamedResponse(function () use ($nativeImage, $filesystem) {
             $outputStream = fopen('php://output', 'wb');

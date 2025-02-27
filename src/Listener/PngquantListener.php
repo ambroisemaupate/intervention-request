@@ -6,6 +6,7 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
+use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
@@ -37,33 +38,35 @@ final readonly class PngquantListener implements ImageFileEventSubscriberInterfa
         }
     }
 
-    public function supports(?File $image = null): bool
+    public function supports(?Image $image = null, ?File $file = null): bool
     {
-        return '' !== $this->pngquantPath && null !== $image && 'image/png' === $image->getMimeType();
+        return '' !== $this->pngquantPath && null !== $image && 'image/png' === $image->mime();
     }
 
     public function onPngImageSaved(ImageSavedEvent $event): void
     {
-        if ($this->supports($event->getImageFile())) {
-            $maxQuality = $event->getQuality();
-            $minQuality = $maxQuality - 10;
-            if ($maxQuality > 100) {
-                $maxQuality = 100;
-            }
-            if ($minQuality < 0) {
-                $minQuality = 0;
-            }
-            $process = new Process([
-                $this->pngquantPath,
-                '-f',
-                '--speed',
-                '2',
-                $this->lossy ? '--quality='.sprintf('%d-%d', $minQuality, $maxQuality) : '',
-                '-o',
-                $event->getImageFile()->getPathname(),
-                $event->getImageFile()->getPathname(),
-            ]);
-            $process->run();
+        if (!$this->supports($event->getImage(), $event->getImageFile())) {
+            return;
         }
+
+        $maxQuality = $event->getQuality();
+        $minQuality = $maxQuality - 10;
+        if ($maxQuality > 100) {
+            $maxQuality = 100;
+        }
+        if ($minQuality < 0) {
+            $minQuality = 0;
+        }
+        $process = new Process([
+            $this->pngquantPath,
+            '-f',
+            '--speed',
+            '2',
+            $this->lossy ? '--quality='.sprintf('%d-%d', $minQuality, $maxQuality) : '',
+            '-o',
+            $event->getImageFile()->getPathname(),
+            $event->getImageFile()->getPathname(),
+        ]);
+        $process->run();
     }
 }

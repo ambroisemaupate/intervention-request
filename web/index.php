@@ -5,12 +5,12 @@ declare(strict_types=1);
 use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\FlysystemFileResolver;
 use AM\InterventionRequest\InterventionRequest;
-use AM\InterventionRequest\LocalFileResolver;
 use AM\InterventionRequest\ShortUrlExpander;
 use AsyncAws\S3\S3Client;
 use League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter;
 use League\Flysystem\AsyncAwsS3\PortableVisibilityConverter;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\Visibility;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -56,14 +56,15 @@ if (
             Visibility::PRIVATE
         )
     );
-    $fileResolver = new FlysystemFileResolver(
-        new Filesystem($adapter),
-        $log,
-        $conf->getImagesPath()
-    );
 } else {
-    $fileResolver = new LocalFileResolver($conf->getImagesPath());
+    $adapter = new LocalFilesystemAdapter($conf->getImagesPath());
 }
+
+$fileResolver = new FlysystemFileResolver(
+    new Filesystem($adapter),
+    new Filesystem(new LocalFilesystemAdapter($conf->getCachePath())),
+    $log
+);
 
 /*
  * Handle short url with Url rewriting

@@ -6,6 +6,7 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
+use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
@@ -38,28 +39,30 @@ final readonly class OxipngListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    public function supports(?File $image = null): bool
+    public function supports(?Image $image = null, ?File $file = null): bool
     {
         return '' !== $this->oxipngPath
             && null !== $image
-            && null !== $image->getMimeType()
-            && 'image/png' === strtolower($image->getMimeType());
+            && null !== $image->mime()
+            && 'image/png' === strtolower($image->mime());
     }
 
     public function onPngImageSaved(ImageSavedEvent $event): void
     {
-        if ($this->supports($event->getImageFile())) {
-            $process = new Process([
-                $this->oxipngPath,
-                '-o',
-                '4',
-                '--strip',
-                'safe',
-                '--out',
-                $event->getImageFile()->getPathname(),
-                $event->getImageFile()->getPathname(),
-            ]);
-            $process->run();
+        if (!$this->supports($event->getImage(), $event->getImageFile())) {
+            return;
         }
+
+        $process = new Process([
+            $this->oxipngPath,
+            '-o',
+            '4',
+            '--strip',
+            'safe',
+            '--out',
+            $event->getImageFile()->getPathname(),
+            $event->getImageFile()->getPathname(),
+        ]);
+        $process->run();
     }
 }

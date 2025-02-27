@@ -18,6 +18,11 @@ abstract class ImageEvent extends Event
         return $this->image;
     }
 
+    public function getMimeType(): ?string
+    {
+        return $this->image?->mime() ?? null;
+    }
+
     public function setImage(Image $image): ImageEvent
     {
         $this->image = $image;
