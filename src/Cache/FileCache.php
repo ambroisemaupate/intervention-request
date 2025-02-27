@@ -213,15 +213,15 @@ class FileCache implements EventSubscriberInterface
         } else {
             $cacheParams['webp'] = false;
             $cacheParams['avif'] = false;
-            if (false === $nativeImage->getRealPath()) {
-                throw new \InvalidArgumentException('Native image does not exist.');
-            }
-            $extension = $this->imageEncoder->getImageAllowedExtension($nativeImage->getRealPath());
+            $cacheParams['heif'] = false;
+            $cacheParams['heic'] = false;
+            $extension = $nativeImage->getExtension();
         }
         $cacheHash = hash('sha1', serialize($cacheParams).$fileMd5);
 
         return $this->cachePath.
             '/'.substr($cacheHash, 0, 2).
-            '/'.substr($cacheHash, 2).'.'.$extension;
+            '/'.substr($cacheHash, 2, 2).
+            '/'.substr($cacheHash, 4).'.'.$extension;
     }
 }
