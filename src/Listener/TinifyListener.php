@@ -6,6 +6,7 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
+use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -40,30 +41,29 @@ final readonly class TinifyListener implements ImageFileEventSubscriberInterface
      */
     public function onImageSaved(ImageSavedEvent $event): void
     {
-        if ($this->supports($event->getImageFile())) {
-            \Tinify\Tinify::setKey($this->apiKey);
-            \Tinify\validate();
+        if (!$this->supports($event->getImage(), $event->getImageFile())) {
+            return;
+        }
 
-            /** @var \Tinify\Source $source */
-            $source = \Tinify\fromFile($event->getImageFile()->getPathname());
-            $this->overrideImageFile($event->getImageFile()->getPathname(), $source);
-            if (null !== $this->logger) {
-                $this->logger->debug('Used tinify.io to minify file.', [
-                    'path' => $event->getImageFile()->getPathname(),
-                ]);
-            }
+        \Tinify\Tinify::setKey($this->apiKey);
+        \Tinify\validate();
+
+        /** @var \Tinify\Source $source */
+        $source = \Tinify\fromFile($event->getImageFile()->getPathname());
+        $this->overrideImageFile($event->getImageFile()->getPathname(), $source);
+        if (null !== $this->logger) {
+            $this->logger->debug('Used tinify.io to minify file.', [
+                'path' => $event->getImageFile()->getPathname(),
+            ]);
         }
     }
 
-    public function supports(?File $image = null): bool
+    public function supports(?Image $image = null, ?File $file = null): bool
     {
-        return '' !== $this->apiKey && null !== $image && '' !== $image->getPathname();
+        return '' !== $this->apiKey && null !== $file && '' !== $file->getPathname();
     }
 
-    /**
-     * @param string $localPath
-     */
-    protected function overrideImageFile($localPath, \Tinify\Source $source): void
+    protected function overrideImageFile(string $localPath, \Tinify\Source $source): void
     {
         $source->toFile($localPath);
     }

@@ -28,38 +28,38 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
 
     public function onRequest(RequestEvent $requestEvent): void
     {
-        if (false === $requestEvent->getInterventionRequest()->getConfiguration()->hasCaching()) {
-            $request = $requestEvent->getRequest();
-            $nativeImage = $this->fileResolver->resolveFile(
-                $this->fileResolver->assertRequestedFilePath($request->get('image'))
-            );
-            $image = $this->processor->process($nativeImage, $request);
-
-            if ($nativeImage->isNextGen()) {
-                $response = new Response(
-                    (string) $image->encode($nativeImage->getNextGenExtension(), $requestEvent->getQuality()),
-                    Response::HTTP_OK,
-                    [
-                        'Content-Type' => $nativeImage->getNextGenMimeType(),
-                        'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
-                        'X-IR-Cached' => '0',
-                        'X-IR-First-Gen' => '1',
-                    ]
-                );
-            } else {
-                $response = new Response(
-                    (string) $image->encode(null, $requestEvent->getQuality()),
-                    Response::HTTP_OK,
-                    [
-                        'Content-Type' => $image->mime(),
-                        'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
-                        'X-IR-Cached' => '0',
-                        'X-IR-First-Gen' => '1',
-                    ]
-                );
-            }
-            $response->setLastModified(new \DateTime('now'));
-            $requestEvent->setResponse($response);
+        if (true === $requestEvent->getInterventionRequest()->getConfiguration()->hasCaching()) {
+            return;
         }
+
+        $request = $requestEvent->getRequest();
+        $nativeImage = $this->fileResolver->resolveFile($request->get('image'));
+        $image = $this->processor->process($nativeImage, $request);
+
+        if ($nativeImage->isNextGen()) {
+            $response = new Response(
+                (string) $image->encode($nativeImage->getNextGenExtension(), $requestEvent->getQuality()),
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => $nativeImage->getNextGenMimeType(),
+                    'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
+                    'X-IR-Cached' => '0',
+                    'X-IR-First-Gen' => '1',
+                ]
+            );
+        } else {
+            $response = new Response(
+                (string) $image->encode(null, $requestEvent->getQuality()),
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => $image->mime(),
+                    'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
+                    'X-IR-Cached' => '0',
+                    'X-IR-First-Gen' => '1',
+                ]
+            );
+        }
+        $response->setLastModified(new \DateTime('now'));
+        $requestEvent->setResponse($response);
     }
 }

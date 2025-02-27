@@ -6,14 +6,14 @@ namespace AM\InterventionRequest;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class ShortUrlExpander
+final class ShortUrlExpander
 {
-    protected string $ignorePath;
+    private string $ignorePath;
 
     /**
      * @var string[]
      */
-    protected static array $operations = [
+    private static array $operations = [
         'a' => 'align',
         'c' => 'crop',
         'w' => 'width',

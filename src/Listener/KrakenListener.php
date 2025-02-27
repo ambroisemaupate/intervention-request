@@ -6,6 +6,7 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
+use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
@@ -45,34 +46,35 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
 
     public function onImageSaved(ImageSavedEvent $event): void
     {
-        if ($this->supports($event->getImageFile())) {
-            $params = [
-                'file' => $event->getImageFile()->getPathname(),
-                'wait' => true,
-                'lossy' => $this->lossy,
-            ];
+        if (!$this->supports($event->getImage(), $event->getImageFile())) {
+            return;
+        }
+        $params = [
+            'file' => $event->getImageFile()->getPathname(),
+            'wait' => true,
+            'lossy' => $this->lossy,
+        ];
 
-            $data = $this->kraken->upload($params);
+        $data = $this->kraken->upload($params);
 
-            if (!is_array($data)) {
-                return;
+        if (!is_array($data)) {
+            return;
+        }
+
+        if (isset($data['success']) && is_string($data['kraked_url']) && !empty($data['kraked_url'])) {
+            if (null !== $this->logger) {
+                $this->logger->debug('Used kraken.io to minify file.', $data);
             }
-
-            if (isset($data['success']) && is_string($data['kraked_url']) && !empty($data['kraked_url'])) {
-                if (null !== $this->logger) {
-                    $this->logger->debug('Used kraken.io to minify file.', $data);
-                }
-                $this->overrideImageFile($event->getImageFile()->getPathname(), $data['kraked_url']);
-            }
+            $this->overrideImageFile($event->getImageFile()->getPathname(), $data['kraked_url']);
         }
     }
 
-    public function supports(?File $image = null): bool
+    public function supports(?Image $image = null, ?File $file = null): bool
     {
         return '' !== $this->apiKey
             && '' !== $this->apiSecret
-            && null !== $image
-            && '' !== $image->getPathname();
+            && null !== $file
+            && '' !== $file->getPathname();
     }
 
     /**

@@ -6,6 +6,7 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
+use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
@@ -37,41 +38,43 @@ final readonly class PingoListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    public function supports(?File $image = null): bool
+    public function supports(?Image $image = null, ?File $file = null): bool
     {
         return '' !== $this->pingoPath
             && null !== $image
-            && ('image/png' === $image->getMimeType() || 'image/jpeg' === $image->getMimeType());
+            && ('image/png' === $image->mime() || 'image/jpeg' === $image->mime());
     }
 
     public function onImageSaved(ImageSavedEvent $event): void
     {
-        if ($this->supports($event->getImageFile())) {
-            $quality = $event->getQuality();
-            $params = [
-                'wine', // Pingo is WINDOWS only, requires Wine on your linux system.
-                $this->pingoPath,
-                '-strip',
-                '-faster',
-            ];
-            switch ($event->getImageFile()->getMimeType()) {
-                case 'image/png':
-                    if ($this->lossy) {
-                        $params[] = '-pngpalette='.$quality;
-                    } else {
-                        $params[] = '-pngfilter='.$quality;
-                    }
-                    if ($this->noAlpha) {
-                        $params[] = '-noalpha';
-                    }
-                    break;
-                case 'image/jpeg':
-                    $params[] = '-jpgquality='.$quality;
-                    break;
-            }
-            $params[] = $event->getImageFile()->getPathname();
-            $process = new Process($params);
-            $process->run();
+        if (!$this->supports($event->getImage(), $event->getImageFile())) {
+            return;
         }
+
+        $quality = $event->getQuality();
+        $params = [
+            'wine', // Pingo is WINDOWS only, requires Wine on your linux system.
+            $this->pingoPath,
+            '-strip',
+            '-faster',
+        ];
+        switch ($event->getImageFile()->getMimeType()) {
+            case 'image/png':
+                if ($this->lossy) {
+                    $params[] = '-pngpalette='.$quality;
+                } else {
+                    $params[] = '-pngfilter='.$quality;
+                }
+                if ($this->noAlpha) {
+                    $params[] = '-noalpha';
+                }
+                break;
+            case 'image/jpeg':
+                $params[] = '-jpgquality='.$quality;
+                break;
+        }
+        $params[] = $event->getImageFile()->getPathname();
+        $process = new Process($params);
+        $process->run();
     }
 }

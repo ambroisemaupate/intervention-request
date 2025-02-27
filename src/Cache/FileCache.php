@@ -8,7 +8,6 @@ use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
-use AM\InterventionRequest\FileWithResourceInterface;
 use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
@@ -17,10 +16,10 @@ use Intervention\Image\Image;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileCache implements EventSubscriberInterface
 {
@@ -41,7 +40,7 @@ class FileCache implements EventSubscriberInterface
             throw new \InvalidArgumentException('Cache path does not exist.');
         }
         $this->cachePath = $cachePath;
-        $this->imageEncoder = new ImageEncoder();
+        $this->imageEncoder = new ImageEncoder($fileResolver);
     }
 
     /**
@@ -58,11 +57,6 @@ class FileCache implements EventSubscriberInterface
 
     protected function saveImage(Image $image, string $cacheFilePath, int $quality): Image
     {
-        $path = dirname($cacheFilePath);
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
-
         return $this->imageEncoder->save($image, $cacheFilePath, $quality);
     }
 
@@ -101,19 +95,6 @@ class FileCache implements EventSubscriberInterface
         return !$streamNoProcess && $config->hasCaching() && !$config->isUsingPassThroughCache();
     }
 
-    protected function copyToCache(File $nativeFile, File $cachedFile): void
-    {
-        $fileSystem = new Filesystem();
-        if (
-            $nativeFile instanceof FileWithResourceInterface
-            && null !== $nativeFile->getResource()
-        ) {
-            $fileSystem->dumpFile((string) $cachedFile, $nativeFile->getResource());
-        } else {
-            $fileSystem->copy((string) $nativeFile, (string) $cachedFile);
-        }
-    }
-
     /**
      * @throws \Exception
      */
@@ -123,70 +104,64 @@ class FileCache implements EventSubscriberInterface
             return;
         }
         $request = $requestEvent->getRequest();
-        $nativeImage = $this->fileResolver->resolveFile(
-            $this->fileResolver->assertRequestedFilePath($request->get('image'))
-        );
+        $sourceFilePath = $this->fileResolver->assertRequestedFilePath($request->get('image'));
+        $nativeImage = $this->fileResolver->resolveFile($request->get('image'));
         $cacheFilePath = $this->getCacheFilePath($request, $nativeImage);
         $cacheFile = new File($cacheFilePath, false);
         $firstGen = false;
 
-        /*
-         * Also check date, if cached date is lower than original date -> Remove cached file
-         */
-        if (\is_file($cacheFilePath)) {
-            $mtime_original_file = $nativeImage->getMTime();
-            $mtime_cached_file = $cacheFile->getMTime();
+        $cacheFileExists = $this->fileResolver->cacheFileExists($cacheFilePath);
 
-            if (
-                (false !== $mtime_original_file)
-                && (false !== $mtime_cached_file && \is_numeric($mtime_cached_file))
-                && ($mtime_cached_file < $mtime_original_file)
-            ) {
-                unlink($cacheFilePath);
+        /*
+         * Check date, if cached date is lower than original date -> Remove cached file
+         */
+        if ($cacheFileExists) {
+            $mtime_original_file = $this->fileResolver->getSourceLastModified($sourceFilePath);
+            $mtime_cached_file = $this->fileResolver->getCacheLastModified($cacheFilePath);
+
+            if ($mtime_cached_file < $mtime_original_file) {
+                $this->fileResolver->deleteCacheFile($cacheFilePath);
             }
         }
 
         /*
          * First render cached image file.
          */
-        if (!is_file($cacheFilePath)) {
-            if ($request->query->has('no_process')) {
-                $image = null;
-                $this->copyToCache($nativeImage, $cacheFile);
-            } else {
-                $image = $this->chainProcessor->process($nativeImage, $request);
-                $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
-            }
-            // create the ImageSavedEvent and dispatch it
+        if (!$cacheFileExists) {
+            $image = $this->chainProcessor->process($nativeImage, $request);
+            $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
+            // create the ImageSavedEvent and dispatch it to apply listeners
+            // that require the image to be saved on disk.
             $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile, $requestEvent->getQuality()));
             $firstGen = true;
         }
 
-        $fileContent = file_get_contents($cacheFile->getPathname());
-        if (false !== $fileContent) {
-            $response = new Response(
+        $fileContent = $this->fileResolver->getCacheStream($cacheFilePath);
+        $response = new StreamedResponse(function () use ($fileContent) {
+            $outputStream = fopen('php://output', 'wb');
+            if (false === $outputStream) {
+                throw new \RuntimeException('Could not open php://output');
+            }
+            stream_copy_to_stream(
                 $fileContent,
-                Response::HTTP_OK,
-                [
-                    'Content-Type' => $cacheFile->getMimeType(),
-                    'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
-                    'Last-Modified' => $cacheFile->getMTime(),
-                    'X-IR-Cached' => '1',
-                    'X-IR-First-Gen' => (int) $firstGen,
-                ]
+                $outputStream
             );
-            $response->setPublic();
-        } else {
-            $response = new Response(
-                null,
-                Response::HTTP_NOT_FOUND
-            );
-        }
+        }, Response::HTTP_OK, [
+            'Content-Type' => $this->fileResolver->getCacheMimeType($cacheFilePath),
+            'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
+            'Last-Modified' => $this->fileResolver->getCacheLastModified($cacheFilePath),
+            'X-IR-Cached' => '1',
+            'X-IR-First-Gen' => (int) $firstGen,
+        ]);
+        $response->setPublic();
 
         $this->initializeGarbageCollection($request);
         $requestEvent->setResponse($response);
     }
 
+    /**
+     * @return string cache file relative path to cache folder
+     */
     protected function getCacheFilePath(Request $request, File $nativeImage): string
     {
         /*
@@ -223,8 +198,7 @@ class FileCache implements EventSubscriberInterface
         }
         $cacheHash = hash('sha1', serialize($cacheParams).$fileMd5);
 
-        return $this->cachePath.
-            '/'.substr($cacheHash, 0, 2).
+        return substr($cacheHash, 0, 2).
             '/'.substr($cacheHash, 2, 2).
             '/'.substr($cacheHash, 4).'.'.$extension;
     }

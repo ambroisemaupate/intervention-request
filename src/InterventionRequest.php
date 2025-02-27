@@ -19,6 +19,7 @@ use AM\InterventionRequest\Listener\StripExifListener;
 use Intervention\Image\Exception\NotReadableException;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -42,6 +43,9 @@ class InterventionRequest
         ?array $processors = null,
         protected bool $debug = false,
     ) {
+        if ($this->debug) {
+            Debug::enable();
+        }
         $this->dispatcher = new EventDispatcher();
         $chainProcessor = $this->getChainProcessor($processors);
 
@@ -154,10 +158,19 @@ class InterventionRequest
                 throw new \LogicException('No listener returned a Response for current request');
             }
         } catch (FileNotFoundException|UnableToRetrieveMetadata $e) {
+            if ($this->debug) {
+                throw $e;
+            }
             $this->response = $this->getNotFoundResponse($e);
         } catch (\InvalidArgumentException|NotReadableException $e) {
+            if ($this->debug) {
+                throw $e;
+            }
             $this->response = $this->getBadRequestResponse($e);
         } catch (\Throwable $e) {
+            if ($this->debug) {
+                throw $e;
+            }
             $this->response = $this->getServerErrorResponse($e);
         }
     }
@@ -209,34 +222,34 @@ class InterventionRequest
 
     public function getResponse(Request $request): Response
     {
-        if (null !== $this->response) {
-            if ($this->response->isCacheable()) {
-                $this->response->setPublic();
-                $this->response->setMaxAge($this->configuration->getResponseTtl());
-                $this->response->setSharedMaxAge($this->configuration->getResponseTtl());
-            }
-            $this->response->setCharset('UTF-8');
-            $this->response->headers->set(
-                'access-control-allow-headers',
-                'DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
-            );
-            $this->response->headers->set(
-                'access-control-allow-methods',
-                'GET, OPTIONS'
-            );
-            $this->response->headers->set(
-                'access-control-allow-origin',
-                '*'
-            );
-            $responseEvent = new ResponseEvent($this->response);
-            $this->dispatcher->dispatch($responseEvent);
-            $this->response = $responseEvent->getResponse();
-            $this->response->prepare($request);
-
-            return $this->response;
-        } else {
+        if (null === $this->response) {
             throw new \RuntimeException('Request had not been handled. Use handle() method before getResponse()', 1);
         }
+
+        if ($this->response->isCacheable()) {
+            $this->response->setPublic();
+            $this->response->setMaxAge($this->configuration->getResponseTtl());
+            $this->response->setSharedMaxAge($this->configuration->getResponseTtl());
+        }
+        $this->response->setCharset('UTF-8');
+        $this->response->headers->set(
+            'access-control-allow-headers',
+            'DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
+        );
+        $this->response->headers->set(
+            'access-control-allow-methods',
+            'GET, OPTIONS'
+        );
+        $this->response->headers->set(
+            'access-control-allow-origin',
+            '*'
+        );
+        $responseEvent = new ResponseEvent($this->response);
+        $this->dispatcher->dispatch($responseEvent);
+        $this->response = $responseEvent->getResponse();
+        $this->response->prepare($request);
+
+        return $this->response;
     }
 
     public function getConfiguration(): Configuration

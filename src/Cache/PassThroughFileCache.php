@@ -24,6 +24,9 @@ final class PassThroughFileCache extends FileCache
         return !$streamNoProcess && $config->hasCaching() && $config->isUsingPassThroughCache();
     }
 
+    /**
+     * @return string cache file relative path to cache folder
+     */
     protected function getCacheFilePath(Request $request, File $nativeImage): string
     {
         /*
@@ -39,6 +42,7 @@ final class PassThroughFileCache extends FileCache
         }
         $cacheFolder = str_replace($documentRoot, '', $this->cachePath);
         $cacheFolderRegex = '#^'.preg_quote($cacheFolder).'#';
+
         if (0 === preg_match($cacheFolderRegex, $request->getPathInfo())) {
             if (null !== $this->logger) {
                 $this->logger->error('Cache path was not found in your request path info.', [
@@ -49,6 +53,16 @@ final class PassThroughFileCache extends FileCache
             throw new FileNotFoundException($request->getPathInfo());
         }
 
-        return $documentRoot.$request->getPathInfo();
+        $relativePath = preg_replace(
+            '#^'.preg_quote($this->cachePath).'/?#',
+            '',
+            $documentRoot.$request->getPathInfo()
+        );
+
+        if (!\is_string($relativePath)) {
+            throw new FileNotFoundException($request->getPathInfo());
+        }
+
+        return $relativePath;
     }
 }

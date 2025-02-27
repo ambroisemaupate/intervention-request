@@ -50,8 +50,8 @@
     "require-dev": {
         "phpstan/phpstan": "^2.1.6",
         "phpstan/phpdoc-parser": "<2",
-        "symfony/debug": "^4.4 || ^5.0.7 || ^6.4",
-        "symfony/var-dumper": "^4.4 || ^5.0.7 || ^6.4",
-        "friendsofphp/php-cs-fixer": "^3.70"
+        "symfony/var-dumper": ">=v5.4.48",
+        "friendsofphp/php-cs-fixer": "^3.70",
+        "symfony/error-handler": ">=v5.4.46"
     }
 }
