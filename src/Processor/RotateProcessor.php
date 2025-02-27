@@ -9,11 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class RotateProcessor implements Processor
 {
-    /**
-     * @param Image $image
-     * @param Request $request
-     * @return void
-     */
     public function process(Image $image, Request $request): void
     {
         if ($request->query->has('rotate')) {

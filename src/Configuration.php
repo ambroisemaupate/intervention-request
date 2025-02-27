@@ -16,7 +16,7 @@ class Configuration
     protected string $driver = 'gd';
     protected int $ttl = 604800; // 7*24*60*60
     protected int $gcProbability = 400;
-    protected string $timezone = "UTC";
+    protected string $timezone = 'UTC';
     protected int $defaultQuality = 90;
     protected bool $useFileChecksum = false;
     protected ?string $pngquantPath = null;
@@ -27,46 +27,32 @@ class Configuration
     protected ?string $jpegoptimPath = null;
     protected int $responseTtl = 31536000; // 365*24*60*60
 
-    /**
-     * @return string|null
-     */
     public function getPngquantPath(): ?string
     {
         return $this->pngquantPath;
     }
 
-    /**
-     * @param string|null $pngquantPath
-     * @return Configuration
-     */
     public function setPngquantPath(?string $pngquantPath): Configuration
     {
         $this->pngquantPath = $pngquantPath;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getJpegoptimPath(): ?string
     {
         return $this->jpegoptimPath;
     }
 
-    /**
-     * @param string|null $jpegoptimPath
-     * @return Configuration
-     */
     public function setJpegoptimPath(?string $jpegoptimPath): Configuration
     {
         $this->jpegoptimPath = $jpegoptimPath;
+
         return $this;
     }
 
     /**
      * Gets the value of caching.
-     *
-     * @return boolean
      */
     public function hasCaching(): bool
     {
@@ -76,8 +62,7 @@ class Configuration
     /**
      * Sets the value of caching.
      *
-     * @param boolean $caching the caching
-     * @return Configuration
+     * @param bool $caching the caching
      */
     public function setCaching(bool $caching): Configuration
     {
@@ -88,8 +73,6 @@ class Configuration
 
     /**
      * Gets the value of driver.
-     *
-     * @return string
      */
     public function getDriver(): string
     {
@@ -100,7 +83,6 @@ class Configuration
      * Sets the value of driver.
      *
      * @param string $driver the driver
-     * @return Configuration
      */
     public function setDriver(string $driver): Configuration
     {
@@ -111,8 +93,6 @@ class Configuration
 
     /**
      * Gets the value of cachePath.
-     *
-     * @return string
      */
     public function getCachePath(): string
     {
@@ -123,7 +103,6 @@ class Configuration
      * Sets the value of cachePath.
      *
      * @param string $cachePath the cache path
-     * @return Configuration
      */
     public function setCachePath(string $cachePath): Configuration
     {
@@ -134,8 +113,6 @@ class Configuration
 
     /**
      * Gets the value of imagesPath.
-     *
-     * @return string
      */
     public function getImagesPath(): string
     {
@@ -146,7 +123,6 @@ class Configuration
      * Sets the value of imagesPath.
      *
      * @param string $imagesPath the images path
-     * @return Configuration
      */
     public function setImagesPath(string $imagesPath): Configuration
     {
@@ -157,8 +133,6 @@ class Configuration
 
     /**
      * Gets the value of garbage collector ttl.
-     *
-     * @return int
      */
     public function getTtl(): int
     {
@@ -169,7 +143,6 @@ class Configuration
      * Sets the value of garbage collector ttl.
      *
      * @param int $ttl the ttl
-     * @return Configuration
      */
     public function setTtl(int $ttl): Configuration
     {
@@ -180,8 +153,6 @@ class Configuration
 
     /**
      * Gets the value of gcProbability.
-     *
-     * @return int
      */
     public function getGcProbability(): int
     {
@@ -195,7 +166,6 @@ class Configuration
      * probability of 1/1 will launch GC at every request.
      *
      * @param int $gcProbability the gc probability
-     * @return Configuration
      */
     public function setGcProbability(int $gcProbability): Configuration
     {
@@ -208,8 +178,6 @@ class Configuration
 
     /**
      * Gets the value of timezone.
-     *
-     * @return string
      */
     public function getTimezone(): string
     {
@@ -220,7 +188,6 @@ class Configuration
      * Sets the value of timezone.
      *
      * @param string $timezone the timezone
-     * @return Configuration
      */
     public function setTimezone(string $timezone): Configuration
     {
@@ -231,8 +198,6 @@ class Configuration
 
     /**
      * Gets the value of defaultQuality.
-     *
-     * @return int
      */
     public function getDefaultQuality(): int
     {
@@ -242,8 +207,7 @@ class Configuration
     /**
      * Sets the value of defaultQuality.
      *
-     * @param integer $defaultQuality the default quality
-     * @return Configuration
+     * @param int $defaultQuality the default quality
      */
     public function setDefaultQuality(int $defaultQuality): Configuration
     {
@@ -257,8 +221,6 @@ class Configuration
 
     /**
      * Gets the value of useFileChecksum.
-     *
-     * @return bool
      */
     public function getUseFileChecksum(): bool
     {
@@ -273,7 +235,6 @@ class Configuration
      * (> 1 Mo).
      *
      * @param bool $useFileChecksum the use file md5
-     * @return Configuration
      */
     public function setUseFileChecksum(bool $useFileChecksum): Configuration
     {
@@ -282,29 +243,18 @@ class Configuration
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isUsingPassThroughCache(): bool
     {
         return $this->usePassThroughCache;
     }
 
-    /**
-     * @param bool $usePassThroughCache
-     * @return Configuration
-     */
     public function setUsePassThroughCache(bool $usePassThroughCache): Configuration
     {
         $this->usePassThroughCache = $usePassThroughCache;
+
         return $this;
     }
 
-    /**
-     * @param int $responseTtl
-     *
-     * @return Configuration
-     */
     public function setResponseTtl(int $responseTtl): Configuration
     {
         $this->responseTtl = $responseTtl;
@@ -317,45 +267,30 @@ class Configuration
         return $this->responseTtl;
     }
 
-    /**
-     * @return string|null
-     */
     public function getOxipngPath(): ?string
     {
         return $this->oxipngPath;
     }
 
-    /**
-     * @param string|null $oxipngPath
-     * @return Configuration
-     */
     public function setOxipngPath(?string $oxipngPath): Configuration
     {
         $this->oxipngPath = $oxipngPath;
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isLossyPng(): bool
     {
         return $this->lossyPng;
     }
 
-    /**
-     * @param bool $lossyPng
-     * @return Configuration
-     */
     public function setLossyPng(bool $lossyPng): Configuration
     {
         $this->lossyPng = $lossyPng;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPingoPath(): ?string
     {
         return $this->pingoPath;
@@ -363,29 +298,23 @@ class Configuration
 
     /**
      * @param string|null $pingoPath
-     * @return Configuration
      */
     public function setPingoPath($pingoPath): Configuration
     {
         $this->pingoPath = $pingoPath;
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isNoAlphaPingo(): bool
     {
         return $this->noAlphaPingo;
     }
 
-    /**
-     * @param bool $noAlphaPingo
-     * @return Configuration
-     */
     public function setNoAlphaPingo(bool $noAlphaPingo): Configuration
     {
         $this->noAlphaPingo = $noAlphaPingo;
+
         return $this;
     }
 }

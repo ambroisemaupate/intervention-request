@@ -9,24 +9,12 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-/**
- * @package AM\InterventionRequest\Listener
- */
-final class JpegFileListener implements ImageFileEventSubscriberInterface
+final readonly class JpegFileListener implements ImageFileEventSubscriberInterface
 {
-    protected string $jpegoptimPath;
-
-    /**
-     * @param string $jpegoptimPath
-     */
-    public function __construct(string $jpegoptimPath)
+    public function __construct(private string $jpegoptimPath)
     {
-        $this->jpegoptimPath = $jpegoptimPath;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -35,36 +23,24 @@ final class JpegFileListener implements ImageFileEventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ResponseEvent $event
-     * @return void
-     */
     public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         if (
-            $this->jpegoptimPath !== '' &&
-            $response->headers->get('Content-Type') === 'image/jpeg' &&
-            (bool) $response->headers->get('X-IR-First-Gen')
+            '' !== $this->jpegoptimPath
+            && 'image/jpeg' === $response->headers->get('Content-Type')
+            && (bool) $response->headers->get('X-IR-First-Gen')
         ) {
             $response->headers->add(['X-IR-JpegOptim' => 1]);
             $event->setResponse($response);
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+    public function supports(?File $image = null): bool
     {
-        return $this->jpegoptimPath !== '' && null !== $image && $image->getMimeType() === 'image/jpeg';
+        return '' !== $this->jpegoptimPath && null !== $image && 'image/jpeg' === $image->getMimeType();
     }
 
-    /**
-     * @param ImageSavedEvent $event
-     * @return void
-     */
     public function onJpegImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {

@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ShortUrlExpander
 {
-    protected Request $request;
     protected string $ignorePath;
 
     /**
@@ -33,9 +32,8 @@ class ShortUrlExpander
         'n' => 'no_process',
     ];
 
-    public function __construct(Request $request)
+    public function __construct(protected readonly Request $request)
     {
-        $this->request = $request;
         $this->ignorePath = '';
     }
 
@@ -57,15 +55,13 @@ class ShortUrlExpander
 
     /**
      * Parse query string and filename from request path-info.
-     *
-     * @return array|null
      */
     public function parsePathInfo(): ?array
     {
         $pathInfo = $this->request->getPathInfo();
 
-        if ($this->ignorePath !== '') {
-            $ignoreRegex = '#^' . preg_quote($this->ignorePath) . '#';
+        if ('' !== $this->ignorePath) {
+            $ignoreRegex = '#^'.preg_quote($this->ignorePath).'#';
             $pathInfo = preg_replace($ignoreRegex, '', $pathInfo);
         }
 
@@ -84,10 +80,6 @@ class ShortUrlExpander
 
     /**
      * Convert param shortcuts to full request GET params.
-     *
-     * @param string $queryString
-     * @param string $filename
-     * @return void
      */
     public function injectParamsToRequest(string $queryString, string $filename): void
     {
@@ -97,10 +89,16 @@ class ShortUrlExpander
         foreach ($params as $param) {
             preg_match("/(?P<operation>[a-z])(?P<value>[\S]*)/", $param, $matches);
             if (
-                isset($matches['operation']) &&
-                isset($matches['value']) &&
-                isset(static::$operations[$matches['operation']])
+                isset($matches['operation'])
+                && isset($matches['value'])
+                && isset(static::$operations[$matches['operation']])
             ) {
+                if (\is_numeric($matches['value'])) {
+                    $matches['value'] = (int) $matches['value'];
+                }
+                if (\is_string($matches['value']) && '' === $matches['value']) {
+                    $matches['value'] = true;
+                }
                 $this->request->query->set(
                     static::$operations[$matches['operation']],
                     $matches['value']
@@ -109,13 +107,10 @@ class ShortUrlExpander
         }
     }
 
-    /**
-     * @param string $ignorePath
-     * @return ShortUrlExpander
-     */
     public function setIgnorePath(string $ignorePath): self
     {
         $this->ignorePath = $ignorePath;
+
         return $this;
     }
 }

@@ -9,27 +9,12 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-final class PingoListener implements ImageFileEventSubscriberInterface
+final readonly class PingoListener implements ImageFileEventSubscriberInterface
 {
-    protected string $pingoPath;
-    protected bool $noAlpha = false;
-    private bool $lossy = false;
-
-    /**
-     * @param string $pingoPath
-     * @param bool $lossy
-     * @param bool $noAlpha
-     */
-    public function __construct(string $pingoPath, bool $lossy = false, bool $noAlpha = false)
+    public function __construct(private string $pingoPath, private bool $lossy = false, private bool $noAlpha = false)
     {
-        $this->pingoPath = $pingoPath;
-        $this->noAlpha = $noAlpha;
-        $this->lossy = $lossy;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -38,16 +23,12 @@ final class PingoListener implements ImageFileEventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ResponseEvent $event
-     * @return void
-     */
     public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         if (
-            $this->pingoPath !== '' &&
-            (bool) $response->headers->get('X-IR-First-Gen')
+            '' !== $this->pingoPath
+            && (bool) $response->headers->get('X-IR-First-Gen')
         ) {
             $response->headers->add(['X-IR-Pingo' => '1']);
             $response->headers->add(['X-IR-Pingo-NoAlpha' => (int) $this->noAlpha]);
@@ -56,21 +37,13 @@ final class PingoListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+    public function supports(?File $image = null): bool
     {
-        return $this->pingoPath !== '' &&
-            null !== $image &&
-            ($image->getMimeType() === 'image/png' || $image->getMimeType() === 'image/jpeg');
+        return '' !== $this->pingoPath
+            && null !== $image
+            && ('image/png' === $image->getMimeType() || 'image/jpeg' === $image->getMimeType());
     }
 
-    /**
-     * @param ImageSavedEvent $event
-     * @return void
-     */
     public function onImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {
@@ -79,21 +52,21 @@ final class PingoListener implements ImageFileEventSubscriberInterface
                 'wine', // Pingo is WINDOWS only, requires Wine on your linux system.
                 $this->pingoPath,
                 '-strip',
-                '-faster'
+                '-faster',
             ];
             switch ($event->getImageFile()->getMimeType()) {
                 case 'image/png':
                     if ($this->lossy) {
-                        $params[] = '-pngpalette=' . $quality;
+                        $params[] = '-pngpalette='.$quality;
                     } else {
-                        $params[] = '-pngfilter=' . $quality;
+                        $params[] = '-pngfilter='.$quality;
                     }
                     if ($this->noAlpha) {
                         $params[] = '-noalpha';
                     }
                     break;
                 case 'image/jpeg':
-                    $params[] = '-jpgquality=' . $quality;
+                    $params[] = '-jpgquality='.$quality;
                     break;
             }
             $params[] = $event->getImageFile()->getPathname();

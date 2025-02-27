@@ -14,43 +14,35 @@ use AM\InterventionRequest\Listener\OxipngListener;
 use AM\InterventionRequest\Listener\PingoListener;
 use AM\InterventionRequest\Listener\PngquantListener;
 use AM\InterventionRequest\Listener\QualitySubscriber;
+use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
-use AM\InterventionRequest\Processor as Processor;
+use Intervention\Image\Exception\NotReadableException;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @package AM\InterventionRequest
- */
 class InterventionRequest
 {
-    protected FileResolverInterface $fileResolver;
     protected ?Response $response = null;
-    protected ?LoggerInterface $logger = null;
-    protected Configuration $configuration;
     protected EventDispatcherInterface $dispatcher;
 
     /**
-     * @param Configuration $configuration
-     * @param FileResolverInterface $fileResolver
-     * @param LoggerInterface|null $logger
-     * @param array|null $processors
+     * @param Processor\Processor[]|null $processors
      */
     public function __construct(
-        Configuration $configuration,
-        FileResolverInterface $fileResolver,
-        LoggerInterface $logger = null,
-        ?array $processors = null
+        protected readonly Configuration $configuration,
+        protected readonly FileResolverInterface $fileResolver,
+        protected readonly LoggerInterface $logger,
+        ?array $processors = null,
+        protected bool $debug = false,
     ) {
         $this->dispatcher = new EventDispatcher();
-        $this->logger = $logger;
-        $this->configuration = $configuration;
-        $this->fileResolver = $fileResolver;
         $chainProcessor = $this->getChainProcessor($processors);
 
         if (null !== $this->configuration->getPingoPath()) {
@@ -74,6 +66,9 @@ class InterventionRequest
             }
         }
 
+        $this->addSubscriber(new StreamNoProcessListener(
+            $this->fileResolver,
+        ));
         $this->addSubscriber(new StripExifListener());
         $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
         $this->addSubscriber(new FileCache(
@@ -102,9 +97,6 @@ class InterventionRequest
         $this->defineTimezone();
     }
 
-    /**
-     * @return void
-     */
     private function defineTimezone(): void
     {
         /*
@@ -113,19 +105,13 @@ class InterventionRequest
         date_default_timezone_set($this->configuration->getTimezone());
     }
 
-    /**
-     * @param EventSubscriberInterface $subscriber
-     * @return void
-     */
     public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         $this->dispatcher->addSubscriber($subscriber);
     }
 
     /**
-     * @param array|null $processors
-     *
-     * @return Processor\ChainProcessor
+     * @param Processor\Processor[]|null $processors
      */
     protected function getChainProcessor(?array $processors = null): Processor\ChainProcessor
     {
@@ -153,77 +139,82 @@ class InterventionRequest
     /**
      * Handle request to convert it to a Response object.
      *
-     * @param Request $request
-     * @return void
      * @throws \Exception
      */
     public function handleRequest(Request $request): void
     {
         try {
             if (!$request->query->has('image')) {
-                throw new \InvalidArgumentException("No valid image path found in URI");
+                throw new \InvalidArgumentException('No valid image path found in URI');
             }
 
             $event = new RequestEvent($request, $this);
             $this->dispatcher->dispatch($event);
             if (null === $this->response = $event->getResponse()) {
-                $this->response = $this->getBadRequestResponse('No listener was configured for current request');
+                throw new \LogicException('No listener returned a Response for current request');
             }
-        } catch (FileNotFoundException $e) {
-            $this->response = $this->getNotFoundResponse($e->getMessage());
-        } catch (\InvalidArgumentException $e) {
-            $this->response = $this->getBadRequestResponse($e->getMessage());
-        } catch (\RuntimeException $e) {
-            $this->response = $this->getBadRequestResponse($e->getMessage());
+        } catch (FileNotFoundException|UnableToRetrieveMetadata $e) {
+            $this->response = $this->getNotFoundResponse($e);
+        } catch (\InvalidArgumentException|NotReadableException $e) {
+            $this->response = $this->getBadRequestResponse($e);
+        } catch (\Throwable $e) {
+            $this->response = $this->getServerErrorResponse($e);
         }
     }
 
-    /**
-     * @param string $message
-     * @return Response
-     */
-    protected function getNotFoundResponse(string $message = ""): Response
+    protected function getNotFoundResponse(\Throwable $e): JsonResponse
     {
-        $body = '<h1>404 Error: File not found</h1>';
-        if ($message != '') {
-            $body .= '<p>' . $message . '</p>';
-        }
-        $body = '<!DOCTYPE html><html lang="en"><body>' . $body . '</body></html>';
-
-        return new Response(
-            $body,
-            Response::HTTP_NOT_FOUND
+        return new JsonResponse(
+            [
+                'error' => array_filter([
+                    'code' => Response::HTTP_NOT_FOUND,
+                    'exception' => $this->debug ? $e::class : null,
+                    'message' => $e->getMessage(),
+                ]),
+            ],
+            Response::HTTP_NOT_FOUND,
+            ['cache-control' => 'no-store']
         );
     }
 
-    /**
-     * @param string $message
-     * @return Response
-     */
-    protected function getBadRequestResponse(string $message = ""): Response
+    protected function getBadRequestResponse(\Throwable $e): JsonResponse
     {
-        $body = '<h1>400 Error: Bad Request</h1>';
-        if ($message != '') {
-            $body .= '<p>' . $message . '</p>';
-        }
-        $body = '<!DOCTYPE html><html lang="en"><body>' . $body . '</body></html>';
-
-        return new Response(
-            $body,
-            Response::HTTP_BAD_REQUEST
+        return new JsonResponse(
+            [
+                'error' => array_filter([
+                    'code' => Response::HTTP_BAD_REQUEST,
+                    'exception' => $this->debug ? $e::class : null,
+                    'message' => $e->getMessage(),
+                ]),
+            ],
+            Response::HTTP_BAD_REQUEST,
+            ['cache-control' => 'no-store']
         );
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
+    protected function getServerErrorResponse(\Throwable $e): JsonResponse
+    {
+        return new JsonResponse(
+            [
+                'error' => array_filter([
+                    'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                    'exception' => $this->debug ? $e::class : null,
+                    'message' => $e->getMessage(),
+                ]),
+            ],
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            ['cache-control' => 'no-store']
+        );
+    }
+
     public function getResponse(Request $request): Response
     {
         if (null !== $this->response) {
-            $this->response->setPublic();
-            $this->response->setMaxAge($this->configuration->getResponseTtl());
-            $this->response->setSharedMaxAge($this->configuration->getResponseTtl());
+            if ($this->response->isCacheable()) {
+                $this->response->setPublic();
+                $this->response->setMaxAge($this->configuration->getResponseTtl());
+                $this->response->setSharedMaxAge($this->configuration->getResponseTtl());
+            }
             $this->response->setCharset('UTF-8');
             $this->response->headers->set(
                 'access-control-allow-headers',
@@ -244,13 +235,10 @@ class InterventionRequest
 
             return $this->response;
         } else {
-            throw new \RuntimeException("Request had not been handled. Use handle() method before getResponse()", 1);
+            throw new \RuntimeException('Request had not been handled. Use handle() method before getResponse()', 1);
         }
     }
 
-    /**
-     * @return Configuration
-     */
     public function getConfiguration(): Configuration
     {
         return $this->configuration;

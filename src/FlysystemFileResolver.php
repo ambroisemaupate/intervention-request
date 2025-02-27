@@ -10,14 +10,12 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 final class FlysystemFileResolver extends LocalFileResolver
 {
-    private FilesystemOperator $filesystem;
-    private LoggerInterface $logger;
-
-    public function __construct(FilesystemOperator $filesystem, LoggerInterface $logger, string $tempFilePath)
-    {
+    public function __construct(
+        private readonly FilesystemOperator $filesystem,
+        private readonly LoggerInterface $logger,
+        string $tempFilePath,
+    ) {
         parent::__construct($tempFilePath);
-        $this->filesystem = $filesystem;
-        $this->logger = $logger;
     }
 
     /**
@@ -34,6 +32,12 @@ final class FlysystemFileResolver extends LocalFileResolver
          * Use resource based NextGenFile to avoid storing data on disk
          */
         $nextgenFile->setFilesystem($this->filesystem);
+
         return $nextgenFile;
+    }
+
+    public function getFilesystem(): FilesystemOperator
+    {
+        return $this->filesystem;
     }
 }

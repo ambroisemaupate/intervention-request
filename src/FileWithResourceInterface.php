@@ -9,10 +9,10 @@ use League\Flysystem\FilesystemOperator;
 interface FileWithResourceInterface
 {
     /**
-     * @param FilesystemOperator $filesystem
      * @return $this
      */
     public function setFilesystem(FilesystemOperator $filesystem): FileWithResourceInterface;
+
     /**
      * @return resource|null
      */

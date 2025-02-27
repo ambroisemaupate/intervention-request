@@ -14,28 +14,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @package AM\InterventionRequest\Processor
- */
-final class ChainProcessor
+final readonly class ChainProcessor
 {
-    private Configuration $configuration;
-    private EventDispatcherInterface $dispatcher;
     /**
-     * @var Processor[]
+     * @param Processor[] $processors
      */
-    private array $processors;
-
-    /**
-     * @param Configuration            $configuration
-     * @param EventDispatcherInterface $dispatcher
-     * @param Processor[]              $processors
-     */
-    public function __construct(Configuration $configuration, EventDispatcherInterface $dispatcher, array $processors)
-    {
-        $this->configuration = $configuration;
-        $this->dispatcher = $dispatcher;
-        $this->processors = $processors;
+    public function __construct(
+        private Configuration $configuration,
+        private EventDispatcherInterface $dispatcher,
+        private array $processors,
+    ) {
     }
 
     protected function makeImage(File $nativeFile): Image
@@ -45,19 +33,13 @@ final class ChainProcessor
             'driver' => $this->configuration->getDriver(),
         ]);
 
-        if ($nativeFile instanceof FileWithResourceInterface && $nativeFile->getResource() !== null) {
+        if ($nativeFile instanceof FileWithResourceInterface && null !== $nativeFile->getResource()) {
             return $manager->make($nativeFile->getResource());
         }
 
         return $manager->make($nativeFile);
     }
 
-    /**
-     * @param File    $nativeImage
-     * @param Request $request
-     *
-     * @return Image
-     */
     public function process(File $nativeImage, Request $request): Image
     {
         if ($request->query->has('no_process')) {

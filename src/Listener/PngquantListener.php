@@ -9,24 +9,12 @@ use AM\InterventionRequest\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Process\Process;
 
-final class PngquantListener implements ImageFileEventSubscriberInterface
+final readonly class PngquantListener implements ImageFileEventSubscriberInterface
 {
-    protected string $pngquantPath;
-    protected bool $lossy = false;
-
-    /**
-     * @param string $pngquantPath
-     * @param bool $lossy
-     */
-    public function __construct(string $pngquantPath, bool $lossy = false)
+    public function __construct(private string $pngquantPath, private bool $lossy = false)
     {
-        $this->pngquantPath = $pngquantPath;
-        $this->lossy = $lossy;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -35,17 +23,13 @@ final class PngquantListener implements ImageFileEventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ResponseEvent $event
-     * @return void
-     */
     public function onResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         if (
-            $this->pngquantPath !== '' &&
-            $response->headers->get('Content-Type') === 'image/png' &&
-            (bool) $response->headers->get('X-IR-First-Gen')
+            '' !== $this->pngquantPath
+            && 'image/png' === $response->headers->get('Content-Type')
+            && (bool) $response->headers->get('X-IR-First-Gen')
         ) {
             $response->headers->add(['X-IR-Pngquant' => '1']);
             $response->headers->add(['X-IR-Pngquant-Lossy' => (int) $this->lossy]);
@@ -53,19 +37,11 @@ final class PngquantListener implements ImageFileEventSubscriberInterface
         }
     }
 
-    /**
-     * @param File|null $image
-     * @return bool
-     */
-    public function supports(File $image = null): bool
+    public function supports(?File $image = null): bool
     {
-        return $this->pngquantPath !== '' && null !== $image && $image->getMimeType() === 'image/png';
+        return '' !== $this->pngquantPath && null !== $image && 'image/png' === $image->getMimeType();
     }
 
-    /**
-     * @param ImageSavedEvent $event
-     * @return void
-     */
     public function onPngImageSaved(ImageSavedEvent $event): void
     {
         if ($this->supports($event->getImageFile())) {
@@ -82,7 +58,7 @@ final class PngquantListener implements ImageFileEventSubscriberInterface
                 '-f',
                 '--speed',
                 '2',
-                $this->lossy ? '--quality=' . sprintf('%d-%d', $minQuality, $maxQuality) : '',
+                $this->lossy ? '--quality='.sprintf('%d-%d', $minQuality, $maxQuality) : '',
                 '-o',
                 $event->getImageFile()->getPathname(),
                 $event->getImageFile()->getPathname(),
