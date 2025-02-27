@@ -97,17 +97,20 @@ WORKDIR /var/www/html
 
 FROM php AS php-prod
 
+ARG UID
+ARG GID
+
 ENV IR_DEBUG=0
 
 RUN ln -sf ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
 COPY --link docker/etc/php/conf.d/php.prod.ini ${PHP_INI_DIR}/conf.d/zz-app.ini
 
 # Composer
-COPY --link --chown=php:php composer.* ./
+COPY --link --chown=${UID}:${GID} composer.* ./
 
 RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
-COPY --link --chown=php:php . .
+COPY --link --chown=${UID}:${GID} . .
 
 RUN composer dump-autoload --classmap-authoritative --no-dev
 

@@ -12,7 +12,6 @@ Makefile
 README.md
 cliff.toml
 compose.override.yml
-compose.override.yml
 compose.override.yml.dist
 compose.yml
 docker-compose.yml
@@ -26,3 +25,7 @@ web/assets
 web/cache
 web/dev.php
 web/images
+
+.php-cs-fixer.cache
+.php-cs-fixer.dist.php
+docker-bake.hcl

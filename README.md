@@ -2,7 +2,7 @@
 
 **A customizable *Intervention Image* wrapper to use image simple re-sampling features over urls and a configurable cache.**
 
-[![Build Status](https://app.travis-ci.com/ambroisemaupate/intervention-request.svg?branch=master)](https://app.travis-ci.com/ambroisemaupate/intervention-request)
+[![Static analysis and code style](https://github.com/ambroisemaupate/intervention-request/actions/workflows/run-test.yml/badge.svg)](https://github.com/ambroisemaupate/intervention-request/actions/workflows/run-test.yml)
 [![Packagist](https://img.shields.io/packagist/v/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 [![Packagist](https://img.shields.io/packagist/dt/ambroisemaupate/intervention-request.svg)](https://packagist.org/packages/ambroisemaupate/intervention-request)
 

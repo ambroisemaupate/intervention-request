@@ -8,7 +8,7 @@ variable "VERSION" {
 
 target "intervention" {
     name = "intervention-${item.name}"
-    platforms = ["linux/amd64"]
+    platforms = ["linux/amd64", "linux/arm64"]
     matrix = {
         item = [
             {
