@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Cache;
 
 use AM\InterventionRequest\Event\RequestEvent;
+use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,8 +19,9 @@ final class PassThroughFileCache extends FileCache
     protected function supports(RequestEvent $requestEvent): bool
     {
         $config = $requestEvent->getInterventionRequest()->getConfiguration();
+        $streamNoProcess = $requestEvent->getRequest()->attributes->get(StreamNoProcessListener::ATTRIBUTE, false);
 
-        return $config->hasCaching() && $config->isUsingPassThroughCache();
+        return !$streamNoProcess && $config->hasCaching() && $config->isUsingPassThroughCache();
     }
 
     protected function getCacheFilePath(Request $request, File $nativeImage): string

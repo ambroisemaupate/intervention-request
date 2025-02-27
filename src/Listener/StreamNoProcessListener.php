@@ -41,13 +41,14 @@ final class StreamNoProcessListener implements EventSubscriberInterface
             return;
         }
 
+        $requestEvent->getRequest()->attributes->set('no_process', true);
+        $requestEvent->getRequest()->attributes->set(self::ATTRIBUTE, true);
+
         $filesystem = $this->fileResolver->getFilesystem();
         $nativeImage = $this->fileResolver->resolveFile(
             $this->fileResolver->assertRequestedFilePath($requestEvent->getRequest()->get('image'))
         );
 
-        $requestEvent->getRequest()->attributes->set('no_process', true);
-        $requestEvent->getRequest()->attributes->set(self::ATTRIBUTE, true);
         $response = new StreamedResponse(function () use ($nativeImage, $filesystem) {
             $outputStream = fopen('php://output', 'wb');
             if (false === $outputStream) {
@@ -61,6 +62,7 @@ final class StreamNoProcessListener implements EventSubscriberInterface
             'Content-Type' => $filesystem->mimeType($nativeImage->getPathname()),
             'Last-Modified' => $filesystem->lastModified($nativeImage->getPathname()),
             'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
+            'X-Direct-Stream' => '1',
         ]);
         $response->setPublic();
         $requestEvent->setResponse($response);

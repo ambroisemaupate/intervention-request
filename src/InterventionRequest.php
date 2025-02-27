@@ -16,6 +16,7 @@ use AM\InterventionRequest\Listener\PngquantListener;
 use AM\InterventionRequest\Listener\QualitySubscriber;
 use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
+use Intervention\Image\Exception\NotReadableException;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -154,14 +155,14 @@ class InterventionRequest
             }
         } catch (FileNotFoundException|UnableToRetrieveMetadata $e) {
             $this->response = $this->getNotFoundResponse($e);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException|NotReadableException $e) {
             $this->response = $this->getBadRequestResponse($e);
-        } catch (\RuntimeException $e) {
+        } catch (\Throwable $e) {
             $this->response = $this->getServerErrorResponse($e);
         }
     }
 
-    protected function getNotFoundResponse(\Exception $e): JsonResponse
+    protected function getNotFoundResponse(\Throwable $e): JsonResponse
     {
         return new JsonResponse(
             [
@@ -176,7 +177,7 @@ class InterventionRequest
         );
     }
 
-    protected function getBadRequestResponse(\Exception $e): JsonResponse
+    protected function getBadRequestResponse(\Throwable $e): JsonResponse
     {
         return new JsonResponse(
             [
@@ -191,7 +192,7 @@ class InterventionRequest
         );
     }
 
-    protected function getServerErrorResponse(\Exception $e): JsonResponse
+    protected function getServerErrorResponse(\Throwable $e): JsonResponse
     {
         return new JsonResponse(
             [
