@@ -161,25 +161,26 @@ You can edit each configuration parameters using their corresponding *setters*:
 
 ## Available operations
 
-|  Query attribute  |  Description  |  Usage  |
-| ----------------- | ------------- | ------------- |
-| image | Native image path relative to your configuration `imagePath` | `?image=path/to/image.jpg` |
-| fit | [Crop and resize combined](http://image.intervention.io/api/fit) It needs a `width` and a `height` in pixels, this filter can be combined with `align` to choose which part of your image to fit | `…&fit=300x300` |
-| align | [Crop and resize combined](http://image.intervention.io/api/fit) Choose which part of your image to fit. | `…&align=c` |
-| flip | [Mirror image horizontal or vertical](http://image.intervention.io/api/flip) You can set `h` for horizontal or `v` for vertical flip. | `…&flip=h` |
-| crop | [Crop an image](http://image.intervention.io/api/crop) It needs a `width` and a `height` in pixels | `…&crop=300x300` |
-| width | [Resize image proportionally to given width](http://image.intervention.io/api/widen) It needs a `width` in pixels | `…&width=300` |
-| height | [Resize image proportionally to given height](http://image.intervention.io/api/heighten) It needs a `height` in pixels | `…&height=300` |
-| crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
-| background | [Matte a png file with a background color](http://image.intervention.io/api/limitColors) | `…&background=ff0000` |
-| greyscale/grayscale | [Turn an image into a greyscale version](http://image.intervention.io/api/greyscale) | `…&greyscale=1` |
-| blur | [Blurs an image](http://image.intervention.io/api/blur) | `…&blur=20` |
-| quality | Set the exporting quality (1 - 100), default to 90 | `…&quality=95` |
-| progressive | [Toggle progressive mode](http://image.intervention.io/api/interlace) | `…&progressive=1` |
-| interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
-| sharpen | [Sharpen image](http://image.intervention.io/api/sharpen) (1 - 100) | `…&sharpen=10` |
-| contrast | [Change image contrast](http://image.intervention.io/api/contrast) (-100 to 100, 0 means no changes) | `…&contrast=10` |
-| no_process | **Disable all image processing by PHP**, this does not load image in memory but executes any post-process optimizers (such as *pngquant*, *jpegoptim*…) | `…&no_process=1` |
+| Query attribute     | Description                                                                                                                                                                                         | Usage                                                            |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| image               | Native image path relative to your configuration `imagePath`                                                                                                                                        | `?image=path/to/image.jpg`                                       |
+| fit                 | [Crop and resize combined](ttps://image.intervention.io/v2/api/fit) It needs a `width` and a `height` in pixels, this filter can be combined with `align` to choose which part of your image to fit | `…&fit=300x300`                                                  |
+| align               | [Crop and resize combined](ttps://image.intervention.io/v2/api/fit) Choose which part of your image to fit.                                                                                         | `…&align=c`                                                      |
+| flip                | [Mirror image horizontal or vertical](ttps://image.intervention.io/v2/api/flip) You can set `h` for horizontal or `v` for vertical flip.                                                            | `…&flip=h`                                                       |
+| crop                | [Crop an image](https://image.intervention.io/v2/api/crop) It needs a `width` and a `height` in pixels                                                                                              | `…&crop=300x300`                                                 |
+| width               | [Resize image proportionally to given width](ttps://image.intervention.io/v2/api/widen) It needs a `width` in pixels                                                                                | `…&width=300`                                                    |
+| height              | [Resize image proportionally to given height](ttps://image.intervention.io/v2/api/heighten) It needs a `height` in pixels                                                                           | `…&height=300`                                                   |
+| crop + height/width | Do the same as *fit* using width or height as final size                                                                                                                                            | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
+| background          | [Matte a png file with a background color](ttps://image.intervention.io/v2/api/limitColors)                                                                                                         | `…&background=ff0000`                                            |
+| greyscale/grayscale | [Turn an image into a greyscale version](ttps://image.intervention.io/v2/api/greyscale)                                                                                                             | `…&greyscale=1`                                                  |
+| blur                | [Blurs an image](ttps://image.intervention.io/v2/api/blur)                                                                                                                                          | `…&blur=20`                                                      |
+| quality             | Set the exporting quality (1 - 100), default to 90                                                                                                                                                  | `…&quality=95`                                                   |
+| progressive         | [Toggle progressive mode](ttps://image.intervention.io/v2/api/interlace)                                                                                                                            | `…&progressive=1`                                                |
+| interlace           | [Toggle interlaced mode](ttps://image.intervention.io/v2/api/interlace)                                                                                                                             | `…&interlace=1`                                                  |
+| sharpen             | [Sharpen image](ttps://image.intervention.io/v2/api/sharpen) (1 - 100)                                                                                                                              | `…&sharpen=10`                                                   |
+| contrast            | [Change image contrast](ttps://image.intervention.io/v2/api/contrast) (-100 to 100, 0 means no changes)                                                                                             | `…&contrast=10`                                                  |
+| no_process          | **Disable all image processing by PHP**, this does not load image in memory but executes any post-process optimizers (such as *pngquant*, *jpegoptim*…)                                             | `…&no_process=1`                                                 |
+| hotspot             | [Crop an image](https://image.intervention.io/v2/api/crop) It needs a `x`, `y` (to define the center point of the image), `width` and a `height` in pixels                                          | `…&hotspot=25x25x50x50`                                          |
 
 ### Fit position
 
@@ -287,23 +288,24 @@ if (null !== $params) {
 URL shortcuts can be combined using `-` (dash) character.
 For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&progressive=0`.
 
-|  Query attribute  |  Shortcut letter  |
-| ----------------- | ------------- |
-| align | a |
-| fit | f |
-| flip | m |
-| crop | c |
-| width | w |
-| height | h |
-| background | b |
-| greyscale | g |
-| blur | l |
-| quality | q |
-| progressive | p |
-| interlace | i |
-| sharpen | s |
-| contrast *(only from 0 to 100)* | k |
-| no_process *(do not process and load image in memory, allows optimizers)* | n |
+| Query attribute                                                           | Shortcut letter |
+|---------------------------------------------------------------------------|-----------------|
+| align                                                                     | a               |
+| fit                                                                       | f               |
+| flip                                                                      | m               |
+| crop                                                                      | c               |
+| width                                                                     | w               |
+| height                                                                    | h               |
+| background                                                                | b               |
+| greyscale                                                                 | g               |
+| blur                                                                      | l               |
+| quality                                                                   | q               |
+| progressive                                                               | p               |
+| interlace                                                                 | i               |
+| sharpen                                                                   | s               |
+| contrast *(only from 0 to 100)*                                           | k               |
+| no_process *(do not process and load image in memory, allows optimizers)* | n               |
+| hotspot                                                                   | z               |
 
 
 ## Use pass-through cache
@@ -396,7 +398,7 @@ public static function getSubscribedEvents()
 }
 ```
 
-This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it. 
+This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it.
 Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to register it.
 
 #### Available events
@@ -475,7 +477,7 @@ $conf->setNoAlphaPingo(true); // Remove png transparency to compress more - defa
 
 ### kraken.io
 
-If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated 
+If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated
 `KrakenListener` to send your resized images over the external service.
 
 ```php
@@ -487,11 +489,11 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\KrakenListener(
 ));
 ```
 
-Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time.
 
 ### tinyjpg.com
 
-If you have subscribed to a paid [tinyjpg.com](https://tinyjpg.com) plan, you can add the dedicated 
+If you have subscribed to a paid [tinyjpg.com](https://tinyjpg.com) plan, you can add the dedicated
 `TinifyListener` to send your resized images over the external service.
 
 ```php
@@ -501,7 +503,7 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\TinifyListener(
 ));
 ```
 
-Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time.
 
 ### jpegtran
 
@@ -537,7 +539,7 @@ AVIF conversion only supports custom compiled *ImageMagick* and only support los
 
 Have fun!
 
-## Testing 
+## Testing
 
 This project uses Docker for development environment.
 Copy `compose.override.yml` to `compose.override.yml`, use `php-dev` target and declare a volume on your project root folder.
@@ -560,7 +562,7 @@ docker compose build
 docker compose up
 ```
 
-Then open `http://0.0.0.0:8080/assets/w300/rhino.jpg` in your browser. 
+Then open `http://0.0.0.0:8080/assets/w300/rhino.jpg` in your browser.
 You should be able to test *intervention-request* with Passthrough cache and *ShortUrl* enabled.
 Set `IR_USE_PASSTHROUGH_CACHE=0` if you don't want cache to be served by *Nginx*.
 
