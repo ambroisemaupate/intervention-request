@@ -1,7 +1,10 @@
 ARG UID=1000
 ARG GID=${UID}
 
-ARG PHP_VERSION=8.4.4
+# Do not switch to PHP 8.4 before upgrading Image Intervention package due to warning:
+# NOTICE: PHP message: PHP Deprecated:  Intervention\Image\Gd\Driver::__construct(): Implicitly marking parameter $decoder as nullable is deprecated,
+# the explicit nullable type must be used instead in /var/www/html/vendor/intervention/image/src/Intervention/Image/Gd/Driver.php on line 16
+ARG PHP_VERSION=8.3.19
 
 #######
 # PHP #
@@ -103,6 +106,7 @@ ARG GID
 ENV IR_DEBUG=0
 
 RUN ln -sf ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
+COPY --link docker/etc/php/conf.d/strict.ini ${PHP_INI_DIR}/conf.d/zz-strict.ini
 COPY --link docker/etc/php/conf.d/php.prod.ini ${PHP_INI_DIR}/conf.d/zz-app.ini
 
 # Composer
@@ -135,6 +139,7 @@ FROM php AS php-dev
 ENV IR_DEBUG=1
 
 RUN ln -sf ${PHP_INI_DIR}/php.ini-development ${PHP_INI_DIR}/php.ini
+COPY --link docker/etc/php/conf.d/strict.ini ${PHP_INI_DIR}/conf.d/zz-strict.ini
 
 # Declare volumes with the correct user
 USER php

@@ -7,4 +7,20 @@ services:
             - ./:/var/www/html
         ports:
             - "8080:80"
+        environment:
+            # Development mode
+            IR_DEBUG: 1
+            IR_USE_PASSTHROUGH_CACHE: 0
+            IR_GC_PROBABILITY: 1
+            IR_GC_TTL: 0
+
+            IR_RESPONSE_TTL: ${IR_RESPONSE_TTL}
+            IR_USE_FILECHECKSUM: ${IR_USE_FILECHECKSUM}
+            IR_DRIVER: ${IR_DRIVER}
+            IR_JPEGOPTIM_PATH: ${IR_JPEGOPTIM_PATH}
+            IR_PNGQUANT_PATH: ${IR_PNGQUANT_PATH}
+            IR_CACHE_PATH: ${IR_CACHE_PATH}
+            IR_IMAGES_PATH: ${IR_IMAGES_PATH}
+            IR_IGNORE_PATH: ${IR_IGNORE_PATH}
+            IR_DEFAULT_QUALITY: ${IR_DEFAULT_QUALITY}
 
