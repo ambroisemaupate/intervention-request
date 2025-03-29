@@ -162,7 +162,7 @@ class FileCache implements EventSubscriberInterface
             $firstGen = true;
         }
 
-        $fileContent = file_get_contents($cacheFile->getPathname());
+        $fileContent = file_get_contents($cacheFilePath);
         if (false !== $fileContent) {
             $response = new Response(
                 $fileContent,
@@ -177,6 +177,10 @@ class FileCache implements EventSubscriberInterface
             );
             $response->setPublic();
         } else {
+            $this->logger->error('Could not read cache file', [
+                'cache_file' => $cacheFilePath,
+                'request' => $request->getRequestUri(),
+            ]);
             $response = new Response(
                 null,
                 Response::HTTP_NOT_FOUND
@@ -205,12 +209,9 @@ class FileCache implements EventSubscriberInterface
          * The key vary on request ALLOWED params and file md5
          * if enabled.
          */
-        $cacheParams = [];
-        foreach ($request->query->all() as $name => $value) {
-            if (in_array($name, ShortUrlExpander::getAllowedOperationsNames())) {
-                $cacheParams[$name] = $value;
-            }
-        }
+        $cacheParams = array_filter($request->query->all(), function ($name) {
+            return in_array($name, ShortUrlExpander::getAllowedOperationsNames());
+        }, ARRAY_FILTER_USE_KEY);
         if ($nativeImage instanceof NextGenFile && $nativeImage->isNextGen()) {
             $cacheParams[$nativeImage->getNextGenExtension()] = true;
             $extension = $nativeImage->getNextGenExtension();
