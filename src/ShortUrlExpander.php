@@ -67,7 +67,7 @@ class ShortUrlExpander
 
         if (
             preg_match(
-                '#(?P<queryString>[a-zA-Z:0-9\\-]+)/(?P<filename>[a-zA-Z0-9\\-_\\./]+)$#s',
+                '#(?P<queryString>[a-zA-Z:;0-9\\-\\.]+)/(?P<filename>[a-zA-Z0-9\\-_\\./]+)$#s',
                 $pathInfo ?? '',
                 $matches
             )
@@ -87,7 +87,7 @@ class ShortUrlExpander
         $params = explode('-', $queryString);
 
         foreach ($params as $param) {
-            preg_match("/(?P<operation>[a-z])(?P<value>[\S]*)/", $param, $matches);
+            preg_match("/(?P<operation>[a-z])(?P<value>\S*)/", $param, $matches);
             if (
                 isset($matches['operation'])
                 && isset($matches['value'])
@@ -96,7 +96,7 @@ class ShortUrlExpander
                 if (\is_numeric($matches['value'])) {
                     $matches['value'] = (int) $matches['value'];
                 }
-                if (\is_string($matches['value']) && '' === $matches['value']) {
+                if ('' === $matches['value']) {
                     $matches['value'] = true;
                 }
                 $this->request->query->set(

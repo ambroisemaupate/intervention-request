@@ -2,6 +2,12 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [5.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v5.0.0...v5.0.1) - 2025-03-29
+
+### Bug Fixes
+
+- Revert to PHP 8.3 to avoid Deprecation messages. Stricter PHP configuration (no sessions, no uploads) - ([32ea982](https://github.com/ambroisemaupate/intervention-request/commit/32ea982c66069fe4e2a4a708ac7e74011aa2f96c)) - Ambroise Maupate
+
 ## [5.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v4.1.1...v5.0.0) - 2025-02-27
 
 ### Bug Fixes
