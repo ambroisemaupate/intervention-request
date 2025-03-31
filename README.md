@@ -566,3 +566,14 @@ Then open `http://0.0.0.0:8080/assets/w300/rhino.jpg` in your browser.
 You should be able to test *intervention-request* with Passthrough cache and *ShortUrl* enabled.
 Set `IR_USE_PASSTHROUGH_CACHE=0` if you don't want cache to be served by *Nginx*.
 
+### Disable cache during development    
+
+Set these variables to avoid caching images during development:
+
+```dotenv
+IR_DEBUG: 1
+IR_USE_PASSTHROUGH_CACHE: 0
+IR_GC_PROBABILITY: 1
+IR_GC_TTL: 0
+```
+

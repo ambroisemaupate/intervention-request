@@ -93,7 +93,6 @@ class InterventionRequest
             $chainProcessor,
             $this->fileResolver
         ));
-
         $this->defineTimezone();
     }
 
