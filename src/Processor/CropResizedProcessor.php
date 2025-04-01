@@ -12,17 +12,13 @@ final class CropResizedProcessor extends AbstractPositionableProcessor
 {
     public function process(Image $image, Request $request): void
     {
+        $crop = CropProcessor::validateCrop($request);
         if (
-            $request->query->has('crop')
-            && 1 === preg_match(
-                '#^([0-9]+)[x\:]([0-9]+)$#',
-                (string) ($request->query->get('crop') ?? ''),
-                $crop
-            )
+            0 < count($crop)
             && !$request->query->has('hotspot')
             && ($request->query->has('width') || $request->query->has('height'))
         ) {
-            $fitRatio = (float) $crop[1] / (float) $crop[2];
+            $fitRatio = (float) $crop[0] / (float) $crop[1];
 
             if ($request->query->has('width')) {
                 $realFitSize = [

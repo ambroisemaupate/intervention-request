@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Processor;
 
+use AM\InterventionRequest\Vector;
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -19,25 +20,29 @@ final readonly class HotspotProcessor implements Processor
         $crop = CropProcessor::validateCrop($request);
         if (
             $request->query->has('hotspot')
-            && $request->query->has('crop')
             && ($request->query->has('width') || $request->query->has('height'))
             && 1 === preg_match('#^(0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)$#', (string) ($request->query->get('hotspot') ?? ''), $hotspot)
             && 0 < count($crop)
         ) {
-            $hotspot = [
-                $hotspot[0],
-                floatval($hotspot[1]),
-                floatval($hotspot[2]),
-            ];
+            $hotspot = new Vector(
+                $hotspot[1],
+                $hotspot[2]
+            );
             // Get width and height with ratio
-            [$width, $height] = $this->getWidthHeight($image, $crop);
+            $crop = new Vector(
+                $crop[0],
+                $crop[1]
+            );
+            $size = $this->getWidthHeight($image, $crop);
+            $width = $size->getRoundedX();
+            $height = $size->getRoundedY();
             // Get point X and Y for crop image based on hotspot
-            [$offset_x, $offset_y] = $this->resolveCropOffset($image, $width, $height, $hotspot);
+            $offset = $this->resolveCropOffset($image, $width, $height, $hotspot);
 
             // Debug mode draw crop and center point on image
-            if ($this->debug) {
-                $center_x = (int) round($hotspot[1] * $image->width());
-                $center_y = (int) round($hotspot[2] * $image->height());
+            if ($this->debug && $request->query->has('trace')) {
+                $center_x = (int) round($hotspot->getX() * $image->width());
+                $center_y = (int) round($hotspot->getY() * $image->height());
 
                 $x1 = (int) min($image->width() - $width, max(0, $center_x - ($width / 2)));
                 $y1 = (int) min($image->height() - $height, max(0, $center_y - ($height / 2)));
@@ -45,7 +50,7 @@ final readonly class HotspotProcessor implements Processor
                 $x2 = (int) max($width, min($image->width(), $center_x + ($width / 2)));
                 $y2 = (int) max($height, min($image->height(), $center_y + ($height / 2)));
 
-                /**
+                /*
                  * Upgrade Intervention Image to 3.x
                  * rectangle() is now handled by drawRectangle()
                  * @see https://image.intervention.io/v3/modifying/drawing#drawing-a-rectangle
@@ -55,7 +60,7 @@ final readonly class HotspotProcessor implements Processor
                     $draw->border(3, '#0000FF');
                 });
 
-                /**
+                /*
                  * Upgrade Intervention Image to 3.x
                  * ellipse() is now handled by drawEllipse()
                  * @see https://image.intervention.io/v3/modifying/drawing#drawing-ellipses
@@ -67,60 +72,47 @@ final readonly class HotspotProcessor implements Processor
 
                 return;
             }
-            $image->crop($width, $height, $offset_x, $offset_y);
+            $image->crop($width, $height, $offset->getRoundedX(), $offset->getRoundedY());
         }
     }
 
-    /**
-     * @param array{int, int} $crop
-     *
-     * @return array{int, int}
-     */
-    private function getWidthHeight(Image $image, array $crop): array
+    private function getWidthHeight(Image $image, Vector $crop): Vector
     {
+        $cropX = $crop->getRoundedX();
+        $cropY = $crop->getRoundedY();
         // Square ratio
-        if ($crop[0] == $crop[1]) {
+        if ($cropX == $cropY) {
             $width = $height = min($image->width(), $image->height());
-        } elseif ($crop[0] > $crop[1]) { // Horizontal ratio
+        } elseif ($cropX > $cropY) { // Horizontal ratio
             $width = $image->width();
-            $height = (int) round(($image->width() * $crop[1]) / $crop[0]);
+            $height = (int) round(($image->width() * $cropY) / $cropX);
         } else { // Vertical ratio
-            $width = (int) round(($image->height() * $crop[0]) / $crop[1]);
+            $width = (int) round(($image->height() * $cropX) / $cropY);
             $height = $image->height();
         }
 
-        return [$width, $height];
+        return new Vector(
+            $width,
+            $height
+        );
     }
 
-    /**
-     * @param array{string, float, float} $hotspot
-     *
-     * @return array{int, int}
-     */
-    private function resolveCropOffset(Image $image, int $width, int $height, array $hotspot): array
+    private function resolveCropOffset(Image $image, int $width, int $height, Vector $hotspot): Vector
     {
-        $offset_x = (int) (($image->width() * $hotspot[1]) - ($width / 2));
-        $offset_y = (int) (($image->height() * $hotspot[2]) - ($height / 2));
+        $offset_x = (int) round(($image->width() * $hotspot->getX()) - ($width / 2));
+        $offset_y = (int) round(($image->height() * $hotspot->getY()) - ($height / 2));
 
-        $max_offset_x = $image->width() - $width;
-        $max_offset_y = $image->height() - $height;
+        $max_offset_x = max(0, $image->width() - $width);
+        $max_offset_y = max(0, $image->height() - $height);
 
-        if ($offset_x < 0) {
-            $offset_x = 0;
-        }
+        $offset_x = max(0, $offset_x);
+        $offset_y = max(0, $offset_y);
+        $offset_x = min($max_offset_x, $offset_x);
+        $offset_y = min($max_offset_y, $offset_y);
 
-        if ($offset_y < 0) {
-            $offset_y = 0;
-        }
-
-        if ($offset_x > $max_offset_x) {
-            $offset_x = $max_offset_x;
-        }
-
-        if ($offset_y > $max_offset_y) {
-            $offset_y = $max_offset_y;
-        }
-
-        return [$offset_x, $offset_y];
+        return new Vector(
+            $offset_x,
+            $offset_y,
+        );
     }
 }
