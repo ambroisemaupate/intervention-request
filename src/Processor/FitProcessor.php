@@ -22,6 +22,11 @@ final class FitProcessor extends AbstractPositionableProcessor
                 $fit
             )
         ) {
+            /**
+             * Upgrade Intervention Image to 3.x
+             * fit() is replaced by cover() and coverDown()
+             * @see https://image.intervention.io/v3/modifying/resizing#fitted-image-resizing
+             */
             $image->fit((int) $fit[1], (int) $fit[2], function (Constraint $constraint) {
                 $constraint->upsize();
             }, $this->parsePosition($request));

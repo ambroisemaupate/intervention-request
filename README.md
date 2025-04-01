@@ -180,23 +180,23 @@ You can edit each configuration parameters using their corresponding *setters*:
 | sharpen             | [Sharpen image](ttps://image.intervention.io/v2/api/sharpen) (1 - 100)                                                                                                                              | `…&sharpen=10`                                                   |
 | contrast            | [Change image contrast](ttps://image.intervention.io/v2/api/contrast) (-100 to 100, 0 means no changes)                                                                                             | `…&contrast=10`                                                  |
 | no_process          | **Disable all image processing by PHP**, this does not load image in memory but executes any post-process optimizers (such as *pngquant*, *jpegoptim*…)                                             | `…&no_process=1`                                                 |
-| hotspot             | [Crop an image](https://image.intervention.io/v2/api/crop) It needs a `x`, `y` (to define the center point of the image), `width` and a `height` in pixels                                          | `…&hotspot=25x25x50x50`                                          |
+| hotspot             | [Crop an image](https://image.intervention.io/v2/api/crop) It needs a `x`, `y` (to define the center point of the image in percentage between 0 and 1), `width` and a `height` in pixels            | `…&hotspot=0.25x0.75`                                            |
 
 ### Fit position
 
 Due to URL rewriting, `align` filter can only takes one or two letters as a value. When no align filter is specified, `center` is used:
 
-| URL value | Alignment |
-| --- | --- |
-| `tl` | top-left |
-| `t` | top |
-| `tr` | top-right |
-| `l` | left |
-| `c` | center |
-| `r` | right |
-| `bl` | bottom-left |
-| `b` | bottom |
-| `br` | bottom-right |
+| URL value | Alignment    |
+|-----------|--------------|
+| `tl`      | top-left     |
+| `t`       | top          |
+| `tr`      | top-right    |
+| `l`       | left         |
+| `c`       | center       |
+| `r`       | right        |
+| `bl`      | bottom-left  |
+| `b`       | bottom       |
+| `br`      | bottom-right |
 
 ## Using standalone entry point
 
@@ -305,7 +305,7 @@ For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&
 | sharpen                                                                   | s               |
 | contrast *(only from 0 to 100)*                                           | k               |
 | no_process *(do not process and load image in memory, allows optimizers)* | n               |
-| hotspot                                                                   | z               |
+| hotspot                                                                   | d               |
 
 
 ## Use pass-through cache
@@ -403,13 +403,13 @@ Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to regis
 
 #### Available events
 
-| Event name | Description |
-| ---------- | ----------- |
-| `RequestEvent::class` | Main request handling event which handles `quality` and image processing and caching. |
-| `ImageBeforeProcessEvent::class` | Before `Image` is being processed. |
-| `ImageAfterProcessEvent::class` | After `Image` has been processed. |
-| `ImageSavedEvent::class` | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
-| `ResponseEvent::class` | After Symfony’s response has been built with image data. (Useful to alter headers) |
+| Event name                       | Description                                                                                                                      |
+|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `RequestEvent::class`            | Main request handling event which handles `quality` and image processing and caching.                                            |
+| `ImageBeforeProcessEvent::class` | Before `Image` is being processed.                                                                                               |
+| `ImageAfterProcessEvent::class`  | After `Image` has been processed.                                                                                                |
+| `ImageSavedEvent::class`         | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
+| `ResponseEvent::class`           | After Symfony’s response has been built with image data. (Useful to alter headers)                                               |
 
 #### Listener examples
 
@@ -521,17 +521,17 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
 With default quality to 90%. \
 AVIF conversion only supports custom compiled *ImageMagick* and only support lossless encoding.
 
-| Url       | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) | AVIF (100%) |
-| ----------------------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
-| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB | 235 kB | 155 kB |  94 kB |
-| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB | 176 kB | 115 kB |  71 kB |
-| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB | 564 kB | 429 kB | 398 kB |
-| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB | 295 kB | 229 kB | 227 kB |
+| Url                                 | PHP raw | *tinyjpg.com* | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) | AVIF (100%) |
+|-------------------------------------|---------|---------------|---------------------|-----------|--------------------|------------|------------|-------------|
+| /test/images/testUHD.jpg?width=2300 | 405 kB  | 168 kB        | 187 kB              | 395 kB    | 390 kB             | 235 kB     | 155 kB     | 94 kB       |
+| /test/images/testUHD.jpg?width=1920 | 294 kB  | 132 kB        | 134 kB              | 285 kB    | 282 kB             | 176 kB     | 115 kB     | 71 kB       |
+| /test/images/rhino.jpg?width=1920   | 642 kB  | 278 kB        | 534 kB              | 598 kB    | 596 kB             | 564 kB     | 429 kB     | 398 kB      |
+| /test/images/rhino.jpg?width=1280   | 325 kB  | 203 kB        | 278 kB              | 303 kB    | 301 kB             | 295 kB     | 229 kB     | 227 kB      |
 
 
-| Url                                 | PHP raw   | pngquant  | oxipng    | *Kraken.io* + lossy    | WebP (100%) | WebP (85%) | AVIF (100%) |
-| ----------------------------------- | --------- | --------- | --------- | --------- | ----------- | --------- | --------- |
-| /test/images/testPNG.png            | 292 kB | 167 kB | 288 kB | 142 kB | 186 kB   | 28 kB | 11.7 kB |
+| Url                      | PHP raw | pngquant | oxipng | *Kraken.io* + lossy | WebP (100%) | WebP (85%) | AVIF (100%) |
+|--------------------------|---------|----------|--------|---------------------|-------------|------------|-------------|
+| /test/images/testPNG.png | 292 kB  | 167 kB   | 288 kB | 142 kB              | 186 kB      | 28 kB      | 11.7 kB     |
 
 ## License
 

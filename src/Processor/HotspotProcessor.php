@@ -45,11 +45,21 @@ final readonly class HotspotProcessor implements Processor
                 $x2 = (int) max($width, min($image->width(), $center_x + ($width / 2)));
                 $y2 = (int) max($height, min($image->height(), $center_y + ($height / 2)));
 
+                /**
+                 * Upgrade Intervention Image to 3.x
+                 * rectangle() is now handled by drawRectangle()
+                 * @see https://image.intervention.io/v3/modifying/drawing#drawing-a-rectangle
+                 */
                 // Draw rectangle on final crop
                 $image->rectangle($x1, $y1, $x2, $y2, function ($draw) {
                     $draw->border(3, '#0000FF');
                 });
 
+                /**
+                 * Upgrade Intervention Image to 3.x
+                 * ellipse() is now handled by drawEllipse()
+                 * @see https://image.intervention.io/v3/modifying/drawing#drawing-ellipses
+                 */
                 // Draw green ellipse in center
                 $image->ellipse(30, 30, $center_x, $center_y, function ($draw) {
                     $draw->border(3, '#0FF000');

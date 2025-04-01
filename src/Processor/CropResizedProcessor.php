@@ -37,6 +37,11 @@ final class CropResizedProcessor extends AbstractPositionableProcessor
             }
 
             if (isset($realFitSize)) {
+                /**
+                 * Upgrade Intervention Image to 3.x
+                 * fit() is replaced by cover() and coverDown()
+                 * @see https://image.intervention.io/v3/modifying/resizing#fitted-image-resizing
+                 */
                 $image->fit($realFitSize[0], $realFitSize[1], function (Constraint $constraint) {
                     $constraint->upsize();
                 }, $this->parsePosition($request));
