@@ -118,21 +118,21 @@ class InterventionRequest
             $this->configuration,
             $this->dispatcher,
             $processors ?? [
-            new Processor\RotateProcessor(),
-            new Processor\FlipProcessor(),
-            new Processor\CropResizedProcessor(),
-            new Processor\FitProcessor(),
-            new Processor\CropProcessor(),
-            new Processor\HotspotProcessor(),
-            new Processor\WidenProcessor(),
-            new Processor\HeightenProcessor(),
-            new Processor\LimitColorsProcessor(),
-            new Processor\GreyscaleProcessor(),
-            new Processor\ContrastProcessor(),
-            new Processor\BlurProcessor(),
-            new Processor\SharpenProcessor(),
-            new Processor\ProgressiveProcessor(),
-        ]
+                new Processor\RotateProcessor(),
+                new Processor\FlipProcessor(),
+                new Processor\CropResizedProcessor(),
+                new Processor\FitProcessor(),
+                new Processor\CropProcessor(),
+                new Processor\HotspotProcessor($this->debug),
+                new Processor\WidenProcessor(),
+                new Processor\HeightenProcessor(),
+                new Processor\LimitColorsProcessor(),
+                new Processor\GreyscaleProcessor(),
+                new Processor\ContrastProcessor(),
+                new Processor\BlurProcessor(),
+                new Processor\SharpenProcessor(),
+                new Processor\ProgressiveProcessor(),
+            ]
         );
     }
 

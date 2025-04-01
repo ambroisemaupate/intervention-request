@@ -19,6 +19,7 @@ final class CropResizedProcessor extends AbstractPositionableProcessor
                 (string) ($request->query->get('crop') ?? ''),
                 $crop
             )
+            && !$request->query->has('hotspot')
             && ($request->query->has('width') || $request->query->has('height'))
         ) {
             $fitRatio = (float) $crop[1] / (float) $crop[2];
