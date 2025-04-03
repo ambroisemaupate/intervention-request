@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Processor;
 
+use AM\InterventionRequest\Vector;
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -11,33 +12,31 @@ final class CropProcessor implements Processor
 {
     public function process(Image $image, Request $request): void
     {
-        $crop = $this->validateCrop($request);
+        $crop = CropProcessor::validateDimensions($request);
         if (
-            $request->query->has('crop')
+            null !== $crop
             && !$request->query->has('width')
             && !$request->query->has('height')
-            && 0 < count($crop)
         ) {
-            $image->crop($crop[0], $crop[1]);
+            $image->crop($crop->getRoundedX(), $crop->getRoundedY());
         }
     }
 
-    /**
-     * @return array{int, int}|array{}
-     */
-    public static function validateCrop(Request $request): array
+    public static function validateDimensions(Request $request, string $paramName = 'crop'): ?Vector
     {
-        $crop = [];
-        $requestCrop = $request->query->get('crop');
-        if (!is_string($requestCrop)) {
-            return [];
+        $requestDimensions = $request->query->get($paramName);
+        if (!is_string($requestDimensions)) {
+            return null;
         }
-        preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $requestCrop, $crop);
+        preg_match('#^([0-9]+)[x\:]([0-9]+)$#', $requestDimensions, $dimensions);
 
-        if (isset($crop[1]) && isset($crop[2])) {
-            return [(int) $crop[1], (int) $crop[2]];
+        if (isset($dimensions[1]) && isset($dimensions[2])) {
+            return new Vector(
+                $dimensions[1],
+                $dimensions[2]
+            );
         }
 
-        return [];
+        return null;
     }
 }

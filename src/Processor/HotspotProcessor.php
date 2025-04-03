@@ -17,22 +17,18 @@ final readonly class HotspotProcessor implements Processor
 
     public function process(Image $image, Request $request): void
     {
-        $crop = CropProcessor::validateCrop($request);
+        $crop = CropProcessor::validateDimensions($request);
         if (
             $request->query->has('hotspot')
             && ($request->query->has('width') || $request->query->has('height'))
             && 1 === preg_match('#^(0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)$#', (string) ($request->query->get('hotspot') ?? ''), $hotspot)
-            && 0 < count($crop)
+            && null !== $crop
         ) {
             $hotspot = new Vector(
                 $hotspot[1],
                 $hotspot[2]
             );
             // Get width and height with ratio
-            $crop = new Vector(
-                $crop[0],
-                $crop[1]
-            );
             $size = $this->getWidthHeight($image, $crop);
             $width = $size->getRoundedX();
             $height = $size->getRoundedY();
