@@ -19,6 +19,11 @@ final class ProgressiveProcessor implements Processor
                                         $request->query->get('progressive') :
                                         $request->query->get('interlace');
 
+            /**
+             * Upgrade Intervention Image to 3.x
+             * interlace() no longer exists and is handle by encoder options.
+             * @see https://image.intervention.io/v3/basics/image-output
+             */
             $image->interlace((bool) $process);
         }
     }

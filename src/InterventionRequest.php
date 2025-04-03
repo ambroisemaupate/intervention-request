@@ -123,6 +123,7 @@ class InterventionRequest
                 new Processor\CropResizedProcessor(),
                 new Processor\FitProcessor(),
                 new Processor\CropProcessor(),
+                new Processor\HotspotProcessor($this->debug),
                 new Processor\WidenProcessor(),
                 new Processor\HeightenProcessor(),
                 new Processor\LimitColorsProcessor(),

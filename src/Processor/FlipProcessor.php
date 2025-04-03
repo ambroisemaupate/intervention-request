@@ -15,6 +15,11 @@ final class FlipProcessor implements Processor
             $request->query->has('flip')
             && 1 === preg_match('#^(h|v)$#', (string) ($request->query->get('flip') ?? ''), $fit)
         ) {
+            /**
+             * Upgrade Intervention Image to 3.x
+             * flip() still exists but has a new signature and is handled by flip() and flop()
+             * @see https://image.intervention.io/v3/modifying/effects#mirror-image-horizontally
+             */
             $image->flip($fit[1]);
         }
     }
