@@ -2,6 +2,16 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [5.1.0](https://github.com/ambroisemaupate/intervention-request/compare/v5.0.1...v5.1.0) - 2025-04-07
+
+### Bug Fixes
+
+- Changed Rotate and Flip processor priority - ([74534cc](https://github.com/ambroisemaupate/intervention-request/commit/74534cc30d416440dbc46daf1fd330d291404261)) - Ambroise Maupate
+
+### Features
+
+- Add hotspot crop ([#28](https://github.com/ambroisemaupate/intervention-request/issues/28)) - ([f99b533](https://github.com/ambroisemaupate/intervention-request/commit/f99b533cf3885a10f4da90feadbc120e1ca73f0a)) - Eliot
+
 ## [5.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v5.0.0...v5.0.1) - 2025-03-29
 
 ### Bug Fixes
