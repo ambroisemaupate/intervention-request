@@ -10,5 +10,5 @@ dev-server:
 
 bake:
 	docker run --privileged --rm tonistiigi/binfmt --install all
-	docker buildx bake --load --push intervention
+	docker buildx bake --push intervention
 
