@@ -20,7 +20,7 @@ final class LimitColorsProcessor implements Processor
                                         $request->query->get('limit_color');
 
             if (1 === preg_match('#^([0-9a-f]{6})$#', (string) ($background ?? ''))) {
-                /**
+                /*
                  * Upgrade Intervention Image to 3.x
                  * limitColors() is handled by reduceColors
                  * @see https://image.intervention.io/v3/modifying/effects

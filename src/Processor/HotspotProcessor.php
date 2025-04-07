@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Processor;
 
 use AM\InterventionRequest\Vector;
+use Intervention\Image\AbstractShape;
 use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -52,7 +53,7 @@ final readonly class HotspotProcessor implements Processor
                  * @see https://image.intervention.io/v3/modifying/drawing#drawing-a-rectangle
                  */
                 // Draw rectangle on final crop
-                $image->rectangle($x1, $y1, $x2, $y2, function ($draw) {
+                $image->rectangle($x1, $y1, $x2, $y2, function (AbstractShape $draw) {
                     $draw->border(3, '#0000FF');
                 });
 
@@ -62,7 +63,7 @@ final readonly class HotspotProcessor implements Processor
                  * @see https://image.intervention.io/v3/modifying/drawing#drawing-ellipses
                  */
                 // Draw green ellipse in center
-                $image->ellipse(30, 30, $center_x, $center_y, function ($draw) {
+                $image->ellipse(30, 30, $center_x, $center_y, function (AbstractShape $draw) {
                     $draw->border(3, '#0FF000');
                 });
 

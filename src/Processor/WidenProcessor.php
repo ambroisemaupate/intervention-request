@@ -20,7 +20,7 @@ final class WidenProcessor implements Processor
                 $width
             )
         ) {
-            /**
+            /*
              * Upgrade Intervention Image to 3.x
              * widen() are replaced by calling scale() and scaleDown() with named arguments
              * @see https://image.intervention.io/v3/modifying/resizing#scale-images
