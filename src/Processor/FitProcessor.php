@@ -12,17 +12,18 @@ final class FitProcessor extends AbstractPositionableProcessor
 {
     public function process(Image $image, Request $request): void
     {
+        $fit = CropProcessor::validateDimensions($request, 'fit');
         if (
-            $request->query->has('fit')
+            null !== $fit
             && !$request->query->has('width')
             && !$request->query->has('height')
-            && 1 === preg_match(
-                '#^([0-9]+)[x\:]([0-9]+)$#',
-                (string) ($request->query->get('fit') ?? ''),
-                $fit
-            )
         ) {
-            $image->fit((int) $fit[1], (int) $fit[2], function (Constraint $constraint) {
+            /*
+             * Upgrade Intervention Image to 3.x
+             * fit() is replaced by cover() and coverDown()
+             * @see https://image.intervention.io/v3/modifying/resizing#fitted-image-resizing
+             */
+            $image->fit($fit->getRoundedX(), $fit->getRoundedY(), function (Constraint $constraint) {
                 $constraint->upsize();
             }, $this->parsePosition($request));
         }
