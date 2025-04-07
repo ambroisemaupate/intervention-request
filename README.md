@@ -161,41 +161,42 @@ You can edit each configuration parameters using their corresponding *setters*:
 
 ## Available operations
 
-|  Query attribute  |  Description  |  Usage  |
-| ----------------- | ------------- | ------------- |
-| image | Native image path relative to your configuration `imagePath` | `?image=path/to/image.jpg` |
-| fit | [Crop and resize combined](http://image.intervention.io/api/fit) It needs a `width` and a `height` in pixels, this filter can be combined with `align` to choose which part of your image to fit | `…&fit=300x300` |
-| align | [Crop and resize combined](http://image.intervention.io/api/fit) Choose which part of your image to fit. | `…&align=c` |
-| flip | [Mirror image horizontal or vertical](http://image.intervention.io/api/flip) You can set `h` for horizontal or `v` for vertical flip. | `…&flip=h` |
-| crop | [Crop an image](http://image.intervention.io/api/crop) It needs a `width` and a `height` in pixels | `…&crop=300x300` |
-| width | [Resize image proportionally to given width](http://image.intervention.io/api/widen) It needs a `width` in pixels | `…&width=300` |
-| height | [Resize image proportionally to given height](http://image.intervention.io/api/heighten) It needs a `height` in pixels | `…&height=300` |
-| crop + height/width | Do the same as *fit* using width or height as final size | `…&crop=300x300&width=200`: This will output a 200 x 200px image |
-| background | [Matte a png file with a background color](http://image.intervention.io/api/limitColors) | `…&background=ff0000` |
-| greyscale/grayscale | [Turn an image into a greyscale version](http://image.intervention.io/api/greyscale) | `…&greyscale=1` |
-| blur | [Blurs an image](http://image.intervention.io/api/blur) | `…&blur=20` |
-| quality | Set the exporting quality (1 - 100), default to 90 | `…&quality=95` |
-| progressive | [Toggle progressive mode](http://image.intervention.io/api/interlace) | `…&progressive=1` |
-| interlace | [Toggle interlaced mode](http://image.intervention.io/api/interlace) | `…&interlace=1` |
-| sharpen | [Sharpen image](http://image.intervention.io/api/sharpen) (1 - 100) | `…&sharpen=10` |
-| contrast | [Change image contrast](http://image.intervention.io/api/contrast) (-100 to 100, 0 means no changes) | `…&contrast=10` |
-| no_process | **Disable all image processing by PHP**, this does not load image in memory but executes any post-process optimizers (such as *pngquant*, *jpegoptim*…) | `…&no_process=1` |
+| Query attribute     | Description                                                                                                                                                                                               | Usage                                                            |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| image               | Native image path relative to your configuration `imagePath`                                                                                                                                              | `?image=path/to/image.jpg`                                       |
+| fit                 | [Crop and resize combined](https://image.intervention.io/v2/api/fit) It needs a `width` and a `height` in pixels, <br> this filter can be combined with `align` to choose which part of your image to fit | `…&fit=300x300`                                                  |
+| align               | [Crop and resize combined](https://image.intervention.io/v2/api/fit) Choose which part of your image to fit.                                                                                              | `…&align=c`                                                      |
+| flip                | [Mirror image horizontal or vertical](https://image.intervention.io/v2/api/flip) You can set `h` for horizontal or `v` for vertical flip.                                                                 | `…&flip=h`                                                       |
+| crop                | [Crop an image](https://image.intervention.io/v2/api/crop) It needs a `width` and a `height` in pixels                                                                                                    | `…&crop=300x300`                                                 |
+| width               | [Resize image proportionally to given width](https://image.intervention.io/v2/api/widen) It needs a `width` in pixels                                                                                     | `…&width=300`                                                    |
+| height              | [Resize image proportionally to given height](https://image.intervention.io/v2/api/heighten) It needs a `height` in pixels                                                                                | `…&height=300`                                                   |
+| crop + height/width | Do the same as *fit* using width or height as final size. Ex: this will output a 200 x 200px image                                                                                                        | `…&crop=300x300&width=200` |
+| background          | [Matte a png file with a background color](https://image.intervention.io/v2/api/limitColors)                                                                                                              | `…&background=ff0000`                                            |
+| greyscale/grayscale | [Turn an image into a greyscale version](https://image.intervention.io/v2/api/greyscale)                                                                                                                  | `…&greyscale=1`                                                  |
+| blur                | [Blurs an image](https://image.intervention.io/v2/api/blur)                                                                                                                                               | `…&blur=20`                                                      |
+| quality             | Set the exporting quality (1 - 100), default to 90                                                                                                                                                        | `…&quality=95`                                                   |
+| progressive         | [Toggle progressive mode](https://image.intervention.io/v2/api/interlace)                                                                                                                                 | `…&progressive=1`                                                |
+| interlace           | [Toggle interlaced mode](https://image.intervention.io/v2/api/interlace)                                                                                                                                  | `…&interlace=1`                                                  |
+| sharpen             | [Sharpen image](https://image.intervention.io/v2/api/sharpen) (1 - 100)                                                                                                                                   | `…&sharpen=10`                                                   |
+| contrast            | [Change image contrast](https://image.intervention.io/v2/api/contrast) (-100 to 100, 0 means no changes)                                                                                                  | `…&contrast=10`                                                  |
+| no_process          | **Disable all image processing by PHP**, this does not load image in memory but executes <br> any post-process optimizers (such as *pngquant*, *jpegoptim*…)                                              | `…&no_process=1`                                                 |
+| hotspot             | [Crop an image](https://image.intervention.io/v2/api/crop) It needs a `x`, `y` <br> (to define the center point of the image in percentage between 0 and 1), `width` and a `height` in pixels             | `…&hotspot=0.25x0.75`                                            |
 
 ### Fit position
 
 Due to URL rewriting, `align` filter can only takes one or two letters as a value. When no align filter is specified, `center` is used:
 
-| URL value | Alignment |
-| --- | --- |
-| `tl` | top-left |
-| `t` | top |
-| `tr` | top-right |
-| `l` | left |
-| `c` | center |
-| `r` | right |
-| `bl` | bottom-left |
-| `b` | bottom |
-| `br` | bottom-right |
+| URL value | Alignment    |
+|-----------|--------------|
+| `tl`      | top-left     |
+| `t`       | top          |
+| `tr`      | top-right    |
+| `l`       | left         |
+| `c`       | center       |
+| `r`       | right        |
+| `bl`      | bottom-left  |
+| `b`       | bottom       |
+| `br`      | bottom-right |
 
 ## Using standalone entry point
 
@@ -287,23 +288,24 @@ if (null !== $params) {
 URL shortcuts can be combined using `-` (dash) character.
 For example `f100x100-q50-g1-p0` stands for `fit=100x100&quality=50&greyscale=1&progressive=0`.
 
-|  Query attribute  |  Shortcut letter  |
-| ----------------- | ------------- |
-| align | a |
-| fit | f |
-| flip | m |
-| crop | c |
-| width | w |
-| height | h |
-| background | b |
-| greyscale | g |
-| blur | l |
-| quality | q |
-| progressive | p |
-| interlace | i |
-| sharpen | s |
-| contrast *(only from 0 to 100)* | k |
-| no_process *(do not process and load image in memory, allows optimizers)* | n |
+| Query attribute                                                           | Shortcut letter |
+|---------------------------------------------------------------------------|-----------------|
+| align                                                                     | a               |
+| fit                                                                       | f               |
+| flip                                                                      | m               |
+| crop                                                                      | c               |
+| width                                                                     | w               |
+| height                                                                    | h               |
+| background                                                                | b               |
+| greyscale                                                                 | g               |
+| blur                                                                      | l               |
+| quality                                                                   | q               |
+| progressive                                                               | p               |
+| interlace                                                                 | i               |
+| sharpen                                                                   | s               |
+| contrast *(only from 0 to 100)*                                           | k               |
+| no_process *(do not process and load image in memory, allows optimizers)* | n               |
+| hotspot                                                                   | d               |
 
 
 ## Use pass-through cache
@@ -396,18 +398,18 @@ public static function getSubscribedEvents()
 }
 ```
 
-This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it. 
+This event will carry a `ImageSavedEvent` object with all you need to optimize/alter it.
 Then, use `$interventionRequest->addSubscriber($yourSubscriber)` method to register it.
 
 #### Available events
 
-| Event name | Description |
-| ---------- | ----------- |
-| `RequestEvent::class` | Main request handling event which handles `quality` and image processing and caching. |
-| `ImageBeforeProcessEvent::class` | Before `Image` is being processed. |
-| `ImageAfterProcessEvent::class` | After `Image` has been processed. |
-| `ImageSavedEvent::class` | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
-| `ResponseEvent::class` | After Symfony’s response has been built with image data. (Useful to alter headers) |
+| Event name                       | Description                                                                                                                      |
+|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `RequestEvent::class`            | Main request handling event which handles `quality` and image processing and caching.                                            |
+| `ImageBeforeProcessEvent::class` | Before `Image` is being processed.                                                                                               |
+| `ImageAfterProcessEvent::class`  | After `Image` has been processed.                                                                                                |
+| `ImageSavedEvent::class`         | After `Image` has been saved to filesystem with a physical file-path. **This event is only dispatched if *caching* is enabled.** |
+| `ResponseEvent::class`           | After Symfony’s response has been built with image data. (Useful to alter headers)                                               |
 
 #### Listener examples
 
@@ -475,7 +477,7 @@ $conf->setNoAlphaPingo(true); // Remove png transparency to compress more - defa
 
 ### kraken.io
 
-If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated 
+If you have subscribed to a paid [kraken.io](https://kraken.io) plan, you can add the dedicated
 `KrakenListener` to send your resized images over the external service.
 
 ```php
@@ -487,11 +489,11 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\KrakenListener(
 ));
 ```
 
-Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time.
 
 ### tinyjpg.com
 
-If you have subscribed to a paid [tinyjpg.com](https://tinyjpg.com) plan, you can add the dedicated 
+If you have subscribed to a paid [tinyjpg.com](https://tinyjpg.com) plan, you can add the dedicated
 `TinifyListener` to send your resized images over the external service.
 
 ```php
@@ -501,7 +503,7 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\TinifyListener(
 ));
 ```
 
-Pay attention, that images will be sent over *kraken.io* API, it will take some additional time. 
+Pay attention, that images will be sent over *kraken.io* API, it will take some additional time.
 
 ### jpegtran
 
@@ -519,17 +521,17 @@ $iRequest->addSubscriber(new \AM\InterventionRequest\Listener\JpegTranListener(
 With default quality to 90%. \
 AVIF conversion only supports custom compiled *ImageMagick* and only support lossless encoding.
 
-| Url       | PHP raw | *tinyjpg.com*  | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) | AVIF (100%) |
-| ----------------------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
-| /test/images/testUHD.jpg?width=2300 | 405 kB | 168 kB | 187 kB | 395 kB | 390 kB | 235 kB | 155 kB |  94 kB |
-| /test/images/testUHD.jpg?width=1920 | 294 kB | 132 kB | 134 kB | 285 kB | 282 kB | 176 kB | 115 kB |  71 kB |
-| /test/images/rhino.jpg?width=1920   | 642 kB | 278 kB | 534 kB | 598 kB | 596 kB | 564 kB | 429 kB | 398 kB |
-| /test/images/rhino.jpg?width=1280   | 325 kB | 203 kB | 278 kB | 303 kB | 301 kB | 295 kB | 229 kB | 227 kB |
+| Url                                 | PHP raw | *tinyjpg.com* | *Kraken.io* + lossy | jpegoptim | mozjpeg (jpegtran) | WebP (90%) | WebP (85%) | AVIF (100%) |
+|-------------------------------------|---------|---------------|---------------------|-----------|--------------------|------------|------------|-------------|
+| /test/images/testUHD.jpg?width=2300 | 405 kB  | 168 kB        | 187 kB              | 395 kB    | 390 kB             | 235 kB     | 155 kB     | 94 kB       |
+| /test/images/testUHD.jpg?width=1920 | 294 kB  | 132 kB        | 134 kB              | 285 kB    | 282 kB             | 176 kB     | 115 kB     | 71 kB       |
+| /test/images/rhino.jpg?width=1920   | 642 kB  | 278 kB        | 534 kB              | 598 kB    | 596 kB             | 564 kB     | 429 kB     | 398 kB      |
+| /test/images/rhino.jpg?width=1280   | 325 kB  | 203 kB        | 278 kB              | 303 kB    | 301 kB             | 295 kB     | 229 kB     | 227 kB      |
 
 
-| Url                                 | PHP raw   | pngquant  | oxipng    | *Kraken.io* + lossy    | WebP (100%) | WebP (85%) | AVIF (100%) |
-| ----------------------------------- | --------- | --------- | --------- | --------- | ----------- | --------- | --------- |
-| /test/images/testPNG.png            | 292 kB | 167 kB | 288 kB | 142 kB | 186 kB   | 28 kB | 11.7 kB |
+| Url                      | PHP raw | pngquant | oxipng | *Kraken.io* + lossy | WebP (100%) | WebP (85%) | AVIF (100%) |
+|--------------------------|---------|----------|--------|---------------------|-------------|------------|-------------|
+| /test/images/testPNG.png | 292 kB  | 167 kB   | 288 kB | 142 kB              | 186 kB      | 28 kB      | 11.7 kB     |
 
 ## License
 
@@ -537,7 +539,7 @@ AVIF conversion only supports custom compiled *ImageMagick* and only support los
 
 Have fun!
 
-## Testing 
+## Testing
 
 This project uses Docker for development environment.
 Copy `compose.override.yml` to `compose.override.yml`, use `php-dev` target and declare a volume on your project root folder.
@@ -560,7 +562,7 @@ docker compose build
 docker compose up
 ```
 
-Then open `http://0.0.0.0:8080/assets/w300/rhino.jpg` in your browser. 
+Then open `http://0.0.0.0:8080/assets/w300/rhino.jpg` in your browser.
 You should be able to test *intervention-request* with Passthrough cache and *ShortUrl* enabled.
 Set `IR_USE_PASSTHROUGH_CACHE=0` if you don't want cache to be served by *Nginx*.
 

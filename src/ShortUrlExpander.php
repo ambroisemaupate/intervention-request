@@ -30,6 +30,7 @@ class ShortUrlExpander
         's' => 'sharpen',
         'k' => 'contrast',
         'n' => 'no_process',
+        'd' => 'hotspot',
     ];
 
     public function __construct(protected readonly Request $request)
