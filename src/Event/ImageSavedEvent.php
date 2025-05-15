@@ -12,11 +12,6 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class ImageSavedEvent extends ImageEvent
 {
-    /**
-     * @deprecated Use ImageSavedEvent::class
-     */
-    public const NAME = ImageSavedEvent::class;
-
     public function __construct(?Image $image, protected readonly File $imageFile, protected int $quality = 90)
     {
         parent::__construct($image);
