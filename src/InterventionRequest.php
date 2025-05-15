@@ -16,7 +16,7 @@ use AM\InterventionRequest\Listener\PngquantListener;
 use AM\InterventionRequest\Listener\QualitySubscriber;
 use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
-use Intervention\Image\Exception\NotReadableException;
+use AM\InterventionRequest\Listener\WatermarkListener;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -64,6 +64,12 @@ class InterventionRequest
                     $this->configuration->isLossyPng()
                 ));
             }
+        }
+
+        if (!empty($this->configuration->getWatermarkPath())) {
+            $this->addSubscriber(new WatermarkListener(
+                $this->configuration->getWatermarkPath(),
+            ));
         }
 
         $this->addSubscriber(new StreamNoProcessListener(
@@ -126,7 +132,7 @@ class InterventionRequest
                 new Processor\FlipProcessor(), // Flip must be AFTER crop/fit
                 new Processor\WidenProcessor(),
                 new Processor\HeightenProcessor(),
-                new Processor\LimitColorsProcessor(),
+                new Processor\BackgroundColorProcessor(),
                 new Processor\GreyscaleProcessor(),
                 new Processor\ContrastProcessor(),
                 new Processor\BlurProcessor(),
@@ -155,7 +161,7 @@ class InterventionRequest
             }
         } catch (FileNotFoundException|UnableToRetrieveMetadata $e) {
             $this->response = $this->getNotFoundResponse($e);
-        } catch (\InvalidArgumentException|NotReadableException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->response = $this->getBadRequestResponse($e);
         } catch (\Throwable $e) {
             $this->response = $this->getServerErrorResponse($e);

@@ -37,7 +37,7 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
 
             if ($nativeImage->isNextGen()) {
                 $response = new Response(
-                    (string) $image->encode($nativeImage->getNextGenExtension(), $requestEvent->getQuality()),
+                    (string) $image->encodeByExtension($nativeImage->getNextGenExtension(), $requestEvent->getQuality()),
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $nativeImage->getNextGenMimeType(),
@@ -48,10 +48,10 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
                 );
             } else {
                 $response = new Response(
-                    (string) $image->encode(null, $requestEvent->getQuality()),
+                    $image->encode()->toString(),
                     Response::HTTP_OK,
                     [
-                        'Content-Type' => $image->mime(),
+                        'Content-Type' => $image->encode()->mimetype(),
                         'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
                         'X-IR-Cached' => '0',
                         'X-IR-First-Gen' => '1',
