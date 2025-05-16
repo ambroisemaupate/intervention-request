@@ -6,28 +6,23 @@ namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageAfterProcessEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
-use Intervention\Image\AbstractFont;
-use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 
 final readonly class WatermarkListener implements ImageEventSubscriberInterface
 {
     /**
-     * @param string       $watermarkText the text string that will be written to the image
-     * @param int|string   $fontFile      Set path to a True Type Font file or a integer value between 1 and 5 for one of the GD library internal fonts. Default: 1
-     * @param int          $size          Set font size in pixels. Font sizing is only available if a font file is set and will be ignored otherwise. Default: 12
-     * @param string|array $color         Set color of the text in one of the available color formats. Default: #FFFFFF
-     * @param string       $align         Set horizontal text alignment relative to given basepoint. Possible values are left, right and center. Default: center
-     * @param string       $valign        Set vertical text alignment relative to given basepoint. Possible values are top, bottom and middle. Default: center
-     * @param int          $angle         Set rotation angle of text in degrees. Text will be rotated counter-clockwise around the vertical and horizontal aligned point. Rotation is only available if a font file is set and will be ignored otherwise. Default: no rotation
+     * @param string $watermarkPath The path string that will be use to search image for watermark
+     * @param string $align         Position of the image to be placed, default: top-left
+     * @param int    $offset_x      Optional relative offset of the new image on x-axis, default: 0
+     * @param int    $offset_y      Optional relative offset of the new image on y-axis, default: 0
+     * @param int    $opacity       Control over the opacity of the placed image ranging from 0 (fully transparent) to 100 (opaque), default: 100
      */
     public function __construct(
-        private string $watermarkText,
-        private int|string $fontFile = 1,
-        private int $size = 24,
-        private array|string $color = '#FFFFFF',
+        private string $watermarkPath,
         private string $align = 'center',
-        private string $valign = 'center',
-        private int $angle = 0,
+        private int $offset_x = 0,
+        private int $offset_y = 0,
+        private int $opacity = 35,
     ) {
     }
 
@@ -52,26 +47,19 @@ final readonly class WatermarkListener implements ImageEventSubscriberInterface
     {
         $image = $event->getImage();
         if (null !== $image && $this->supports($image)) {
-            // use callback to define details
-            $image->text(
-                $this->watermarkText,
-                $image->getWidth() / 2,
-                $image->getHeight() / 2,
-                function (AbstractFont $font) {
-                    $font->file((string) $this->fontFile);
-                    $font->size($this->size);
-                    $font->color($this->color);
-                    $font->align($this->align);
-                    $font->valign($this->valign);
-                    $font->angle($this->angle);
-                }
+            $image->place(
+                $this->watermarkPath,
+                $this->align,
+                $this->offset_x,
+                $this->offset_y,
+                $this->opacity,
             );
 
             $event->setImage($image);
         }
     }
 
-    public function supports(?Image $image = null): bool
+    public function supports(?ImageInterface $image = null): bool
     {
         return null !== $image;
     }

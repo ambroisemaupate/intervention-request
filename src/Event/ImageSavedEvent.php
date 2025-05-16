@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -12,12 +13,7 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class ImageSavedEvent extends ImageEvent
 {
-    /**
-     * @deprecated Use ImageSavedEvent::class
-     */
-    public const NAME = ImageSavedEvent::class;
-
-    public function __construct(?Image $image, protected readonly File $imageFile, protected int $quality = 90)
+    public function __construct(?ImageInterface $image, protected readonly File $imageFile, protected int $quality = 90)
     {
         parent::__construct($image);
     }

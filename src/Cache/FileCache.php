@@ -13,7 +13,7 @@ use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use AM\InterventionRequest\ShortUrlExpander;
-use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -56,7 +56,7 @@ class FileCache implements EventSubscriberInterface
         ];
     }
 
-    protected function saveImage(Image $image, string $cacheFilePath, int $quality): Image
+    protected function saveImage(ImageInterface $image, string $cacheFilePath, int $quality): ImageInterface
     {
         $path = dirname($cacheFilePath);
         if (!file_exists($path)) {
