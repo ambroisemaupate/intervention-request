@@ -577,3 +577,46 @@ IR_GC_PROBABILITY: 1
 IR_GC_TTL: 0
 ```
 
+### Unit tests
+
+This project includes a comprehensive set of unit tests to validate various image manipulation operations.
+These tests ensure that image transformations are applied correctly and consistently.
+Available Tests :
+
+- testFitImageGeneration: Verifies that the image is resized to fit within the given dimensions while maintaining its aspect ratio.
+- testCropImageGeneration: Validates cropping of an image to the specified size.
+- testBackgroundImageGeneration: Tests the application or modification of a background color or image.
+- testBlurImageGeneration: Checks the application of a blur effect to the image.
+- testContrastImageGeneration: Validates the adjustment of image contrast.
+- testFlip: Verifies image flipping (horizontal and/or vertical).
+- flipImageGeneration: Tests image generation with flip transformations (complementary to testFlip).
+- testHotspotImageGeneration: Ensures correct placement and rendering of a focal point ("hotspot") on the image.
+- testRotateImageGeneration: Checks that the image is rotated by the correct angle.
+- testSharpenImageGeneration: Verifies the application of a sharpening filter.
+- testWidenImageGeneration: Tests image resizing that increases the width while preserving content.
+- testHeightenImageGeneration: Tests image resizing that increases the height.
+
+#### Test Strategy
+Each image processing test validates the output by comparing the MD5 hash of the generated image with a known, expected hash.
+This ensures that the image transformation produces exact and reproducible results, pixel for pixel.
+
+For each test, the following approach is used:
+
+- Load a source image (e.g., rhino.webp).
+- Apply a specific transformation using query parameters (e.g., fit=500x500).
+- Use a dedicated processor (e.g., FitProcessor) to apply the transformation.
+- Save the processed image temporarily in a local output directory.
+- Compute the MD5 hash of the generated image file.
+- Compare it with the expected hash using an assertion.
+
+This method ensures that even minor unintended changes in image generation logic will be detected during test runs.
+
+#### Running the Tests
+
+To run the full test suite:
+
+```bash
+php vendor/bin/phpunit tests/
+```
+
+Make sure PHPUnit is properly configured and all required image processing dependencies are installed (such as GD, Imagick, or any relevant libraries your application uses).
