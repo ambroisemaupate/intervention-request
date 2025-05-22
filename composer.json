@@ -52,6 +52,7 @@
         "phpstan/phpdoc-parser": "<2",
         "symfony/debug": "^4.4 || ^5.0.7 || ^6.4",
         "symfony/var-dumper": "^4.4 || ^5.0.7 || ^6.4",
-        "friendsofphp/php-cs-fixer": "^3.70"
+        "friendsofphp/php-cs-fixer": "^3.70",
+        "symfony/test-pack": "^1.0"
     }
 }
