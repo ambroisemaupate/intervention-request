@@ -6,6 +6,7 @@ namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
 use AM\InterventionRequest\Cache\PassThroughFileCache;
+use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
@@ -13,6 +14,7 @@ use AM\InterventionRequest\Listener\NoCacheImageRequestSubscriber;
 use AM\InterventionRequest\Listener\OxipngListener;
 use AM\InterventionRequest\Listener\PingoListener;
 use AM\InterventionRequest\Listener\PngquantListener;
+use AM\InterventionRequest\Listener\ProgressiveSubscriber;
 use AM\InterventionRequest\Listener\QualitySubscriber;
 use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
@@ -77,6 +79,7 @@ class InterventionRequest
         ));
         $this->addSubscriber(new StripExifListener());
         $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
+        $this->addSubscriber(new ProgressiveSubscriber(false));
         $this->addSubscriber(new FileCache(
             $chainProcessor,
             $this->fileResolver,
@@ -97,7 +100,8 @@ class InterventionRequest
         ));
         $this->addSubscriber(new NoCacheImageRequestSubscriber(
             $chainProcessor,
-            $this->fileResolver
+            $this->fileResolver,
+            new ImageEncoder()
         ));
         $this->defineTimezone();
     }
@@ -137,7 +141,6 @@ class InterventionRequest
                 new Processor\ContrastProcessor(),
                 new Processor\BlurProcessor(),
                 new Processor\SharpenProcessor(),
-                new Processor\ProgressiveProcessor(),
             ]
         );
     }

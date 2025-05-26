@@ -13,8 +13,12 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class ImageSavedEvent extends ImageEvent
 {
-    public function __construct(?ImageInterface $image, protected readonly File $imageFile, protected int $quality = 90)
-    {
+    public function __construct(
+        ?ImageInterface $image,
+        protected readonly File $imageFile,
+        protected int $quality = 90,
+        protected bool $progressive = false,
+    ) {
         parent::__construct($image);
     }
 
@@ -31,6 +35,18 @@ class ImageSavedEvent extends ImageEvent
     public function setQuality(int $quality): ImageSavedEvent
     {
         $this->quality = $quality;
+
+        return $this;
+    }
+
+    public function isProgressive(): bool
+    {
+        return $this->progressive;
+    }
+
+    public function setProgressive(bool $progressive): ImageSavedEvent
+    {
+        $this->progressive = $progressive;
 
         return $this;
     }
