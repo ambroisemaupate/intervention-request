@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Tests\Functional;
 
 use AM\InterventionRequest\Configuration;
+use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\InterventionRequest;
 use AM\InterventionRequest\LocalFileResolver;
 use AM\InterventionRequest\ShortUrlExpander;
@@ -42,7 +43,8 @@ class InterventionRequestTestCase extends TestCase
         $this->interventionRequest = new InterventionRequest(
             $conf,
             $fileResolver,
-            $log
+            $log,
+            new ImageEncoder()
         );
     }
 
