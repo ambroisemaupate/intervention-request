@@ -6,7 +6,7 @@ namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
 use AM\InterventionRequest\Cache\PassThroughFileCache;
-use AM\InterventionRequest\Encoder\ImageEncoder;
+use AM\InterventionRequest\Encoder\ImageEncoderInterface;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
@@ -41,6 +41,7 @@ class InterventionRequest
         protected readonly Configuration $configuration,
         protected readonly FileResolverInterface $fileResolver,
         protected readonly LoggerInterface $logger,
+        protected readonly ImageEncoderInterface $imageEncoder,
         ?array $processors = null,
         protected bool $debug = false,
     ) {
@@ -83,6 +84,7 @@ class InterventionRequest
         $this->addSubscriber(new FileCache(
             $chainProcessor,
             $this->fileResolver,
+            $this->imageEncoder,
             $this->configuration->getCachePath(),
             $this->logger,
             $this->configuration->getTtl(),
@@ -92,6 +94,7 @@ class InterventionRequest
         $this->addSubscriber(new PassThroughFileCache(
             $chainProcessor,
             $this->fileResolver,
+            $this->imageEncoder,
             $this->configuration->getCachePath(),
             $this->logger,
             $this->configuration->getTtl(),
@@ -101,7 +104,7 @@ class InterventionRequest
         $this->addSubscriber(new NoCacheImageRequestSubscriber(
             $chainProcessor,
             $this->fileResolver,
-            new ImageEncoder()
+            $this->imageEncoder
         ));
         $this->defineTimezone();
     }

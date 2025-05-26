@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use AM\InterventionRequest\Configuration;
+use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\FlysystemFileResolver;
 use AM\InterventionRequest\InterventionRequest;
 use AM\InterventionRequest\LocalFileResolver;
@@ -87,6 +88,7 @@ $iRequest = new InterventionRequest(
     $conf,
     $fileResolver,
     $log,
+    new ImageEncoder(),
     null,
     (bool) getenv('IR_DEBUG')
 );

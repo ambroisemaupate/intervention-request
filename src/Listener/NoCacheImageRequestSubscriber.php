@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Listener;
 
-use AM\InterventionRequest\Encoder\ImageEncoder;
+use AM\InterventionRequest\Encoder\ImageEncoderInterface;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
 use AM\InterventionRequest\Processor\ChainProcessor;
@@ -16,7 +16,7 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
     public function __construct(
         private ChainProcessor $processor,
         private FileResolverInterface $fileResolver,
-        private ImageEncoder $imageEncoder,
+        private ImageEncoderInterface $imageEncoder,
     ) {
     }
 
