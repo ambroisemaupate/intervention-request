@@ -11,11 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ProgressiveSubscriber implements EventSubscriberInterface
 {
-    private bool $progressive;
-
-    public function __construct(bool $progressive)
-    {
-        $this->setProgressive($progressive);
+    public function __construct(
+        private bool $progressive,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -25,13 +23,6 @@ final class ProgressiveSubscriber implements EventSubscriberInterface
             ImageSavedEvent::class => ['onImageSaved', 100],
             ResponseEvent::class => 'onResponse',
         ];
-    }
-
-    public function setProgressive(bool $progressive): ProgressiveSubscriber
-    {
-        $this->progressive = $progressive;
-
-        return $this;
     }
 
     public function onResponse(ResponseEvent $event): void
@@ -45,7 +36,7 @@ final class ProgressiveSubscriber implements EventSubscriberInterface
     {
         if ($requestEvent->getRequest()->query->has('no_process')) {
             // Do not alter progressive at image file save. but allow to post-process optimizer to use progressive info.
-            $this->setProgressive(false);
+            $this->progressive = false;
             $requestEvent->setProgressive(false);
         } else {
             $progressive = $requestEvent->getRequest()->get(
@@ -53,16 +44,16 @@ final class ProgressiveSubscriber implements EventSubscriberInterface
                 $this->progressive
             );
             if (\is_numeric($progressive)) {
-                if (1 == $progressive) {
+                if (1 === (int) $progressive) {
                     $progressive = true;
-                } elseif (0 == $progressive) {
+                } elseif (0 === (int) $progressive) {
                     $progressive = false;
                 } else {
                     throw new \InvalidArgumentException('Progressive must be 1 or 0');
                 }
             }
             if (\is_bool($progressive)) {
-                $this->setProgressive($progressive);
+                $this->progressive = $progressive;
                 $requestEvent->setProgressive($this->progressive);
             }
         }

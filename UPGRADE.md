@@ -1,6 +1,6 @@
-# Upgrade to 6
+# Upgrade to V6
 
-## Upgrade to Intervention Image 3.x
+## Functional upgrade
 
 ### Watermarking Changes
 
@@ -25,3 +25,16 @@
   ```
 
   Ensure that your client-side code or API consumers are updated accordingly to use only `background`.
+
+
+## Breaking changes
+
+### Signature Changes
+
+* **The `Image` class now has its own dedicated interface `ImageInterface` and each function with the Image input or output signature now has its own interface.
+
+
+### Introduction of `ImageEncoderInterface`
+
+* **The `InterventionRequest` class now requires an implementation of `ImageEncoderInterface` to be passed as a constructor argument.**
+  Instead of passing `null`, ensure that you provide a valid `ImageEncoder` implementation when initializing the `InterventionRequest`.

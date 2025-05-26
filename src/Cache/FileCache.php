@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Cache;
 
-use AM\InterventionRequest\Encoder\ImageEncoder;
+use AM\InterventionRequest\Encoder\ImageEncoderInterface;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
@@ -25,11 +25,11 @@ use Symfony\Component\HttpFoundation\Response;
 class FileCache implements EventSubscriberInterface
 {
     protected string $cachePath;
-    private ImageEncoder $imageEncoder;
 
     public function __construct(
         protected readonly ChainProcessor $chainProcessor,
         protected readonly FileResolverInterface $fileResolver,
+        protected readonly ImageEncoderInterface $imageEncoder,
         string $cachePath,
         protected readonly LoggerInterface $logger,
         protected readonly int $ttl = 604800,
@@ -41,7 +41,6 @@ class FileCache implements EventSubscriberInterface
             throw new \InvalidArgumentException('Cache path does not exist.');
         }
         $this->cachePath = $cachePath;
-        $this->imageEncoder = new ImageEncoder();
     }
 
     /**

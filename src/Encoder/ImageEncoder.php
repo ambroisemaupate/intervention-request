@@ -8,7 +8,7 @@ use Intervention\Image\Exceptions\NotWritableException;
 use Intervention\Image\Interfaces\EncodedImageInterface;
 use Intervention\Image\Interfaces\ImageInterface;
 
-class ImageEncoder
+final class ImageEncoder implements ImageEncoderInterface
 {
     /**
      * @var array<string>
@@ -40,7 +40,7 @@ class ImageEncoder
         return $image;
     }
 
-    public function getImageAllowedExtension(string $path): string
+    private function getImageAllowedExtension(string $path): string
     {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         if (!in_array($extension, static::$allowedExtensions)) {
