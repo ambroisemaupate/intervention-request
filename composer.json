@@ -46,6 +46,11 @@
             "AM\\InterventionRequest\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "AM\\InterventionRequest\\Tests\\": "tests/"
+        }
+    },
     "bin": ["bin/intervention"],
     "require-dev": {
         "phpstan/phpstan": "^2.1.6",
