@@ -17,12 +17,12 @@ class ImageEncoder
         'jpeg', 'jpg', 'gif', 'png', 'webp', 'avif', 'tiff', 'tif', 'bmp', 'svg', 'ico',
     ];
 
-    public function encode(ImageInterface $image, string $path, int $quality): EncodedImageInterface
+    public function encode(ImageInterface $image, string $path, int $quality, bool $progressive = false): EncodedImageInterface
     {
-        return $image->encodeByExtension($this->getImageAllowedExtension($path), quality: $quality);
+        return $image->encodeByExtension($this->getImageAllowedExtension($path), quality: $quality, progressive: $progressive);
     }
 
-    public function save(ImageInterface $image, string $path, int $quality): ImageInterface
+    public function save(ImageInterface $image, string $path, int $quality, bool $progressive = false): ImageInterface
     {
         $path = empty($path) ? $image->origin()->filePath() : $path;
 
@@ -30,7 +30,7 @@ class ImageEncoder
             throw new NotWritableException("Can't write to undefined path.");
         }
 
-        $data = $this->encode($image, $path, $quality);
+        $data = $this->encode($image, $path, $quality, $progressive);
         $saved = @file_put_contents($path, $data);
 
         if (false === $saved) {

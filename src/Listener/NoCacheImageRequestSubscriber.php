@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Listener;
 
+use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
 use AM\InterventionRequest\Processor\ChainProcessor;
@@ -12,8 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ChainProcessor $processor, private FileResolverInterface $fileResolver)
-    {
+    public function __construct(
+        private ChainProcessor $processor,
+        private FileResolverInterface $fileResolver,
+        private ImageEncoder $imageEncoder,
+    ) {
     }
 
     /**
@@ -37,7 +41,7 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
 
             if ($nativeImage->isNextGen()) {
                 $response = new Response(
-                    (string) $image->encodeByExtension($nativeImage->getNextGenExtension(), $requestEvent->getQuality()),
+                    $this->imageEncoder->encode($image, $nativeImage->getPath(), $requestEvent->getQuality(), $requestEvent->isProgressive())->toString(),
                     Response::HTTP_OK,
                     [
                         'Content-Type' => $nativeImage->getNextGenMimeType(),
@@ -47,11 +51,12 @@ final readonly class NoCacheImageRequestSubscriber implements EventSubscriberInt
                     ]
                 );
             } else {
+                $encodedImage = $this->imageEncoder->encode($image, $image->origin()->filePath() ?? '', $requestEvent->getQuality(), $requestEvent->isProgressive());
                 $response = new Response(
-                    $image->encode()->toString(),
+                    $encodedImage->toString(),
                     Response::HTTP_OK,
                     [
-                        'Content-Type' => $image->encode()->mimetype(),
+                        'Content-Type' => $encodedImage->mimetype(),
                         'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
                         'X-IR-Cached' => '0',
                         'X-IR-First-Gen' => '1',
