@@ -71,6 +71,7 @@ abstract class ImageProcessingTestCase extends TestCase
     {
         $extension = pathinfo($inputPath, PATHINFO_EXTENSION);
         $outputPath = dirname(__DIR__).'/temp';
+
         return $outputPath.'/temp.'.$extension;
     }
 }
