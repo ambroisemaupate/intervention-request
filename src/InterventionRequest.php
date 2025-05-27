@@ -6,6 +6,7 @@ namespace AM\InterventionRequest;
 
 use AM\InterventionRequest\Cache\FileCache;
 use AM\InterventionRequest\Cache\PassThroughFileCache;
+use AM\InterventionRequest\Encoder\ImageEncoderInterface;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\Event\ResponseEvent;
 use AM\InterventionRequest\Listener\JpegFileListener;
@@ -13,10 +14,11 @@ use AM\InterventionRequest\Listener\NoCacheImageRequestSubscriber;
 use AM\InterventionRequest\Listener\OxipngListener;
 use AM\InterventionRequest\Listener\PingoListener;
 use AM\InterventionRequest\Listener\PngquantListener;
+use AM\InterventionRequest\Listener\ProgressiveSubscriber;
 use AM\InterventionRequest\Listener\QualitySubscriber;
 use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
-use Intervention\Image\Exception\NotReadableException;
+use AM\InterventionRequest\Listener\WatermarkListener;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -39,6 +41,7 @@ class InterventionRequest
         protected readonly Configuration $configuration,
         protected readonly FileResolverInterface $fileResolver,
         protected readonly LoggerInterface $logger,
+        protected readonly ImageEncoderInterface $imageEncoder,
         ?array $processors = null,
         protected bool $debug = false,
     ) {
@@ -66,14 +69,22 @@ class InterventionRequest
             }
         }
 
+        if (!empty($this->configuration->getWatermarkPath())) {
+            $this->addSubscriber(new WatermarkListener(
+                $this->configuration->getWatermarkPath(),
+            ));
+        }
+
         $this->addSubscriber(new StreamNoProcessListener(
             $this->fileResolver,
         ));
         $this->addSubscriber(new StripExifListener());
         $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
+        $this->addSubscriber(new ProgressiveSubscriber(false));
         $this->addSubscriber(new FileCache(
             $chainProcessor,
             $this->fileResolver,
+            $this->imageEncoder,
             $this->configuration->getCachePath(),
             $this->logger,
             $this->configuration->getTtl(),
@@ -83,6 +94,7 @@ class InterventionRequest
         $this->addSubscriber(new PassThroughFileCache(
             $chainProcessor,
             $this->fileResolver,
+            $this->imageEncoder,
             $this->configuration->getCachePath(),
             $this->logger,
             $this->configuration->getTtl(),
@@ -91,7 +103,8 @@ class InterventionRequest
         ));
         $this->addSubscriber(new NoCacheImageRequestSubscriber(
             $chainProcessor,
-            $this->fileResolver
+            $this->fileResolver,
+            $this->imageEncoder
         ));
         $this->defineTimezone();
     }
@@ -126,12 +139,11 @@ class InterventionRequest
                 new Processor\FlipProcessor(), // Flip must be AFTER crop/fit
                 new Processor\WidenProcessor(),
                 new Processor\HeightenProcessor(),
-                new Processor\LimitColorsProcessor(),
+                new Processor\BackgroundColorProcessor(),
                 new Processor\GreyscaleProcessor(),
                 new Processor\ContrastProcessor(),
                 new Processor\BlurProcessor(),
                 new Processor\SharpenProcessor(),
-                new Processor\ProgressiveProcessor(),
             ]
         );
     }
@@ -155,7 +167,7 @@ class InterventionRequest
             }
         } catch (FileNotFoundException|UnableToRetrieveMetadata $e) {
             $this->response = $this->getNotFoundResponse($e);
-        } catch (\InvalidArgumentException|NotReadableException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->response = $this->getBadRequestResponse($e);
         } catch (\Throwable $e) {
             $this->response = $this->getServerErrorResponse($e);

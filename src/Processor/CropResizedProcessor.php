@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Processor;
 
 use AM\InterventionRequest\Vector;
-use Intervention\Image\Constraint;
-use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CropResizedProcessor extends AbstractPositionableProcessor
 {
-    public function process(Image $image, Request $request): void
+    public function process(ImageInterface $image, Request $request): void
     {
         $crop = CropProcessor::validateDimensions($request);
         if (
@@ -34,14 +33,7 @@ final class CropResizedProcessor extends AbstractPositionableProcessor
             }
 
             if (isset($realFitSize)) {
-                /*
-                 * Upgrade Intervention Image to 3.x
-                 * fit() is replaced by cover() and coverDown()
-                 * @see https://image.intervention.io/v3/modifying/resizing#fitted-image-resizing
-                 */
-                $image->fit($realFitSize->getRoundedX(), $realFitSize->getRoundedY(), function (Constraint $constraint) {
-                    $constraint->upsize();
-                }, $this->parsePosition($request));
+                $image->coverDown($realFitSize->getRoundedX(), $realFitSize->getRoundedY(), $this->parsePosition($request));
             }
         }
     }

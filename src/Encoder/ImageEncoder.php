@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Encoder;
 
-use Intervention\Image\Exception\NotWritableException;
-use Intervention\Image\Image;
+use Intervention\Image\Exceptions\NotWritableException;
+use Intervention\Image\Interfaces\EncodedImageInterface;
+use Intervention\Image\Interfaces\ImageInterface;
 
-class ImageEncoder
+final class ImageEncoder implements ImageEncoderInterface
 {
     /**
      * @var array<string>
@@ -16,33 +17,30 @@ class ImageEncoder
         'jpeg', 'jpg', 'gif', 'png', 'webp', 'avif', 'tiff', 'tif', 'bmp', 'svg', 'ico',
     ];
 
-    public function encode(Image $image, string $path, int $quality): Image
+    public function encode(ImageInterface $image, string $path, int $quality, bool $progressive = false): EncodedImageInterface
     {
-        return $image->encode($this->getImageAllowedExtension($path), $quality);
+        return $image->encodeByExtension($this->getImageAllowedExtension($path), quality: $quality, progressive: $progressive);
     }
 
-    public function save(Image $image, string $path, int $quality): Image
+    public function save(ImageInterface $image, string $path, int $quality, bool $progressive = false): ImageInterface
     {
-        $path = empty($path) ? $image->basePath() : $path;
+        $path = empty($path) ? $image->origin()->filePath() : $path;
 
         if (empty($path)) {
             throw new NotWritableException("Can't write to undefined path.");
         }
 
-        $data = $this->encode($image, $path, $quality);
+        $data = $this->encode($image, $path, $quality, $progressive);
         $saved = @file_put_contents($path, $data);
 
         if (false === $saved) {
             throw new NotWritableException("Can't write image data to path ({$path})");
         }
 
-        // set new file info
-        $image->setFileInfoFromPath($path);
-
         return $image;
     }
 
-    public function getImageAllowedExtension(string $path): string
+    private function getImageAllowedExtension(string $path): string
     {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         if (!in_array($extension, static::$allowedExtensions)) {

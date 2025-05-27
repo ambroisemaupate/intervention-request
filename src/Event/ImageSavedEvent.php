@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Event;
 
 use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -12,13 +13,12 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class ImageSavedEvent extends ImageEvent
 {
-    /**
-     * @deprecated Use ImageSavedEvent::class
-     */
-    public const NAME = ImageSavedEvent::class;
-
-    public function __construct(?Image $image, protected readonly File $imageFile, protected int $quality = 90)
-    {
+    public function __construct(
+        ?ImageInterface $image,
+        protected readonly File $imageFile,
+        protected int $quality = 90,
+        protected bool $progressive = false,
+    ) {
         parent::__construct($image);
     }
 
@@ -35,6 +35,18 @@ class ImageSavedEvent extends ImageEvent
     public function setQuality(int $quality): ImageSavedEvent
     {
         $this->quality = $quality;
+
+        return $this;
+    }
+
+    public function isProgressive(): bool
+    {
+        return $this->progressive;
+    }
+
+    public function setProgressive(bool $progressive): ImageSavedEvent
+    {
+        $this->progressive = $progressive;
 
         return $this;
     }
