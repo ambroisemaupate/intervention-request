@@ -2,6 +2,14 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [6.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v5.1.0...v6.0.0) - 2025-05-27
+
+See [UPGRADE.md](./UPGRADE.md) for upgrade instructions.
+
+### Features
+
+- Upgrade to Intervention Image 3.x ([#32](https://github.com/ambroisemaupate/intervention-request/issues/32)) - ([0d27f85](https://github.com/ambroisemaupate/intervention-request/commit/0d27f85c8b732ea204f58c99326276defcd1af36)) - Eliot
+
 ## [5.1.0](https://github.com/ambroisemaupate/intervention-request/compare/v5.0.1...v5.1.0) - 2025-04-07
 
 ### Bug Fixes
@@ -20,7 +28,7 @@ All notable changes to *Intervention Request* will be documented in this file.
 
 ## [5.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v4.1.1...v5.0.0) - 2025-02-27
 
-### Bug Fixes
+### Bug Fixes 
 
 - Do not check if file is an image in FileCache.php - ([a627625](https://github.com/ambroisemaupate/intervention-request/commit/a627625fd2db2a019172c58bb337c0b6acfd62fd)) - Ambroise Maupate
 
