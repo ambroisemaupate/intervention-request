@@ -157,7 +157,7 @@ class FileCache implements EventSubscriberInterface
                 $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
             }
             // create the ImageSavedEvent and dispatch it
-            $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile, $requestEvent->getQuality()));
+            $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile, $requestEvent->getQuality(), $requestEvent->isProgressive()));
             $firstGen = true;
         }
 

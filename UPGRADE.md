@@ -31,10 +31,10 @@
 
 ### Signature Changes
 
-* **The `Image` class now has its own dedicated interface `ImageInterface` and each function with the Image input or output signature now has its own interface.
+* All classes and methods depending on `Image` class now depend on `ImageInterface`
 
 
 ### Introduction of `ImageEncoderInterface`
 
-* **The `InterventionRequest` class now requires an implementation of `ImageEncoderInterface` to be passed as a constructor argument.**
-  Instead of passing `null`, ensure that you provide a valid `ImageEncoder` implementation when initializing the `InterventionRequest`.
+* `InterventionRequest` class now requires an implementation of `ImageEncoderInterface` to be passed as a constructor argument.  Ensure that you provide a valid `ImageEncoderInterface` implementation such as our default `ImageEncoder`
+* `Configuration::getDriver()` method returns `ImagickDriver|GdDriver` instead of a `string`
