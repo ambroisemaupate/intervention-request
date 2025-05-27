@@ -58,6 +58,6 @@
         "symfony/debug": "^4.4 || ^5.0.7 || ^6.4",
         "symfony/var-dumper": "^4.4 || ^5.0.7 || ^6.4",
         "friendsofphp/php-cs-fixer": "^3.70",
-        "phpunit/phpunit": "^12.1"
+        "phpunit/phpunit": "^11.5"
     }
 }
