@@ -22,16 +22,20 @@ class InterventionRequestTestCase extends TestCase
 
     protected function setUp(): void
     {
+        $cachePath = dirname(__DIR__).'/temp';
         $conf = new Configuration();
         $conf->setJpegoptimPath(null);
         $conf->setPngquantPath(null);
         $conf->setGcProbability(0);
         $conf->setTtl(0);
         $conf->setResponseTtl(0);
-        $conf->setCachePath(dirname(__DIR__).'/temp');
-        if (!file_exists(dirname(__DIR__).'/temp')) {
-            mkdir(dirname(__DIR__).'/temp', 0777, true);
+        $conf->setCachePath($cachePath);
+
+        $fileSystem = new Filesystem();
+        if (!$fileSystem->exists($cachePath)) {
+            $fileSystem->mkdir($cachePath);
         }
+
         $conf->setUsePassThroughCache(false);
         $conf->setImagesPath(dirname(__DIR__).'/../web/images');
         $conf->setUseFileChecksum(false);
