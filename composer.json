@@ -46,12 +46,18 @@
             "AM\\InterventionRequest\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "AM\\InterventionRequest\\Tests\\": "tests/"
+        }
+    },
     "bin": ["bin/intervention"],
     "require-dev": {
         "phpstan/phpstan": "^2.1.6",
         "phpstan/phpdoc-parser": "<2",
         "symfony/debug": "^4.4 || ^5.0.7 || ^6.4",
         "symfony/var-dumper": "^4.4 || ^5.0.7 || ^6.4",
-        "friendsofphp/php-cs-fixer": "^3.70"
+        "friendsofphp/php-cs-fixer": "^3.70",
+        "phpunit/phpunit": "^11.5"
     }
 }

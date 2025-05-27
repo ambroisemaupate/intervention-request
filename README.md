@@ -577,3 +577,99 @@ IR_GC_PROBABILITY: 1
 IR_GC_TTL: 0
 ```
 
+### Running Tests
+
+To run the full test suite:
+
+```bash
+php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
+```
+OR
+```bash
+make test-unit
+```
+
+Make sure PHPUnit is properly configured and all required image processing dependencies are installed (such as GD, Imagick, or any relevant libraries your application uses).
+
+### Unit tests
+
+This project includes a comprehensive set of unit tests to validate various image manipulation operations.
+These tests ensure that image transformations are applied correctly and consistently.
+Available Tests :
+
+- testFitImageGeneration: Verifies that the image is resized to fit within the given dimensions while maintaining its aspect ratio.
+- testCropImageGeneration: Validates cropping of an image to the specified size.
+- testCropResizedImageGeneration: Validates cropping of an image with a specific ratio and alignment to the specified size.
+- testBackgroundImageGeneration: Tests the application or modification of a background color or image.
+- testBlurImageGeneration: Checks the application of a blur effect to the image.
+- testContrastImageGeneration: Validates the adjustment of image contrast.
+- testFlipImageGeneration: Verifies image flipping (horizontal and vertical).
+- testHotspotImageGeneration: Ensures correct placement and rendering of a focal point ("hotspot") on the image.
+- testRotateImageGeneration: Checks that the image is rotated by the correct angle.
+- testSharpenImageGeneration: Verifies the application of a sharpening filter.
+- testWidenImageGeneration: Tests image resizing that increases the width while preserving content.
+- testHeightenImageGeneration: Tests image resizing that increases the height.
+
+#### Test Strategy
+Each image processing test validates the output by comparing the MD5 hash of the generated image with a known, expected hash.
+This ensures that the image transformation produces exact and reproducible results, pixel for pixel.
+
+For each test, the following approach is used:
+
+- Load a source image (e.g., rhino.webp).
+- Apply a specific transformation using query parameters (e.g., fit=500x500).
+- Use a dedicated processor (e.g., FitProcessor) to apply the transformation.
+- Save the processed image temporarily in a local output directory.
+- Compute the MD5 hash of the generated image file.
+- Compare it with the expected hash using an assertion.
+
+This method ensures that even minor unintended changes in image generation logic will be detected during test runs.
+
+#### Running the Tests
+
+To run only the unit tests:
+
+```bash
+php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
+```
+OR
+```bash
+make test-unit
+```
+
+
+### Functional tests
+
+This project includes a comprehensive set of unit tests to validate various image manipulation operations.
+These tests ensure that image transformations are applied correctly and consistently.
+Available Tests :
+
+- **Fit Image Generation**: Validates that an image is resized proportionally to fit within specified dimensions.
+- **Crop Image Generation**: Ensures correct cropping of an image to the desired size.
+- **Crop and Resize Image Generation**: Checks cropping combined with specific ratio and alignment for accurate resizing.
+- **Background Image Generation**: Tests the application or customization of a background (either color or another image).
+- **Blur Effect Application**: Verifies proper application of a blur effect to an image.
+- **Contrast Adjustment**: Validates that image contrast adjustments are rendered accurately.
+- **Flip Operation**: Tests horizontal and vertical flipping of an image.
+- **Hotspot Placement**: Ensures precise placement of a focal point or "hotspot" on the image.
+- **Rotation**: Validates rotation transformations applied to an image.
+- **Sharpening Filter**: Ensures consistent application of sharpen filters.
+- **Widen Image Functionality**: Tests width increase transformations while maintaining image content.
+- **Heighten Image Functionality**: Tests height increase transformations while retaining image quality and content.
+
+#### Test Strategy
+
+Each image manipulation strategy is tested via HTTP-like requests using the `InterventionRequest` handler.
+This simulates real-world image transformations applied via URL parameters.
+
+#### Running the Tests
+
+To run only the functional tests:
+
+```bash
+php -d "memory_limit=-1" vendor/bin/phpunit tests/Functional
+```
+OR
+```bash
+make test-functional
+```
