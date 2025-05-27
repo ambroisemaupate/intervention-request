@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest;
 
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+
 class Configuration
 {
     protected bool $caching = true;
@@ -26,6 +29,7 @@ class Configuration
     protected ?string $oxipngPath = null;
     protected ?string $jpegoptimPath = null;
     protected int $responseTtl = 31536000; // 365*24*60*60
+    protected ?string $watermarkPath = null;
 
     public function getPngquantPath(): ?string
     {
@@ -74,9 +78,13 @@ class Configuration
     /**
      * Gets the value of driver.
      */
-    public function getDriver(): string
+    public function getDriver(): ImagickDriver|GdDriver
     {
-        return $this->driver;
+        if ('imagick' === $this->driver) {
+            return new ImagickDriver();
+        }
+
+        return new GdDriver();
     }
 
     /**
@@ -314,6 +322,18 @@ class Configuration
     public function setNoAlphaPingo(bool $noAlphaPingo): Configuration
     {
         $this->noAlphaPingo = $noAlphaPingo;
+
+        return $this;
+    }
+
+    public function getWatermarkPath(): ?string
+    {
+        return $this->watermarkPath;
+    }
+
+    public function setWatermarkPath(?string $watermarkPath): Configuration
+    {
+        $this->watermarkPath = $watermarkPath;
 
         return $this;
     }

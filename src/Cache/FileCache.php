@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Cache;
 
-use AM\InterventionRequest\Encoder\ImageEncoder;
+use AM\InterventionRequest\Encoder\ImageEncoderInterface;
 use AM\InterventionRequest\Event\ImageSavedEvent;
 use AM\InterventionRequest\Event\RequestEvent;
 use AM\InterventionRequest\FileResolverInterface;
@@ -13,7 +13,7 @@ use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\NextGenFile;
 use AM\InterventionRequest\Processor\ChainProcessor;
 use AM\InterventionRequest\ShortUrlExpander;
-use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,11 +25,11 @@ use Symfony\Component\HttpFoundation\Response;
 class FileCache implements EventSubscriberInterface
 {
     protected string $cachePath;
-    private ImageEncoder $imageEncoder;
 
     public function __construct(
         protected readonly ChainProcessor $chainProcessor,
         protected readonly FileResolverInterface $fileResolver,
+        protected readonly ImageEncoderInterface $imageEncoder,
         string $cachePath,
         protected readonly LoggerInterface $logger,
         protected readonly int $ttl = 604800,
@@ -41,7 +41,6 @@ class FileCache implements EventSubscriberInterface
             throw new \InvalidArgumentException('Cache path does not exist.');
         }
         $this->cachePath = $cachePath;
-        $this->imageEncoder = new ImageEncoder();
     }
 
     /**
@@ -56,7 +55,7 @@ class FileCache implements EventSubscriberInterface
         ];
     }
 
-    protected function saveImage(Image $image, string $cacheFilePath, int $quality): Image
+    protected function saveImage(ImageInterface $image, string $cacheFilePath, int $quality): ImageInterface
     {
         $path = dirname($cacheFilePath);
         if (!file_exists($path)) {
@@ -158,7 +157,7 @@ class FileCache implements EventSubscriberInterface
                 $this->saveImage($image, $cacheFilePath, $requestEvent->getQuality());
             }
             // create the ImageSavedEvent and dispatch it
-            $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile, $requestEvent->getQuality()));
+            $dispatcher->dispatch(new ImageSavedEvent($image, $cacheFile, $requestEvent->getQuality(), $requestEvent->isProgressive()));
             $firstGen = true;
         }
 

@@ -117,3 +117,4 @@ project_env.sh
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+/tests/temp/

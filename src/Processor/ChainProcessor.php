@@ -8,8 +8,8 @@ use AM\InterventionRequest\Configuration;
 use AM\InterventionRequest\Event\ImageAfterProcessEvent;
 use AM\InterventionRequest\Event\ImageBeforeProcessEvent;
 use AM\InterventionRequest\FileWithResourceInterface;
-use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,21 +26,19 @@ final readonly class ChainProcessor
     ) {
     }
 
-    protected function makeImage(File $nativeFile): Image
+    protected function makeImage(File $nativeFile): ImageInterface
     {
         // create an image manager instance with favored driver
-        $manager = new ImageManager([
-            'driver' => $this->configuration->getDriver(),
-        ]);
+        $manager = new ImageManager($this->configuration->getDriver());
 
         if ($nativeFile instanceof FileWithResourceInterface && null !== $nativeFile->getResource()) {
-            return $manager->make($nativeFile->getResource());
+            return $manager->read($nativeFile->getResource());
         }
 
-        return $manager->make($nativeFile);
+        return $manager->read($nativeFile);
     }
 
-    public function process(File $nativeImage, Request $request): Image
+    public function process(File $nativeImage, Request $request): ImageInterface
     {
         if ($request->query->has('no_process')) {
             return $this->makeImage($nativeImage);

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use AM\InterventionRequest\Configuration;
+use AM\InterventionRequest\Encoder\ImageEncoder;
 use AM\InterventionRequest\FlysystemFileResolver;
 use AM\InterventionRequest\InterventionRequest;
 use AM\InterventionRequest\LocalFileResolver;
@@ -38,6 +39,9 @@ $conf->setImagesPath((string) getenv('IR_IMAGES_PATH'));
 $conf->setUseFileChecksum((bool) getenv('IR_USE_FILECHECKSUM'));
 $conf->setDriver((string) getenv('IR_DRIVER'));
 $conf->setDefaultQuality((int) getenv('IR_DEFAULT_QUALITY'));
+if (getenv('IR_WATERMARK_PATH')) {
+    $conf->setWatermarkPath((string) getenv('IR_WATERMARK_PATH'));
+}
 
 if (
     false !== getenv('IR_AWS_ACCESS_KEY_ID')
@@ -84,6 +88,7 @@ $iRequest = new InterventionRequest(
     $conf,
     $fileResolver,
     $log,
+    new ImageEncoder(),
     null,
     (bool) getenv('IR_DEBUG')
 );

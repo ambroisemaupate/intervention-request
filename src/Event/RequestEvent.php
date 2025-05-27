@@ -17,6 +17,7 @@ final class RequestEvent extends Event
         protected readonly Request $request,
         protected readonly InterventionRequest $interventionRequest,
         protected int $quality = 90,
+        protected bool $progressive = false,
     ) {
     }
 
@@ -50,6 +51,18 @@ final class RequestEvent extends Event
     public function setQuality(int $quality): RequestEvent
     {
         $this->quality = $quality;
+
+        return $this;
+    }
+
+    public function isProgressive(): bool
+    {
+        return $this->progressive;
+    }
+
+    public function setProgressive(bool $progressive): RequestEvent
+    {
+        $this->progressive = $progressive;
 
         return $this;
     }

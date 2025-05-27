@@ -4,7 +4,7 @@ ARG GID=${UID}
 # Do not switch to PHP 8.4 before upgrading Image Intervention package due to warning:
 # NOTICE: PHP message: PHP Deprecated:  Intervention\Image\Gd\Driver::__construct(): Implicitly marking parameter $decoder as nullable is deprecated,
 # the explicit nullable type must be used instead in /var/www/html/vendor/intervention/image/src/Intervention/Image/Gd/Driver.php on line 16
-ARG PHP_VERSION=8.3.19
+ARG PHP_VERSION=8.3.21
 
 #######
 # PHP #

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Processor;
 
 use AM\InterventionRequest\Vector;
-use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CropProcessor implements Processor
 {
-    public function process(Image $image, Request $request): void
+    public function process(ImageInterface $image, Request $request): void
     {
         $crop = CropProcessor::validateDimensions($request);
         if (

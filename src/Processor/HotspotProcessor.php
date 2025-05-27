@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Processor;
 
 use AM\InterventionRequest\Vector;
-use Intervention\Image\AbstractShape;
-use Intervention\Image\Image;
+use Intervention\Image\Geometry\Factories\EllipseFactory;
+use Intervention\Image\Geometry\Factories\RectangleFactory;
+use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 final readonly class HotspotProcessor implements Processor
@@ -16,7 +17,7 @@ final readonly class HotspotProcessor implements Processor
     ) {
     }
 
-    public function process(Image $image, Request $request): void
+    public function process(ImageInterface $image, Request $request): void
     {
         $crop = CropProcessor::validateDimensions($request);
         if (
@@ -47,24 +48,15 @@ final readonly class HotspotProcessor implements Processor
                 $x2 = (int) max($width, min($image->width(), $center_x + ($width / 2)));
                 $y2 = (int) max($height, min($image->height(), $center_y + ($height / 2)));
 
-                /*
-                 * Upgrade Intervention Image to 3.x
-                 * rectangle() is now handled by drawRectangle()
-                 * @see https://image.intervention.io/v3/modifying/drawing#drawing-a-rectangle
-                 */
                 // Draw rectangle on final crop
-                $image->rectangle($x1, $y1, $x2, $y2, function (AbstractShape $draw) {
-                    $draw->border(3, '#0000FF');
+                $image->drawRectangle($x1, $y1, function (RectangleFactory $rectangle) {
+                    $rectangle->border('#0000FF', 3);
                 });
 
-                /*
-                 * Upgrade Intervention Image to 3.x
-                 * ellipse() is now handled by drawEllipse()
-                 * @see https://image.intervention.io/v3/modifying/drawing#drawing-ellipses
-                 */
                 // Draw green ellipse in center
-                $image->ellipse(30, 30, $center_x, $center_y, function (AbstractShape $draw) {
-                    $draw->border(3, '#0FF000');
+                $image->drawEllipse($center_x, $center_y, function (EllipseFactory $ellipse) {
+                    $ellipse->border('#0FF000', 3);
+                    $ellipse->size(30, 30);
                 });
 
                 return;
@@ -73,7 +65,7 @@ final readonly class HotspotProcessor implements Processor
         }
     }
 
-    private function getWidthHeight(Image $image, Vector $crop): Vector
+    private function getWidthHeight(ImageInterface $image, Vector $crop): Vector
     {
         $cropX = $crop->getRoundedX();
         $cropY = $crop->getRoundedY();
@@ -94,7 +86,7 @@ final readonly class HotspotProcessor implements Processor
         );
     }
 
-    private function resolveCropOffset(Image $image, int $width, int $height, Vector $hotspot): Vector
+    private function resolveCropOffset(ImageInterface $image, int $width, int $height, Vector $hotspot): Vector
     {
         $offset_x = (int) round(($image->width() * $hotspot->getX()) - ($width / 2));
         $offset_y = (int) round(($image->height() * $hotspot->getY()) - ($height / 2));

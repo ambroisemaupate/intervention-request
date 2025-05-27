@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace AM\InterventionRequest\Listener;
 
 use AM\InterventionRequest\Event\ImageAfterProcessEvent;
-use Intervention\Image\Image;
+use Intervention\Image\Drivers\Imagick\Core as ImagickCore;
+use Intervention\Image\Drivers\Imagick\Modifiers\StripMetaModifier;
+use Intervention\Image\Interfaces\ImageInterface;
 
 final class StripExifListener implements ImageEventSubscriberInterface
 {
@@ -16,9 +18,9 @@ final class StripExifListener implements ImageEventSubscriberInterface
         ];
     }
 
-    public function supports(?Image $image = null): bool
+    public function supports(?ImageInterface $image = null): bool
     {
-        return null !== $image && class_exists('\Imagick') && $image->getCore() instanceof \Imagick;
+        return null !== $image && class_exists('\Imagick') && $image->core() instanceof ImagickCore;
     }
 
     public function afterProcess(ImageAfterProcessEvent $afterProcessEvent): void
@@ -26,10 +28,9 @@ final class StripExifListener implements ImageEventSubscriberInterface
         if (
             null !== $afterProcessEvent->getImage()
             && $this->supports($afterProcessEvent->getImage())
-            // needed for Phpstan
-            && $afterProcessEvent->getImage()->getCore() instanceof \Imagick
         ) {
-            $afterProcessEvent->getImage()->getCore()->stripImage();
+            $modifier = new StripMetaModifier();
+            $modifier->apply($afterProcessEvent->getImage());
         }
     }
 }
