@@ -582,7 +582,7 @@ IR_GC_TTL: 0
 To run the full test suite:
 
 ```bash
-php vendor/bin/phpunit tests/Processor
+php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
 ```
 OR
 ```bash
@@ -630,7 +630,7 @@ This method ensures that even minor unintended changes in image generation logic
 To run only the unit tests:
 
 ```bash
-php vendor/bin/phpunit tests/Processor
+php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
 ```
 OR
 ```bash
@@ -667,7 +667,7 @@ This simulates real-world image transformations applied via URL parameters.
 To run only the functional tests:
 
 ```bash
-php vendor/bin/phpunit tests/Functional
+php -d "memory_limit=-1" vendor/bin/phpunit tests/Functional
 ```
 OR
 ```bash

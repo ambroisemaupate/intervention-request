@@ -2,8 +2,8 @@
 .PHONY: test dev-server
 test:
 	php -d "memory_limit=-1" vendor/bin/php-cs-fixer fix --ansi -vvv
-	php -d memory_limit=-1 vendor/bin/phpstan analyse -c phpstan.neon;
-	php vendor/bin/phpunit tests/
+	php -d "memory_limit=-1" vendor/bin/phpstan analyse -c phpstan.neon;
+	php -d "memory_limit=-1" vendor/bin/phpunit tests/
 
 dev-server:
 	# http://0.0.0.0:8080/dev.php/cache/w1000/rhino.jpg
@@ -14,7 +14,7 @@ bake:
 	docker buildx bake --push intervention
 
 test-functional:
-	php vendor/bin/phpunit tests/Functional
+	php -d "memory_limit=-1" vendor/bin/phpunit tests/Functional
 
 test-unit:
-	php vendor/bin/phpunit tests/Processor
+	php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
