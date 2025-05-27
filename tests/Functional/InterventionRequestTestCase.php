@@ -29,6 +29,9 @@ class InterventionRequestTestCase extends TestCase
         $conf->setTtl(0);
         $conf->setResponseTtl(0);
         $conf->setCachePath(dirname(__DIR__).'/temp');
+        if (!file_exists(dirname(__DIR__).'/temp')) {
+            mkdir(dirname(__DIR__).'/temp', 0777, true);
+        }
         $conf->setUsePassThroughCache(false);
         $conf->setImagesPath(dirname(__DIR__).'/../web/images');
         $conf->setUseFileChecksum(false);
