@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Event;
 
-use Intervention\Image\Image;
 use Intervention\Image\Interfaces\ImageInterface;
 use Symfony\Component\HttpFoundation\File\File;
 

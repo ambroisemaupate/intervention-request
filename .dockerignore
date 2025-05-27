@@ -25,6 +25,7 @@ web/assets
 web/cache
 web/dev.php
 web/images
+tests/temp
 
 .php-cs-fixer.cache
 .php-cs-fixer.dist.php
