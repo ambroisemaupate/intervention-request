@@ -10,7 +10,7 @@ final class ImageSharpenProcessingTest extends ImageProcessingTestCase
 {
     public function testSharpenImageHash(): void
     {
-        $this->testProcessedImageHash(
+        $this->processedImageHash(
             new SharpenProcessor(),
             '/testUHD.jpg',
             '81413b59796e3b4ed808cbf9458400ba',

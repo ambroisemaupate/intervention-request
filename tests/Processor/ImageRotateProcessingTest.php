@@ -11,7 +11,7 @@ final class ImageRotateProcessingTest extends ImageProcessingTestCase
     public function testHotspotImageHash(): void
     {
         // test with testPNG.png with rotate 20 and background transparent
-        $this->testProcessedImageHash(
+        $this->processedImageHash(
             new RotateProcessor(),
             '/testPNG.png',
             'd0d1e345cc491b8e1becdd62a4c455ca',

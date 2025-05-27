@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class ImageProcessingTestCase extends TestCase
 {
-    public function testProcessedImageHash(
+    public function processedImageHash(
         Processor $processor,
         string $imageToProcess,
         string $expectedHash,

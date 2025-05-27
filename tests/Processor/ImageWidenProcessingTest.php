@@ -11,7 +11,7 @@ final class ImageWidenProcessingTest extends ImageProcessingTestCase
     public function testSharpenImageHash(): void
     {
         // test the md5 of testUHD.jpg with width 200
-        $this->testProcessedImageHash(
+        $this->processedImageHash(
             new WidenProcessor(),
             '/testUHD.jpg',
             '69b0bc28701755b168d395febc7604a3',

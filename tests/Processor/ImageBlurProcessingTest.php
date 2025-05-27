@@ -10,7 +10,7 @@ final class ImageBlurProcessingTest extends ImageProcessingTestCase
 {
     public function testBlurImageHash(): void
     {
-        $this->testProcessedImageHash(
+        $this->processedImageHash(
             new BlurProcessor(),
             '/rhino.webp',
             'b2dd14e94b656232831630689ff37749',

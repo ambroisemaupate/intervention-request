@@ -11,7 +11,7 @@ final class ImageHotspotProcessingTest extends ImageProcessingTestCase
     public function testHotspotImageHash(): void
     {
         // test with md5 of rhino.webp with hotspot 1x0 + crop 1x1 + width 1050
-        $this->testProcessedImageHash(
+        $this->processedImageHash(
             new HotspotProcessor(),
             '/rhino.webp',
             'cf81c4032580c633b609bc3cd9662ad6',
