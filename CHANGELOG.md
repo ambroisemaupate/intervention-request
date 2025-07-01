@@ -2,9 +2,13 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
-## [6.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v5.1.0...v6.0.0) - 2025-05-27
+## [6.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.0...v6.0.1) - 2025-07-01
 
-See [UPGRADE.md](./UPGRADE.md) for upgrade instructions.
+### Bug Fixes
+
+- remove unused flysystem dependencies - ([b0a8662](https://github.com/ambroisemaupate/intervention-request/commit/b0a8662a207a28202e9fe1c6a1cbbff2203871aa)) - Ambroise Maupate
+
+## [6.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v5.1.0...v6.0.0) - 2025-05-27
 
 ### Features
 
@@ -28,7 +32,7 @@ See [UPGRADE.md](./UPGRADE.md) for upgrade instructions.
 
 ## [5.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v4.1.1...v5.0.0) - 2025-02-27
 
-### Bug Fixes 
+### Bug Fixes
 
 - Do not check if file is an image in FileCache.php - ([a627625](https://github.com/ambroisemaupate/intervention-request/commit/a627625fd2db2a019172c58bb337c0b6acfd62fd)) - Ambroise Maupate
 
