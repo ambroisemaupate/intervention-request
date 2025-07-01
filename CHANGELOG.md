@@ -2,6 +2,12 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [6.0.2](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.1...v6.0.2) - 2025-07-01
+
+### Bug Fixes
+
+- update version to 6.0.2 and bump PHP version to 8.3.22 - ([c655393](https://github.com/ambroisemaupate/intervention-request/commit/c65539348e3e0209078091828eba994fe1adb871)) - Ambroise Maupate
+
 ## [6.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.0...v6.0.1) - 2025-07-01
 
 ### Bug Fixes
