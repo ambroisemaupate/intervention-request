@@ -9,9 +9,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class FitProcessor extends AbstractPositionableProcessor
 {
+    use DimensionTrait;
+
     public function process(ImageInterface $image, Request $request): void
     {
-        $fit = CropProcessor::validateDimensions($request, 'fit');
+        $fit = $this->validateDimensions($request, 'fit');
         if (
             null !== $fit
             && !$request->query->has('width')

@@ -10,9 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class CropResizedProcessor extends AbstractPositionableProcessor
 {
+    use DimensionTrait;
+
     public function process(ImageInterface $image, Request $request): void
     {
-        $crop = CropProcessor::validateDimensions($request);
+        $crop = $this->validateDimensions($request, 'crop');
         if (
             null !== $crop
             && !$request->query->has('hotspot')

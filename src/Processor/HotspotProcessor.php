@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final readonly class HotspotProcessor implements Processor
 {
+    use DimensionTrait;
+
     public function __construct(
         private ?bool $debug = false,
     ) {
@@ -19,19 +21,12 @@ final readonly class HotspotProcessor implements Processor
 
     public function process(ImageInterface $image, Request $request): void
     {
-        $crop = CropProcessor::validateDimensions($request);
-        if (
-            $request->query->has('hotspot')
-            && ($request->query->has('width') || $request->query->has('height'))
-            && 1 === preg_match('#^(0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)$#', (string) ($request->query->get('hotspot') ?? ''), $hotspot)
-            && null !== $crop
-        ) {
-            $hotspot = new Vector(
-                $hotspot[1],
-                $hotspot[2]
-            );
+        $crop = $this->validateDimensions($request, 'crop');
+        $hotspot = $this->validateNormalizedVector($request, 'hotspot');
+
+        if (null !== $hotspot && null !== $crop) {
             // Get width and height with ratio
-            $size = $this->getWidthHeight($image, $crop);
+            $size = $this->getCroppedWidthHeight($image, $crop);
             $width = $size->getRoundedX();
             $height = $size->getRoundedY();
             // Get point X and Y for crop image based on hotspot
@@ -45,11 +40,10 @@ final readonly class HotspotProcessor implements Processor
                 $x1 = (int) min($image->width() - $width, max(0, $center_x - ($width / 2)));
                 $y1 = (int) min($image->height() - $height, max(0, $center_y - ($height / 2)));
 
-                $x2 = (int) max($width, min($image->width(), $center_x + ($width / 2)));
-                $y2 = (int) max($height, min($image->height(), $center_y + ($height / 2)));
-
                 // Draw rectangle on final crop
-                $image->drawRectangle($x1, $y1, function (RectangleFactory $rectangle) {
+                $image->drawRectangle($x1, $y1, function (RectangleFactory $rectangle) use ($width, $height) {
+                    $rectangle->width($width);
+                    $rectangle->height($height);
                     $rectangle->border('#0000FF', 3);
                 });
 
@@ -63,27 +57,6 @@ final readonly class HotspotProcessor implements Processor
             }
             $image->crop($width, $height, $offset->getRoundedX(), $offset->getRoundedY());
         }
-    }
-
-    private function getWidthHeight(ImageInterface $image, Vector $crop): Vector
-    {
-        $cropX = $crop->getRoundedX();
-        $cropY = $crop->getRoundedY();
-        // Square ratio
-        if ($cropX == $cropY) {
-            $width = $height = min($image->width(), $image->height());
-        } elseif ($cropX > $cropY) { // Horizontal ratio
-            $width = $image->width();
-            $height = (int) round(($image->width() * $cropY) / $cropX);
-        } else { // Vertical ratio
-            $width = (int) round(($image->height() * $cropX) / $cropY);
-            $height = $image->height();
-        }
-
-        return new Vector(
-            $width,
-            $height
-        );
     }
 
     private function resolveCropOffset(ImageInterface $image, int $width, int $height, Vector $hotspot): Vector
