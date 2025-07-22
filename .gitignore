@@ -2,6 +2,7 @@ public/dev.php
 public/cache
 public/local
 public/assets
+public/images
 
 ### Composer ###
 composer.phar
