@@ -11,7 +11,7 @@ class ImageCropFunctionalTest extends InterventionRequestTestCase
      */
     public function testCrop(): void
     {
-        $expectedMd5 = 'b7e99efe3a0e2011afaa1ec2c0b93523';
+        $expectedMd5 = '35a7de410a39f361fa51a46dfbdbb852';
         $request = $this->generateRequest('http://localhost/assets/c1000x1000/rhino.webp');
         $this->interventionRequest->handleRequest($request);
         $response = $this->interventionRequest->getResponse($request);

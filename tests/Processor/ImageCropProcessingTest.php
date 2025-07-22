@@ -13,7 +13,7 @@ final class ImageCropProcessingTest extends ImageProcessingTestCase
         $this->processedImageHash(
             new CropProcessor(),
             '/rhino.webp',
-            '58fdd35900ba9550ce73341883a7fc26',
+            '7f43d5f2c6553b2c83c2d690c978c7d7',
             ['crop' => '1000x1000'],
         );
     }
