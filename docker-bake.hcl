@@ -3,7 +3,7 @@ variable "REGISTRY" {
 }
 
 variable "VERSION" {
-    default = "6.0.2"
+    default = "6.0.3"
 }
 
 target "intervention" {
