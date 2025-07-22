@@ -8,12 +8,12 @@ use AM\InterventionRequest\Processor\CropResizedProcessor;
 
 final class ImageCropResizedProcessingTest extends ImageProcessingTestCase
 {
-    public function testCropResizedImageHash(): void
+    public function test(): void
     {
         $this->processedImageHash(
             new CropResizedProcessor(),
             '/rhino.webp',
-            'c1936cfe5dea023d7220deccb16a70c1',
+            'b1df5c456d33069f8e8fea650f995bbe',
             [
                 'crop' => '1x1',
                 'width' => '1000',

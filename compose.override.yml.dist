@@ -3,11 +3,15 @@ services:
         build:
             context: .
             target: php-dev
+            #target: frankenphp-dev
         volumes:
-            - ./:/var/www/html
+            - ./:/app
         ports:
             - "8080:80"
         environment:
+            # For FrankenPHP
+            SERVER_NAME: ":80"
+            FRANKENPHP_CONFIG: "worker ./public/worker.php"
             # Development mode
             IR_DEBUG: 1
             IR_USE_PASSTHROUGH_CACHE: 0

@@ -9,12 +9,11 @@ class ImageWidenFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testWiden(): void
+    public function test(): void
     {
-        $expectedMd5 = 'b5dc420b0e12564ad477a04248726abe';
+        $expectedMd5 = 'd06c62e0afa34ba9e2ac9f3fd71ea6dc';
         $request = $this->generateRequest('http://localhost/assets/w500/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);

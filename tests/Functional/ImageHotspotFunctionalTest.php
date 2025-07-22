@@ -9,12 +9,11 @@ class ImageHotspotFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testHotspotRightOnLandscape(): void
+    public function testRightOnLandscape(): void
     {
-        $expectedMd5 = '0d6f771f07af11678db5ef930f7a9f41';
+        $expectedMd5 = 'b8a58cda05b6365a12d92cce2cc996bb';
         $request = $this->generateRequest('http://localhost/assets/d1x0.5-c1x1-w1050/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);
@@ -24,12 +23,11 @@ class ImageHotspotFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testHotspotLeftOnLandscape(): void
+    public function testLeftOnLandscape(): void
     {
-        $expectedMd5 = 'dd9fbc7edcff36fcd14676178a0177cf';
+        $expectedMd5 = 'cfee1ea3019c15d9df49e31212220c61';
         $request = $this->generateRequest('http://localhost/assets/d0x0.5-c1x1-w1050/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);
@@ -39,12 +37,11 @@ class ImageHotspotFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testHotspotTopOnPortrait(): void
+    public function testTopOnPortrait(): void
     {
-        $expectedMd5 = 'b4d2dc2c463f2b456f59cc3672c4904a';
+        $expectedMd5 = 'ece62c3321e1b19ddede51d1c328da5f';
         $request = $this->generateRequest('http://localhost/assets/r90-d0.5x0-c1x1-w1000/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);
@@ -54,12 +51,11 @@ class ImageHotspotFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testHotspotBottomOnPortrait(): void
+    public function testBottomOnPortrait(): void
     {
-        $expectedMd5 = '175bc011be1af8dfd5231ce714be0ffb';
+        $expectedMd5 = '63a51b670494190fc3e208d0ccc1c0e6';
         $request = $this->generateRequest('http://localhost/assets/r90-d0.5x1-c1x1-w1000/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);

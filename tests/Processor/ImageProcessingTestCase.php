@@ -42,7 +42,7 @@ abstract class ImageProcessingTestCase extends TestCase
 
     private function getInputPath(string $imageToProcess): string
     {
-        return dirname(__DIR__).'/../web/images'.$imageToProcess;
+        return dirname(__DIR__).'/../public/images'.$imageToProcess;
     }
 
     protected function setUp(): void

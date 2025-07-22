@@ -8,7 +8,7 @@ use AM\InterventionRequest\Processor\BlurProcessor;
 
 final class ImageBlurProcessingTest extends ImageProcessingTestCase
 {
-    public function testBlurImageHash(): void
+    public function test(): void
     {
         $this->processedImageHash(
             new BlurProcessor(),

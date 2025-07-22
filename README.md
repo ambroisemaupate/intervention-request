@@ -43,13 +43,13 @@
 Intervention Request is now available as a standalone Docker server to use with whatever CMS or language you need.
 It declares two volumes: one for your images storage and one for cached files.
 
-- `/var/www/html/web/images`: you can set it as read-only to prevent any write operation
-- `/var/www/html/web/assets`: you must set it as read-write to allow cache files to be written
+- `/app/public/images`: you can set it as read-only to prevent any write operation
+- `/app/public/assets`: you must set it as read-write to allow cache files to be written
 
 ```php
 docker pull ambroisemaupate/intervention-request;
 # Make sure to share your volume with READ-ONLY flag
-docker run -v "/my/images/folder:/var/www/html/web/images:ro" -p 8080:80/tcp ambroisemaupate/intervention-request;
+docker run -v "/my/images/folder:/app/public/images:ro" -p 8080:80/tcp ambroisemaupate/intervention-request;
 ```
 
 - Create a `/my/images/folder/your-image.png`
@@ -80,15 +80,15 @@ services:
     intervention:
         image: ambroisemaupate/intervention-request:latest
         volumes:
-            - cache:/var/www/html/web/assets
+            - cache:/app/public/assets
             ## If using local storage file system
-            - ./my/images/folder:/var/www/html/web/images:ro
+            - ./my/images/folder:/app/public/images:ro
         # You can override some defaults below
         environment:
             IR_DEBUG: 0
             IR_DEFAULT_QUALITY: 80
             ## If using local storage file system
-            IR_IMAGES_PATH: /var/www/html/web/images
+            IR_IMAGES_PATH: /app/public/images
             ## If using an AWS or Scaleway Object storage file system 
             IR_AWS_ACCESS_KEY_ID: 'changeme'
             IR_AWS_ACCESS_KEY_SECRET: 'changeme'
@@ -551,7 +551,7 @@ services:
             context: .
             target: php-dev
         volumes:
-            - ./:/var/www/html
+            - ./:/app
         ports:
             -   "8080:80/tcp"
 

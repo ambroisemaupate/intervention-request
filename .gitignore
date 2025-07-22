@@ -1,7 +1,7 @@
-/web/dev.php
-web/cache
-web/local
-web/assets
+public/dev.php
+public/cache
+public/local
+public/assets
 
 ### Composer ###
 composer.phar

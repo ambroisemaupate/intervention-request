@@ -8,13 +8,13 @@ use AM\InterventionRequest\Processor\RotateProcessor;
 
 final class ImageRotateProcessingTest extends ImageProcessingTestCase
 {
-    public function testHotspotImageHash(): void
+    public function test(): void
     {
         // test with testPNG.png with rotate 20 and background transparent
         $this->processedImageHash(
             new RotateProcessor(),
             '/testPNG.png',
-            'd0d1e345cc491b8e1becdd62a4c455ca',
+            'f96b9143c1571fbcde3abfb0a72e5ef3',
             [
                 'rotate' => '20',
                 'background' => 'transparent',

@@ -9,12 +9,11 @@ class ImageFlipFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testFlipHorizontal(): void
+    public function testHorizontal(): void
     {
         $expectedMd5 = '52d0e88a82b1fd5b7a5356f412b27f7b';
         $request = $this->generateRequest('http://localhost/assets/mh/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);
@@ -24,12 +23,11 @@ class ImageFlipFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testFlipVertical(): void
+    public function testVertical(): void
     {
         $expectedMd5 = '65bd1c3dcbc120e6a2b876b37e59d490';
         $request = $this->generateRequest('http://localhost/assets/mv/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);

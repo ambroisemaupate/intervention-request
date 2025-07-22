@@ -9,12 +9,11 @@ class ImageHeightenFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testHeighten(): void
+    public function test(): void
     {
-        $expectedMd5 = '794e14c1357fe7913dbdbcd56a41b8a6';
+        $expectedMd5 = 'fcc208f0a6366e8441d739955ed1605d';
         $request = $this->generateRequest('http://localhost/assets/h800/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);

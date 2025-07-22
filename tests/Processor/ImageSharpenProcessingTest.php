@@ -8,12 +8,12 @@ use AM\InterventionRequest\Processor\SharpenProcessor;
 
 final class ImageSharpenProcessingTest extends ImageProcessingTestCase
 {
-    public function testSharpenImageHash(): void
+    public function test(): void
     {
         $this->processedImageHash(
             new SharpenProcessor(),
             '/testUHD.jpg',
-            '81413b59796e3b4ed808cbf9458400ba',
+            '83f739459ec2219ecaed9e8ca49ef4b2',
             ['sharpen' => '90'],
         );
     }

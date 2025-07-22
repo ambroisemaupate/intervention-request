@@ -9,12 +9,11 @@ class ImageFitFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testFit(): void
+    public function test(): void
     {
-        $expectedMd5 = 'f19703e93d053f41408503f6377f7cb6';
+        $expectedMd5 = 'a543141705444fe939f60aa68f013dd7';
         $request = $this->generateRequest('http://localhost/assets/f500x500/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);

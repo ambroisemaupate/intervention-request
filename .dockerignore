@@ -1,4 +1,3 @@
-!vendor
 !composer.lock
 !bin/intervention
 
@@ -14,17 +13,16 @@ cliff.toml
 compose.override.yml
 compose.override.yml.dist
 compose.yml
-docker-compose.yml
 phpcs.xml.dist
 phpstan.neon
 project_env.sh
 report.txt
 router.php
 supervisord.pid
-web/assets
-web/cache
-web/dev.php
-web/images
+public/assets
+public/cache
+public/dev.php
+public/images
 tests/temp
 
 .php-cs-fixer.cache

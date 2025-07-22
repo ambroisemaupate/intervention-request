@@ -8,7 +8,7 @@ use AM\InterventionRequest\Processor\HotspotProcessor;
 
 final class ImageHotspotProcessingTest extends ImageProcessingTestCase
 {
-    public function testHotspotImageHash(): void
+    public function test(): void
     {
         // test with md5 of rhino.webp with hotspot 1x0 + crop 1x1 + width 1050
         $this->processedImageHash(

@@ -16,6 +16,7 @@ use AM\InterventionRequest\Listener\PingoListener;
 use AM\InterventionRequest\Listener\PngquantListener;
 use AM\InterventionRequest\Listener\ProgressiveSubscriber;
 use AM\InterventionRequest\Listener\QualitySubscriber;
+use AM\InterventionRequest\Listener\ResponseHeadersListener;
 use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
 use AM\InterventionRequest\Listener\WatermarkListener;
@@ -31,7 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InterventionRequest
 {
-    protected ?Response $response = null;
     protected EventDispatcherInterface $dispatcher;
 
     /**
@@ -79,6 +79,7 @@ class InterventionRequest
             $this->fileResolver,
         ));
         $this->addSubscriber(new StripExifListener());
+        $this->addSubscriber(new ResponseHeadersListener($this->configuration));
         $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
         $this->addSubscriber(new ProgressiveSubscriber(false));
         $this->addSubscriber(new FileCache(
@@ -153,7 +154,7 @@ class InterventionRequest
      *
      * @throws \Exception
      */
-    public function handleRequest(Request $request): void
+    public function handleRequest(Request $request): Response
     {
         try {
             if (!$request->query->has('image')) {
@@ -162,15 +163,20 @@ class InterventionRequest
 
             $event = new RequestEvent($request, $this);
             $this->dispatcher->dispatch($event);
-            if (null === $this->response = $event->getResponse()) {
+            if (null === $response = $event->getResponse()) {
                 throw new \LogicException('No listener returned a Response for current request');
             }
+            $responseEvent = new ResponseEvent($response);
+            $this->dispatcher->dispatch($responseEvent);
+            $response = $responseEvent->getResponse();
+
+            return $response->prepare($request);
         } catch (FileNotFoundException|UnableToRetrieveMetadata $e) {
-            $this->response = $this->getNotFoundResponse($e);
+            return $this->getNotFoundResponse($e);
         } catch (\InvalidArgumentException $e) {
-            $this->response = $this->getBadRequestResponse($e);
+            return $this->getBadRequestResponse($e);
         } catch (\Throwable $e) {
-            $this->response = $this->getServerErrorResponse($e);
+            return $this->getServerErrorResponse($e);
         }
     }
 
@@ -217,38 +223,6 @@ class InterventionRequest
             Response::HTTP_INTERNAL_SERVER_ERROR,
             ['cache-control' => 'no-store']
         );
-    }
-
-    public function getResponse(Request $request): Response
-    {
-        if (null !== $this->response) {
-            if ($this->response->isCacheable()) {
-                $this->response->setPublic();
-                $this->response->setMaxAge($this->configuration->getResponseTtl());
-                $this->response->setSharedMaxAge($this->configuration->getResponseTtl());
-            }
-            $this->response->setCharset('UTF-8');
-            $this->response->headers->set(
-                'access-control-allow-headers',
-                'DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
-            );
-            $this->response->headers->set(
-                'access-control-allow-methods',
-                'GET, OPTIONS'
-            );
-            $this->response->headers->set(
-                'access-control-allow-origin',
-                '*'
-            );
-            $responseEvent = new ResponseEvent($this->response);
-            $this->dispatcher->dispatch($responseEvent);
-            $this->response = $responseEvent->getResponse();
-            $this->response->prepare($request);
-
-            return $this->response;
-        } else {
-            throw new \RuntimeException('Request had not been handled. Use handle() method before getResponse()', 1);
-        }
     }
 
     public function getConfiguration(): Configuration

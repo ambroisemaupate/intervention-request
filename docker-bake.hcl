@@ -3,7 +3,7 @@ variable "REGISTRY" {
 }
 
 variable "VERSION" {
-    default = "6.0.2"
+    default = "develop"
 }
 
 target "intervention" {
@@ -15,10 +15,21 @@ target "intervention" {
                 name = "php"
                 target = "php-prod"
             },
+            {
+                name = "frankenphp"
+                target = "frankenphp-prod"
+            },
         ]
     }
     context = "."
     target = item.target
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}:${VERSION}", "${REGISTRY}:latest"]
+    tags = [
+        notequal(VERSION, "develop") && notequal(item.name, "php") ? "${REGISTRY}:${item.name}-${VERSION}" : "",
+        notequal(VERSION, "develop") && notequal(item.name, "php") ? "${REGISTRY}:${item.name}" : "",
+        equal(VERSION, "develop") && notequal(item.name, "php") ? "${REGISTRY}:${item.name}-develop" : "",
+        equal(VERSION, "develop") && equal(item.name, "php") ? "${REGISTRY}:develop" : "",
+        notequal(VERSION, "develop") && equal(item.name, "php") ? "${REGISTRY}:${VERSION}" : "",
+        notequal(VERSION, "develop") && equal(item.name, "php") ? "${REGISTRY}:latest" : "",
+    ]
 }

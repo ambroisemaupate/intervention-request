@@ -8,7 +8,7 @@ use AM\InterventionRequest\Processor\BackgroundColorProcessor;
 
 final class ImageBackgroundProcessingTest extends ImageProcessingTestCase
 {
-    public function testBackgroundImageHash(): void
+    public function test(): void
     {
         // test with md5 of testPNG.png.jpg with background red
         $this->processedImageHash(

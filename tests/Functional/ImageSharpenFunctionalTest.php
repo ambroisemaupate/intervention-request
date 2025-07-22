@@ -9,12 +9,11 @@ class ImageSharpenFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testSharpen(): void
+    public function test(): void
     {
-        $expectedMd5 = 'cb35dd342d3b76f75eea9634974e6f84';
+        $expectedMd5 = 'c9915c11c2d2b321ca72cada1832999b';
         $request = $this->generateRequest('http://localhost/assets/s100-f1000x1000/testUHD.jpg');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);
