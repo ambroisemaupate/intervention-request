@@ -1,0 +1,29 @@
+{
+    skip_install_trust
+
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+		worker {
+            file /app/public/index.php
+            watch /app/src/**/*.php
+        }
+	}
+}
+
+{$SERVER_NAME:localhost} {
+    log {
+        # Redact the authorization query parameter that can be set by Mercure
+        format filter {
+            request>uri query {
+                replace authorization REDACTED
+            }
+        }
+    }
+
+	root * /app/public
+
+    {$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	php_server
+}

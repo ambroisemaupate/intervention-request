@@ -162,6 +162,8 @@ ARG GID
 
 ARG COMPOSER_VERSION=2.8.2
 
+ENV SERVER_NAME=":80"
+ENV FRANKENPHP_CONFIG="worker /app/public/index.php"
 ENV IR_GC_PROBABILITY=400
 ENV IR_GC_TTL=604800
 # 1 year
@@ -234,6 +236,9 @@ FROM frankenphp AS frankenphp-dev
 ENV IR_DEBUG=1
 ENV XDEBUG_MODE=off
 
+COPY --link docker/etc/php/conf.d/strict.ini ${PHP_INI_DIR}/conf.d/zz-strict.ini
+COPY --link docker/etc/caddy/Caddyfile.dev /etc/frankenphp/Caddyfile
+
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 USER php
@@ -254,11 +259,18 @@ ENV IR_DEBUG=0
 RUN mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
 
 # Composer
+COPY --link docker/etc/php/conf.d/strict.ini ${PHP_INI_DIR}/conf.d/zz-strict.ini
+COPY --link docker/etc/php/conf.d/php.prod.ini ${PHP_INI_DIR}/conf.d/zz-app.ini
+COPY --link docker/etc/caddy/Caddyfile.prod /etc/frankenphp/Caddyfile
+
 COPY --link --chown=${UID}:${GID} composer.* ./
 
 RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
 COPY --link --chown=${UID}:${GID} . .
+
+# Overwrite default entrypoint with worker.php
+COPY --link --chown=${UID}:${GID} ./public/worker.php /app/public/index.php
 
 RUN composer dump-autoload --classmap-authoritative --no-dev
 
