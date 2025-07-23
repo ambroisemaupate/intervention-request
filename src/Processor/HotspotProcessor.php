@@ -59,14 +59,14 @@ final readonly class HotspotProcessor implements Processor
                 $image->drawRectangle($rectInit->getRoundedX(), $rectInit->getRoundedY(), function (RectangleFactory $rectangle) use ($rectSize) {
                     $rectangle->width($rectSize->getRoundedX());
                     $rectangle->height($rectSize->getRoundedY());
-                    $rectangle->background('#FF000040');
+                    $rectangle->background('#FF000030');
                 });
 
                 // Draw rectangle on final crop
                 $image->drawRectangle($cropOffset->getRoundedX(), $cropOffset->getRoundedY(), function (RectangleFactory $rectangle) use ($croppedSize) {
-                    $rectangle->width($croppedSize->getRoundedX() - 3);
-                    $rectangle->height($croppedSize->getRoundedY() - 3);
-                    $rectangle->border('#FF0000', 3);
+                    $rectangle->width($croppedSize->getRoundedX() - 5);
+                    $rectangle->height($croppedSize->getRoundedY() - 5);
+                    $rectangle->border('#FF0000', 5);
                 });
 
                 // Draw green ellipse in center

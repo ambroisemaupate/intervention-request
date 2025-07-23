@@ -17,6 +17,7 @@ use Intervention\Image\Interfaces\ImageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 class FileCache implements EventSubscriberInterface
 {
     protected string $cachePath;
+    protected Filesystem $filesystem;
 
     public function __construct(
         protected readonly ChainProcessor $chainProcessor,
@@ -41,6 +43,7 @@ class FileCache implements EventSubscriberInterface
             throw new \InvalidArgumentException('Cache path does not exist.');
         }
         $this->cachePath = $cachePath;
+        $this->filesystem = new Filesystem();
     }
 
     /**
@@ -57,11 +60,6 @@ class FileCache implements EventSubscriberInterface
 
     protected function saveImage(ImageInterface $image, string $cacheFilePath, int $quality): ImageInterface
     {
-        $path = dirname($cacheFilePath);
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
-        }
-
         return $this->imageEncoder->save($image, $cacheFilePath, $quality);
     }
 
@@ -102,14 +100,13 @@ class FileCache implements EventSubscriberInterface
 
     protected function copyToCache(File $nativeFile, File $cachedFile): void
     {
-        $fileSystem = new Filesystem();
         if (
             $nativeFile instanceof FileWithResourceInterface
             && null !== $nativeFile->getResource()
         ) {
-            $fileSystem->dumpFile((string) $cachedFile, $nativeFile->getResource());
+            $this->filesystem->dumpFile((string) $cachedFile, $nativeFile->getResource());
         } else {
-            $fileSystem->copy((string) $nativeFile, (string) $cachedFile);
+            $this->filesystem->copy((string) $nativeFile, (string) $cachedFile);
         }
     }
 
@@ -141,7 +138,7 @@ class FileCache implements EventSubscriberInterface
                 && (false !== $mtime_cached_file && \is_numeric($mtime_cached_file))
                 && ($mtime_cached_file < $mtime_original_file)
             ) {
-                unlink($cacheFilePath);
+                $this->filesystem->remove($cacheFilePath);
             }
         }
 
@@ -161,8 +158,8 @@ class FileCache implements EventSubscriberInterface
             $firstGen = true;
         }
 
-        $fileContent = file_get_contents($cacheFilePath);
-        if (false !== $fileContent) {
+        try {
+            $fileContent = $this->filesystem->readFile($cacheFilePath);
             $response = new Response(
                 $fileContent,
                 Response::HTTP_OK,
@@ -174,8 +171,7 @@ class FileCache implements EventSubscriberInterface
                     'X-IR-First-Gen' => (int) $firstGen,
                 ]
             );
-            $response->setPublic();
-        } else {
+        } catch (IOException $exception) {
             $this->logger->error('Could not read cache file', [
                 'cache_file' => $cacheFilePath,
                 'request' => $request->getRequestUri(),

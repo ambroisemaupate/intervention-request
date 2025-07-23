@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class UnlockGarbageCollectorCommand extends Command
 {
@@ -43,6 +44,7 @@ class UnlockGarbageCollectorCommand extends Command
         $cacheDir = $input->getArgument('cache');
         $logFile = $input->getOption('log');
         $text = '';
+        $fs = new Filesystem();
 
         if (is_string($logFile) && !empty($logFile)) {
             $log = new Logger('InterventionRequest');
@@ -51,10 +53,10 @@ class UnlockGarbageCollectorCommand extends Command
             $log = new NullLogger();
         }
 
-        if (is_string($cacheDir) && file_exists($cacheDir)) {
+        if (is_string($cacheDir) && $fs->exists($cacheDir)) {
             $gc = new GarbageCollector($cacheDir, $log);
-            if (file_exists($gc->getLockPath())) {
-                unlink($gc->getLockPath());
+            if ($fs->exists($gc->getLockPath())) {
+                $fs->remove($gc->getLockPath());
             }
             $text .= '<info>Garbage collection unlocked.</info>'.PHP_EOL;
         } else {
