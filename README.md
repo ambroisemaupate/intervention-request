@@ -577,24 +577,17 @@ IR_GC_PROBABILITY: 1
 IR_GC_TTL: 0
 ```
 
-### Running Tests
+### Test grid
 
-To run the full test suite:
-
-```bash
-php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
-```
-OR
-```bash
-make test-unit
-```
-
-Make sure PHPUnit is properly configured and all required image processing dependencies are installed (such as GD, Imagick, or any relevant libraries your application uses).
+A simple test grid is available at `http://localhost:8080/test.html`
 
 ### Unit tests
 
+Make sure PHPUnit is properly configured and all required image processing dependencies are installed (such as GD, Imagick, or any relevant libraries your application uses).
+
 This project includes a comprehensive set of unit tests to validate various image manipulation operations.
 These tests ensure that image transformations are applied correctly and consistently.
+
 Available Tests :
 
 - testFitImageGeneration: Verifies that the image is resized to fit within the given dimensions while maintaining its aspect ratio.
