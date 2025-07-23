@@ -2,6 +2,13 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [6.0.3](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.2...v6.0.3) - 2025-07-22
+
+### Bug Fixes
+
+- Allow crop processor without width or height parameters - fix #34 - ([39af691](https://github.com/ambroisemaupate/intervention-request/commit/39af69160e6dbb891a598398ec33472f01514c34)) - Ambroise Maupate
+- update expected MD5 hashes in image crop tests - ([b8408b8](https://github.com/ambroisemaupate/intervention-request/commit/b8408b807b2ed98a7eb725172e03639e42ba19e8)) - Ambroise Maupate
+
 ## [6.0.2](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.1...v6.0.2) - 2025-07-01
 
 ### Bug Fixes
