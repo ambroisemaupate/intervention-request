@@ -8,12 +8,12 @@ use AM\InterventionRequest\Processor\FitProcessor;
 
 final class ImageFitProcessingTest extends ImageProcessingTestCase
 {
-    public function testFitImageHash(): void
+    public function test(): void
     {
         $this->processedImageHash(
             new FitProcessor(),
             '/rhino.webp',
-            '2b5b305cd8a20d52261f5a34cfabba23',
+            'adf5dc307d7ee97ac06964b6c8210485',
             ['fit' => '500x500', 'quality' => '80'],
         );
     }

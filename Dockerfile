@@ -1,10 +1,7 @@
 ARG UID=1000
 ARG GID=${UID}
 
-# Do not switch to PHP 8.4 before upgrading Image Intervention package due to warning:
-# NOTICE: PHP message: PHP Deprecated:  Intervention\Image\Gd\Driver::__construct(): Implicitly marking parameter $decoder as nullable is deprecated,
-# the explicit nullable type must be used instead in /var/www/html/vendor/intervention/image/src/Intervention/Image/Gd/Driver.php on line 16
-ARG PHP_VERSION=8.3.22
+ARG PHP_VERSION=8.4.10
 
 #######
 # PHP #
@@ -26,10 +23,10 @@ ENV IR_RESPONSE_TTL=31557600
 ENV IR_USE_FILECHECKSUM=0
 ENV IR_USE_PASSTHROUGH_CACHE=1
 ENV IR_DRIVER="gd"
-ENV IR_CACHE_PATH=/var/www/html/web/assets
+ENV IR_CACHE_PATH=/app/public/assets
 ENV IR_IGNORE_PATH=/assets
 ENV IR_DEFAULT_QUALITY=80
-ENV IR_IMAGES_PATH=/var/www/html/web/images
+ENV IR_IMAGES_PATH=/app/public/images
 ENV IR_JPEGOPTIM_PATH=/usr/bin/jpegoptim
 ENV IR_PNGQUANT_PATH=/usr/bin/pngquant
 
@@ -57,10 +54,10 @@ adduser --home /home/php --shell /bin/bash --uid ${GID} --gecos php --ingroup ph
 echo "php ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/php
 
 # App
-install --verbose --owner php --group php --mode 0755 --directory /var/www/html
+install --verbose --owner php --group php --mode 0755 --directory /app
 
 /usr/bin/crontab -u php /crontab.txt
-chown -R php:php /var/www/html
+chown -R php:php /app
 
 # Php extensions
 curl -sSLf  https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions \
@@ -85,12 +82,11 @@ COPY --link docker/etc/nginx/mime.types                /etc/nginx/mime.types
 COPY --link docker/etc/nginx/conf.d/_gzip.conf         /etc/nginx/conf.d/_gzip.conf
 COPY --link docker/etc/nginx/conf.d/_security.conf     /etc/nginx/conf.d/_security.conf
 COPY --link docker/etc/nginx/conf.d/default.conf       /etc/nginx/conf.d/default.conf
-COPY --link docker/etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY --link docker/etc/supervisor/supervisord.conf     /etc/supervisor/supervisord.conf
 COPY --link docker/etc/supervisor/conf.d/services.conf /etc/supervisor/conf.d/services.conf
+COPY --link --chmod=755 docker/docker-php-entrypoint   /usr/local/bin/docker-php-entrypoint
 
-COPY --link --chmod=755 docker/docker-php-entrypoint /usr/local/bin/docker-php-entrypoint
-
-WORKDIR /var/www/html
+WORKDIR /app
 
 
 ##################
@@ -120,8 +116,8 @@ RUN composer dump-autoload --classmap-authoritative --no-dev
 # Declare volumes with the correct user
 USER php
 
-VOLUME /var/www/html/web/images \
-       /var/www/html/web/assets
+VOLUME /app/public/images \
+       /app/public/assets
 
 USER root
 
@@ -143,7 +139,7 @@ COPY --link docker/etc/php/conf.d/strict.ini ${PHP_INI_DIR}/conf.d/zz-strict.ini
 # Declare volumes with the correct user
 USER php
 
-VOLUME /var/www/html
+VOLUME /app
 
 USER root
 
@@ -151,3 +147,134 @@ CMD [ "supervisord", "-n",  "-u", "root", "-c", "/etc/supervisor/supervisord.con
 
 EXPOSE 80
 
+
+##############
+# FrankenPHP #
+##############
+
+FROM dunglas/frankenphp:php${PHP_VERSION}-bookworm AS frankenphp
+
+LABEL org.opencontainers.image.authors="ambroise@rezo-zero.com"
+
+ARG UID
+ARG GID
+
+ARG COMPOSER_VERSION=2.8.2
+
+ENV SERVER_NAME=":80"
+ENV FRANKENPHP_CONFIG="worker /app/public/index.php"
+ENV IR_GC_PROBABILITY=400
+ENV IR_GC_TTL=604800
+# 1 year
+ENV IR_RESPONSE_TTL=31557600
+ENV IR_USE_FILECHECKSUM=0
+ENV IR_USE_PASSTHROUGH_CACHE=1
+ENV IR_DRIVER="gd"
+ENV IR_CACHE_PATH=/app/public/assets
+ENV IR_IGNORE_PATH=/assets
+ENV IR_DEFAULT_QUALITY=80
+ENV IR_IMAGES_PATH=/app/public/images
+ENV IR_JPEGOPTIM_PATH=/usr/bin/jpegoptim
+ENV IR_PNGQUANT_PATH=/usr/bin/pngquant
+
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
+
+COPY --link docker/crontab.txt /crontab.txt
+
+RUN <<EOF
+apt-get --quiet update
+apt-get --quiet --yes --purge --autoremove upgrade
+# Packages - System
+apt-get --quiet --yes --no-install-recommends --verbose-versions install \
+    less \
+    nginx \
+    cron \
+    pngquant \
+    supervisor \
+    jpegoptim \
+    sudo
+rm -rf /var/lib/apt/lists/*
+
+# User
+addgroup --gid ${UID} php
+adduser --home /home/php --shell /bin/bash --uid ${GID} --gecos php --ingroup php --disabled-password php
+echo "php ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/php
+
+# App
+install --verbose --owner php --group php --mode 0755 --directory /app
+
+/usr/bin/crontab -u php /crontab.txt
+chown -R php:php /app
+
+# Php extensions
+curl -sSLf  https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions \
+    --output /usr/local/bin/install-php-extensions
+chmod +x /usr/local/bin/install-php-extensions
+install-php-extensions \
+    @composer-${COMPOSER_VERSION} \
+    apcu \
+    exif \
+    gd \
+    imagick \
+    opcache \
+    zip
+
+setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp
+
+chown --recursive ${UID}:${GID} /data/caddy /config/caddy
+EOF
+
+WORKDIR /app
+
+#######################
+# Php - franken - Dev #
+#######################
+
+FROM frankenphp AS frankenphp-dev
+
+ENV IR_DEBUG=1
+ENV XDEBUG_MODE=off
+
+COPY --link docker/etc/php/conf.d/strict.ini ${PHP_INI_DIR}/conf.d/zz-strict.ini
+COPY --link docker/etc/caddy/Caddyfile.dev /etc/frankenphp/Caddyfile
+
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
+USER php
+
+VOLUME /app
+
+########################
+# Php - franken - Prod #
+########################
+
+FROM frankenphp AS frankenphp-prod
+
+ARG UID
+ARG GID
+
+ENV IR_DEBUG=0
+
+RUN mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
+
+# Composer
+COPY --link docker/etc/php/conf.d/strict.ini ${PHP_INI_DIR}/conf.d/zz-strict.ini
+COPY --link docker/etc/php/conf.d/php.prod.ini ${PHP_INI_DIR}/conf.d/zz-app.ini
+COPY --link docker/etc/caddy/Caddyfile.prod /etc/frankenphp/Caddyfile
+
+COPY --link --chown=${UID}:${GID} composer.* ./
+
+RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+
+COPY --link --chown=${UID}:${GID} . .
+
+# Overwrite default entrypoint with worker.php
+COPY --link --chown=${UID}:${GID} ./public/worker.php /app/public/index.php
+
+RUN composer dump-autoload --classmap-authoritative --no-dev
+
+# Declare volumes with the correct user
+USER php
+
+VOLUME /app/public/images \
+       /app/public/assets

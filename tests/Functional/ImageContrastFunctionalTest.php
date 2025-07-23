@@ -9,12 +9,11 @@ class ImageContrastFunctionalTest extends InterventionRequestTestCase
     /**
      * @throws \Exception
      */
-    public function testContrast(): void
+    public function test(): void
     {
         $expectedMd5 = '93d5cffe79f40818547f3e2605793ec2';
         $request = $this->generateRequest('http://localhost/assets/k90/rhino.webp');
-        $this->interventionRequest->handleRequest($request);
-        $response = $this->interventionRequest->getResponse($request);
+        $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
 
         $this->assertEquals($expectedMd5, $actualMd5);

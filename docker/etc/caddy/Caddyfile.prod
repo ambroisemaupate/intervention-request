@@ -1,0 +1,17 @@
+{
+    skip_install_trust
+
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+	    worker /app/public/index.php
+	}
+}
+
+{$SERVER_NAME:localhost} {
+	root * /app/public
+
+    {$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	php_server
+}

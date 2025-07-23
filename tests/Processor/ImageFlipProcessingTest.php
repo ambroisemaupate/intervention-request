@@ -8,7 +8,7 @@ use AM\InterventionRequest\Processor\FlipProcessor;
 
 final class ImageFlipProcessingTest extends ImageProcessingTestCase
 {
-    public function testFlipImageHash(): void
+    public function test(): void
     {
         // test with md5 of rhino.webp with flip horizontally
         $this->processedImageHash(

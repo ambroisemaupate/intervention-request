@@ -22,7 +22,7 @@ final class CropProcessor extends AbstractPositionableProcessor
             && !$request->query->has('height')
         ) {
             // Get width and height with ratio
-            $size = $this->getCroppedWidthHeight($image, $crop);
+            $size = $this->getCroppedWidthHeight($image->width(), $image->height(), $crop);
 
             $image->crop($size->getRoundedX(), $size->getRoundedY(), position: $this->parsePosition($request));
         }

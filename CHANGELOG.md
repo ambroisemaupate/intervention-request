@@ -2,7 +2,7 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
-## [6.0.3](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.2...6.0.3) - 2025-07-22
+## [6.0.3](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.2...v6.0.3) - 2025-07-22
 
 ### Bug Fixes
 

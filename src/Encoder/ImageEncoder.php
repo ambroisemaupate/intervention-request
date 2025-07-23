@@ -7,6 +7,8 @@ namespace AM\InterventionRequest\Encoder;
 use Intervention\Image\Exceptions\NotWritableException;
 use Intervention\Image\Interfaces\EncodedImageInterface;
 use Intervention\Image\Interfaces\ImageInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 
 final class ImageEncoder implements ImageEncoderInterface
 {
@@ -24,6 +26,7 @@ final class ImageEncoder implements ImageEncoderInterface
 
     public function save(ImageInterface $image, string $path, int $quality, bool $progressive = false): ImageInterface
     {
+        $filesystem = new Filesystem();
         $path = empty($path) ? $image->origin()->filePath() : $path;
 
         if (empty($path)) {
@@ -31,10 +34,11 @@ final class ImageEncoder implements ImageEncoderInterface
         }
 
         $data = $this->encode($image, $path, $quality, $progressive);
-        $saved = @file_put_contents($path, $data);
 
-        if (false === $saved) {
-            throw new NotWritableException("Can't write image data to path ({$path})");
+        try {
+            $filesystem->dumpFile($path, $data);
+        } catch (IOException $e) {
+            throw new NotWritableException("Can't write image data to path ({$path}): ".$e->getMessage(), previous: $e);
         }
 
         return $image;
@@ -43,7 +47,7 @@ final class ImageEncoder implements ImageEncoderInterface
     private function getImageAllowedExtension(string $path): string
     {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        if (!in_array($extension, static::$allowedExtensions)) {
+        if (!in_array($extension, self::$allowedExtensions)) {
             return 'jpg';
         }
 

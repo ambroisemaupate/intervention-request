@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crop tests</title>
+    <style>
+        [rel=main] {
+            max-width: 1440px;
+            margin: 2rem auto;
+            font-family: sans-serif;
+            font-size: 1rem;
+        }
+        figure {
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+        }
+        figure img {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 600px;
+        }
+        section {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid #ccc;
+        }
+        .images {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div rel="main">
+    <h1>IR tests</h1>
+</div>
+<script>
+    (() => {
+        const simpleTest = [
+            '/assets/q70-w600-k20/rhino.jpg.webp',
+            '/assets/q70-w600-r90/testUHD.jpg.webp',
+            '/assets/q40-w600/rhino.jpg.webp',
+        ]
+        const test = [
+            '/assets/q70-w600-c1:1-d0.5:0.5:0.2:0.333:0.9:0.7333/rhino.jpg.webp',
+            '/assets/q70-w600-c2:1-d0.8:0.5:0.2:0.333:0.9:0.7333/rhino.jpg.webp',
+            '/assets/q70-w600-c1:2-d0.3333:0.5/rhino.jpg.webp',
+            '/assets/q70-w600-c1:1-d0.5:0.5:0.2:0.333:0.9:0.7333/testUHD.jpg.webp',
+            '/assets/q70-w600-c3:1-d0.7:0.5:0.1:0.333:0.9:0.7333/testUHD.jpg.webp',
+        ]
+        const main = document.querySelector('[rel=main]');
+        if (!main) {
+            return;
+        }
+        test.forEach(test => {
+            main.insertAdjacentHTML('beforeend', `
+                <section>
+                    <p>${test}</p>
+                    <div class="images">
+                    <figure>
+                        <img loading="lazy" src="${test}?trace=1" alt="">
+                        <figcaption>Image with trace</figcaption>
+                    </figure>
+                    <figure>
+                        <img loading="lazy" src="${test}" alt="">
+                        <figcaption>Image result</figcaption>
+                    </figure>
+                    </div>
+                </section>
+            `);
+        });
+        simpleTest.forEach(test => {
+            main.insertAdjacentHTML('beforeend', `
+                <section>
+                    <p>${test}</p>
+                    <div class="images">
+                    <figure>
+                        <img loading="lazy" src="${test}" alt="">
+                        <figcaption>Image result</figcaption>
+                    </figure>
+                    </div>
+                </section>
+            `);
+        });
+    })();
+</script>
+</body>
+</html>

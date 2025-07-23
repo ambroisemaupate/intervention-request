@@ -37,7 +37,7 @@ class InterventionRequestTestCase extends TestCase
         }
 
         $conf->setUsePassThroughCache(false);
-        $conf->setImagesPath(dirname(__DIR__).'/../web/images');
+        $conf->setImagesPath(dirname(__DIR__).'/../public/images');
         $conf->setUseFileChecksum(false);
         $conf->setDriver('gd');
         $conf->setDefaultQuality(80);

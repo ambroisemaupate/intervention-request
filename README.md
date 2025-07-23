@@ -35,21 +35,29 @@
     * [tinyjpg.com](#tinyjpgcom)
     * [jpegtran](#jpegtran)
     * [Optimization benchmark](#optimization-benchmark)
-- [License](#license)
 - [Testing](#testing)
+    * [Disable cache during development](#disable-cache-during-development)
+    * [Test grid](#test-grid)
+    * [Unit tests](#unit-tests)
+        + [Test Strategy](#test-strategy)
+        + [Running the Tests](#running-the-tests)
+    * [Functional tests](#functional-tests)
+        + [Test Strategy](#test-strategy-1)
+        + [Running the Tests](#running-the-tests-1)
+- [License](#license)
 
 ## Ready-to-go *Docker* image
 
 Intervention Request is now available as a standalone Docker server to use with whatever CMS or language you need.
 It declares two volumes: one for your images storage and one for cached files.
 
-- `/var/www/html/web/images`: you can set it as read-only to prevent any write operation
-- `/var/www/html/web/assets`: you must set it as read-write to allow cache files to be written
+- `/app/public/images`: you can set it as read-only to prevent any write operation
+- `/app/public/assets`: you must set it as read-write to allow cache files to be written
 
 ```php
 docker pull ambroisemaupate/intervention-request;
 # Make sure to share your volume with READ-ONLY flag
-docker run -v "/my/images/folder:/var/www/html/web/images:ro" -p 8080:80/tcp ambroisemaupate/intervention-request;
+docker run -v "/my/images/folder:/app/public/images:ro" -p 8080:80/tcp ambroisemaupate/intervention-request;
 ```
 
 - Create a `/my/images/folder/your-image.png`
@@ -79,16 +87,17 @@ version: '3'
 services:
     intervention:
         image: ambroisemaupate/intervention-request:latest
+        #image: ambroisemaupate/intervention-request:frankenphp
         volumes:
-            - cache:/var/www/html/web/assets
+            - cache:/app/public/assets
             ## If using local storage file system
-            - ./my/images/folder:/var/www/html/web/images:ro
+            - ./my/images/folder:/app/public/images:ro
         # You can override some defaults below
         environment:
             IR_DEBUG: 0
             IR_DEFAULT_QUALITY: 80
             ## If using local storage file system
-            IR_IMAGES_PATH: /var/www/html/web/images
+            IR_IMAGES_PATH: /app/public/images
             ## If using an AWS or Scaleway Object storage file system 
             IR_AWS_ACCESS_KEY_ID: 'changeme'
             IR_AWS_ACCESS_KEY_SECRET: 'changeme'
@@ -161,26 +170,27 @@ You can edit each configuration parameters using their corresponding *setters*:
 
 ## Available operations
 
-| Query attribute     | Description                                                                                                                                                                                              | Usage                                                            |
-|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| image               | Native image path relative to your configuration `imagePath`                                                                                                                                             | `?image=path/to/image.jpg`                                       |
-| fit                 | [Crop and resize combined](https://image.intervention.io/v3/modifying-images/resizing#fitted-resizing-without-exceeding-the-original-size) It needs a `width` and a `height` in pixels, <br> this filter can be combined with `align` to choose which part of your image to fit | `…&fit=300x300`                                                  |
-| align               | [Crop and resize combined](https://image.intervention.io/v3/modifying-images/resizing#fitted-resizing-without-exceeding-the-original-size) Choose which part of your image to fit.                                                                                             | `…&align=c`                                                      |
-| flip                | [Mirror image horizontal or vertical](https://image.intervention.io/v3/modifying-images/effects#mirror-image-horizontally) You can set `h` for horizontal or `v` for vertical flip.                                                                | `…&flip=h`                                                       |
-| crop                | [Crop an image](https://image.intervention.io/v3/modifying-images/resizing#crop-image) It needs a `width` and a `height` in pixels                                                                                                   | `…&crop=300x300`                                                 |
-| width               | [Resize image proportionally to given width](https://image.intervention.io/v3/modifying-images/resizing#scale-images-but-do-not-exceed-the-original-size) It needs a `width` in pixels                                                                                    | `…&width=300`                                                    |
-| height              | [Resize image proportionally to given height](https://image.intervention.io/v3/modifying-images/resizing#scale-images-but-do-not-exceed-the-original-size) It needs a `height` in pixels                                                                               | `…&height=300`                                                   |
-| crop + height/width | Do the same as *fit* using width or height as final size. Ex: this will output a 200 x 200px image                                                                                                       | `…&crop=300x300&width=200` |
-| background          | [Matte a png file with a background color](https://image.intervention.io/v3/basics/colors#merge-transparent-areas-with-color)                                                                                                             | `…&background=ff0000`                                            |
-| greyscale/grayscale | [Turn an image into a greyscale version](https://image.intervention.io/v3/modifying-images/effects#convert-image-to-a-greyscale-version)                                                                                                                 | `…&greyscale=1`                                                  |
-| blur                | [Blurs an image](https://image.intervention.io/v3/modifying-images/effects#blur-effect)                                                                                                                                              | `…&blur=20`                                                      |
-| quality             | Set the exporting quality (1 - 100), default to 90                                                                                                                                                       | `…&quality=95`                                                   |
-| progressive         | [Toggle progressive mode](https://image.intervention.io/v3/basics/image-output#encode-images-by-media-mime-type)                                                                                                                                | `…&progressive=1`                                                |
-| interlace           | [Toggle interlaced mode](https://image.intervention.io/v3/basics/image-output#encode-images-by-media-mime-type)                                                                                                                                 | `…&interlace=1`                                                  |
-| sharpen             | [Sharpen image](https://image.intervention.io/v3/modifying-images/effects#sharpening-effect) (1 - 100)                                                                                                                                   | `…&sharpen=10`                                                   |
-| contrast            | [Change image contrast](https://image.intervention.io/v3/modifying-images/effects#change-the-image-contrast) (-100 to 100, 0 means no changes)                                                                                                 | `…&contrast=10`                                                  |
-| no_process          | **Disable all image processing by PHP**, this does not load image in memory but executes <br> any post-process optimizers (such as *pngquant*, *jpegoptim*…)                                             | `…&no_process=1`                                                 |
-| hotspot             | [Crop an image](https://image.intervention.io/v3/modifying-images/resizing#crop-image) It needs a `x`, `y` <br> (to define the center point of the image in percentage between 0 and 1), `width` and a `height` in pixels            | `…&hotspot=0.25x0.75`                                            |
+| Query attribute     | Description                                                                                                                                                                                                                                                                                                                                                      | Usage                                 |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
+| image               | Native image path relative to your configuration `imagePath`                                                                                                                                                                                                                                                                                                     | `?image=path/to/image.jpg`            |
+| fit                 | [Crop and resize combined](https://image.intervention.io/v3/modifying-images/resizing#fitted-resizing-without-exceeding-the-original-size) It needs a `width` and a `height` in pixels, <br>this filter can be combined with `align` to choose which part of your image to fit                                                                                   | `…&fit=300x300`                       |
+| align               | [Crop and resize combined](https://image.intervention.io/v3/modifying-images/resizing#fitted-resizing-without-exceeding-the-original-size) Choose which part of your image to fit.                                                                                                                                                                               | `…&align=c`                           |
+| flip                | [Mirror image horizontal or vertical](https://image.intervention.io/v3/modifying-images/effects#mirror-image-horizontally) You can set `h` for horizontal or `v` for vertical flip.                                                                                                                                                                              | `…&flip=h`                            |
+| crop                | [Crop an image](https://image.intervention.io/v3/modifying-images/resizing#crop-image) Crop and image by a **ratio** , using origin image size.                                                                                                                                                                                                                  | `…&crop=1:1`                          |
+| width               | [Resize image proportionally to given width](https://image.intervention.io/v3/modifying-images/resizing#scale-images-but-do-not-exceed-the-original-size) It needs a `width` in pixels                                                                                                                                                                           | `…&width=300`                         |
+| height              | [Resize image proportionally to given height](https://image.intervention.io/v3/modifying-images/resizing#scale-images-but-do-not-exceed-the-original-size) It needs a `height` in pixels                                                                                                                                                                         | `…&height=300`                        |
+| crop + height/width | Do the same as *fit* using width or height as final size. Ex: this will output a 200 x 200px image                                                                                                                                                                                                                                                               | `…&crop=1:1&width=200`                |
+| background          | [Matte a png file with a background color](https://image.intervention.io/v3/basics/colors#merge-transparent-areas-with-color)                                                                                                                                                                                                                                    | `…&background=ff0000`                 |
+| greyscale/grayscale | [Turn an image into a greyscale version](https://image.intervention.io/v3/modifying-images/effects#convert-image-to-a-greyscale-version)                                                                                                                                                                                                                         | `…&greyscale=1`                       |
+| blur                | [Blurs an image](https://image.intervention.io/v3/modifying-images/effects#blur-effect)                                                                                                                                                                                                                                                                          | `…&blur=20`                           |
+| quality             | Set the exporting quality (1 - 100), default to 90                                                                                                                                                                                                                                                                                                               | `…&quality=95`                        |
+| progressive         | [Toggle progressive mode](https://image.intervention.io/v3/basics/image-output#encode-images-by-media-mime-type)                                                                                                                                                                                                                                                 | `…&progressive=1`                     |
+| interlace           | [Toggle interlaced mode](https://image.intervention.io/v3/basics/image-output#encode-images-by-media-mime-type)                                                                                                                                                                                                                                                  | `…&interlace=1`                       |
+| sharpen             | [Sharpen image](https://image.intervention.io/v3/modifying-images/effects#sharpening-effect) (1 - 100)                                                                                                                                                                                                                                                           | `…&sharpen=10`                        |
+| contrast            | [Change image contrast](https://image.intervention.io/v3/modifying-images/effects#change-the-image-contrast) (-100 to 100, 0 means no changes)                                                                                                                                                                                                                   | `…&contrast=10`                       |
+| no_process          | **Disable all image processing by PHP**, this does not load image in memory but executes <br> any post-process optimizers (such as *pngquant*, *jpegoptim*…)                                                                                                                                                                                                     | `…&no_process=1`                      |
+| hotspot             | [Crop an image](https://image.intervention.io/v3/modifying-images/resizing#crop-image) using a center point and a base area equal to original image. <br>It needs a `x`, `y` (to define the center point of the image in percentage between 0 and 1).  <br>[Since v6.0.0](https://github.com/ambroisemaupate/intervention-request/releases/tag/v6.0.0)           | `…&hotspot=0.25:0.75`                 |
+| hotspot + area      | [Crop an image](https://image.intervention.io/v3/modifying-images/resizing#crop-image) with a base area and a center point (relative to the area).  <br>It needs `centerX`, `centerY`, `areaStartX`, `areaStartY`, `areaEndX`, `areaEndY` (all between 0 and 1). <br>[Since v7.0.0](https://github.com/ambroisemaupate/intervention-request/releases/tag/v7.0.0) | `…&hotspot=0.25:0.75:0.1:0.1:0.9:0.9` |
 
 ### Fit position
 
@@ -533,12 +543,6 @@ AVIF conversion only supports custom compiled *ImageMagick* and only support los
 |--------------------------|---------|----------|--------|---------------------|-------------|------------|-------------|
 | /test/images/testPNG.png | 292 kB  | 167 kB   | 288 kB | 142 kB              | 186 kB      | 28 kB      | 11.7 kB     |
 
-## License
-
-*Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
-
-Have fun!
-
 ## Testing
 
 This project uses Docker for development environment.
@@ -551,7 +555,7 @@ services:
             context: .
             target: php-dev
         volumes:
-            - ./:/var/www/html
+            - ./:/app
         ports:
             -   "8080:80/tcp"
 
@@ -577,24 +581,17 @@ IR_GC_PROBABILITY: 1
 IR_GC_TTL: 0
 ```
 
-### Running Tests
+### Test grid
 
-To run the full test suite:
-
-```bash
-php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
-```
-OR
-```bash
-make test-unit
-```
-
-Make sure PHPUnit is properly configured and all required image processing dependencies are installed (such as GD, Imagick, or any relevant libraries your application uses).
+A simple test grid is available at `http://localhost:8080/test.html`
 
 ### Unit tests
 
+Make sure PHPUnit is properly configured and all required image processing dependencies are installed (such as GD, Imagick, or any relevant libraries your application uses).
+
 This project includes a comprehensive set of unit tests to validate various image manipulation operations.
 These tests ensure that image transformations are applied correctly and consistently.
+
 Available Tests :
 
 - testFitImageGeneration: Verifies that the image is resized to fit within the given dimensions while maintaining its aspect ratio.
@@ -637,7 +634,6 @@ OR
 make test-unit
 ```
 
-
 ### Functional tests
 
 This project includes a comprehensive set of unit tests to validate various image manipulation operations.
@@ -673,3 +669,10 @@ OR
 ```bash
 make test-functional
 ```
+
+
+## License
+
+*Intervention Request* is handcrafted by *Ambroise Maupate* under **MIT license**.
+
+Have fun!

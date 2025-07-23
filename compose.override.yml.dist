@@ -3,8 +3,13 @@ services:
         build:
             context: .
             target: php-dev
+            #target: frankenphp-dev
         volumes:
-            - ./:/var/www/html
+            - ./:/app
+#            - ./docker/etc/caddy/Caddyfile.dev:/etc/frankenphp/Caddyfile:ro
+#            - ./public/worker.php:/app/public/index.php:ro
+#            - caddy_data:/data
+#            - caddy_config:/config
         ports:
             - "8080:80"
         environment:
@@ -24,3 +29,7 @@ services:
             IR_IGNORE_PATH: ${IR_IGNORE_PATH}
             IR_DEFAULT_QUALITY: ${IR_DEFAULT_QUALITY}
 
+# Volumes needed for Caddy certificates and configuration
+#volumes:
+#    caddy_data:
+#    caddy_config:

@@ -3,7 +3,11 @@ variable "REGISTRY" {
 }
 
 variable "VERSION" {
-    default = "6.0.3"
+    default = "7.0.0"
+}
+
+group "default" {
+    targets = ["intervention", "intervention-frankenphp"]
 }
 
 target "intervention" {
@@ -15,10 +19,37 @@ target "intervention" {
                 name = "php"
                 target = "php-prod"
             },
+            {
+                name = "frankenphp"
+                target = "frankenphp-prod"
+            },
         ]
     }
     context = "."
     target = item.target
     dockerfile = "Dockerfile"
-    tags = ["${REGISTRY}:${VERSION}", "${REGISTRY}:latest"]
+    tags = [
+        notequal(VERSION, "develop") ? "${REGISTRY}:${VERSION}" : "${REGISTRY}:develop",
+        notequal(VERSION, "develop") ? "${REGISTRY}:latest" : "",
+    ]
+}
+
+target "intervention-frankenphp" {
+    name = "intervention-${item.name}"
+    platforms = ["linux/amd64", "linux/arm64"]
+    matrix = {
+        item = [
+            {
+                name = "frankenphp"
+                target = "frankenphp-prod"
+            },
+        ]
+    }
+    context = "."
+    target = item.target
+    dockerfile = "Dockerfile"
+    tags = [
+        notequal(VERSION, "develop") ? "${REGISTRY}:${item.name}-${VERSION}" : "${REGISTRY}:${item.name}-develop",
+        notequal(VERSION, "develop") ? "${REGISTRY}:${item.name}" : "",
+    ]
 }

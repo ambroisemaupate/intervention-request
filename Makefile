@@ -1,20 +1,16 @@
 
-.PHONY: test dev-server
+.PHONY: test bake dev-server test-functional test-unit
 test:
-	php -d "memory_limit=-1" vendor/bin/php-cs-fixer fix --ansi -vvv
-	php -d "memory_limit=-1" vendor/bin/phpstan analyse -c phpstan.neon;
-	php -d "memory_limit=-1" vendor/bin/phpunit tests/
-
-dev-server:
-	# http://0.0.0.0:8080/dev.php/cache/w1000/rhino.jpg
-	cd web && php -S 0.0.0.0:8080
+	docker compose run --rm --entrypoint= -e "PHP_CS_FIXER_IGNORE_ENV=1" intervention php -d "memory_limit=-1" vendor/bin/php-cs-fixer fix --ansi -vvv
+	docker compose run --rm --entrypoint= intervention php -d "memory_limit=-1" vendor/bin/phpstan analyse -c phpstan.neon;
+	docker compose run --rm --entrypoint= intervention php -d "memory_limit=-1" vendor/bin/phpunit tests/
 
 bake:
 	docker run --privileged --rm tonistiigi/binfmt --install all
 	docker buildx bake --push intervention
 
 test-functional:
-	php -d "memory_limit=-1" vendor/bin/phpunit tests/Functional
+	docker compose run --rm --entrypoint= intervention php -d "memory_limit=-1" vendor/bin/phpunit tests/Functional
 
 test-unit:
-	php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor
+	docker compose run --rm --entrypoint= intervention php -d "memory_limit=-1" vendor/bin/phpunit tests/Processor

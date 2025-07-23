@@ -8,13 +8,13 @@ use AM\InterventionRequest\Processor\WidenProcessor;
 
 final class ImageWidenProcessingTest extends ImageProcessingTestCase
 {
-    public function testSharpenImageHash(): void
+    public function test(): void
     {
         // test the md5 of testUHD.jpg with width 200
         $this->processedImageHash(
             new WidenProcessor(),
             '/testUHD.jpg',
-            '69b0bc28701755b168d395febc7604a3',
+            'f8b5da72d41c4b3ec80a8b16cfd38949',
             ['width' => '200'],
         );
     }

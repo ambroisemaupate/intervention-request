@@ -116,7 +116,7 @@ final class GarbageCollector
      */
     private function start(): void
     {
-        $this->logger->debug(sprintf('GC started'));
+        $this->logger->debug('GC started');
 
         // Create the file that tells Intervention Request that
         // the garbage collector is currently running and doesn't need to run again right now.
@@ -132,7 +132,7 @@ final class GarbageCollector
         $this->fs->remove($this->lockPath);
 
         if ($successful) {
-            $this->logger->debug(sprintf('GC completed'));
+            $this->logger->debug('GC completed');
         }
     }
 

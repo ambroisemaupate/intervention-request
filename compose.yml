@@ -2,8 +2,8 @@ services:
     intervention:
         image: ambroisemaupate/intervention-request:latest
         volumes:
-            - ./web/assets:/var/www/html/web/assets
-            - ./web/images:/var/www/html/web/images:ro
+            - ./public/assets:/app/public/assets
+            - ./public/images:/app/public/images:ro
         environment:
             IR_GC_PROBABILITY: ${IR_GC_PROBABILITY}
             IR_GC_TTL: ${IR_GC_TTL}
