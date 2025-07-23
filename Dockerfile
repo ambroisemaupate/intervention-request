@@ -82,10 +82,9 @@ COPY --link docker/etc/nginx/mime.types                /etc/nginx/mime.types
 COPY --link docker/etc/nginx/conf.d/_gzip.conf         /etc/nginx/conf.d/_gzip.conf
 COPY --link docker/etc/nginx/conf.d/_security.conf     /etc/nginx/conf.d/_security.conf
 COPY --link docker/etc/nginx/conf.d/default.conf       /etc/nginx/conf.d/default.conf
-COPY --link docker/etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY --link docker/etc/supervisor/supervisord.conf     /etc/supervisor/supervisord.conf
 COPY --link docker/etc/supervisor/conf.d/services.conf /etc/supervisor/conf.d/services.conf
-
-COPY --link --chmod=755 docker/docker-php-entrypoint /usr/local/bin/docker-php-entrypoint
+COPY --link --chmod=755 docker/docker-php-entrypoint   /usr/local/bin/docker-php-entrypoint
 
 WORKDIR /app
 
