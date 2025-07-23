@@ -2,6 +2,33 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [7.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.2...v7.0.0) - 2025-07-23
+
+### ⚠ Breaking changes
+
+- Please change your docker container volume configuration from `/var/www/html/web` to `/app/public`.
+
+Added FrankenPHP build
+
+### Bug Fixes
+
+- Allow crop processor without width or height parameters - fix #34 - ([9db0997](https://github.com/ambroisemaupate/intervention-request/commit/9db09975318b0bcf988f2988bbeb6c96543d9a05)) - Ambroise Maupate
+
+### Documentation
+
+- Update README with test grid section and add new test.html for image processing tests - ([5c8056f](https://github.com/ambroisemaupate/intervention-request/commit/5c8056fbc6ef88956e317c48d67d1595b50c1b4c)) - Ambroise Maupate
+
+### Features
+
+- **(docker)** [**breaking**] Use PHP 8.4 and moved directories from /var/www/html to /app and ./web to ./public - ([2e1a71c](https://github.com/ambroisemaupate/intervention-request/commit/2e1a71c84a1ed5a04d1bae78649a7d450647935e)) - Ambroise Maupate
+- **(docker)** Add intervention-frankenphp target and update .gitignore for public/images - ([c6d0bd2](https://github.com/ambroisemaupate/intervention-request/commit/c6d0bd2365c2845e91f06e71ea410aa9a9a4d828)) - Ambroise Maupate
+- Added new hotspot parameter to define hotspot area in addition of its center - ([71153e0](https://github.com/ambroisemaupate/intervention-request/commit/71153e0308c9f71bccb22d426a3b9ff4f05fb428)) - Ambroise Maupate
+- FrankenPHP worker mode and Caddyfiles for development and production - ([25d69a3](https://github.com/ambroisemaupate/intervention-request/commit/25d69a34e027ee41d0caa850e950052d0287efe6)) - Ambroise Maupate
+
+### Refactor
+
+- Refactor file handling in cache and image encoder to use Symfony Filesystem component - ([6972db3](https://github.com/ambroisemaupate/intervention-request/commit/6972db3dbe3ed5f1ad901df77b0f079638314823)) - Ambroise Maupate
+
 ## [6.0.2](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.1...v6.0.2) - 2025-07-01
 
 ### Bug Fixes

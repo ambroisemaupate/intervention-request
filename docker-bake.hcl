@@ -3,7 +3,7 @@ variable "REGISTRY" {
 }
 
 variable "VERSION" {
-    default = "develop"
+    default = "7.0.0"
 }
 
 group "default" {
