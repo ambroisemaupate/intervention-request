@@ -19,7 +19,7 @@
  services:
      intervention:
 -       image: ambroisemaupate/intervention-request:6.0.3
-+       image: ambroisemaupate/intervention-request:7.0.1
++       image: ambroisemaupate/intervention-request:7.0.2
          volumes:
 -           - image_cache:/var/www/html/web/assets
 -           - image_storage:/var/www/html/web/images:ro
@@ -49,15 +49,15 @@
 ### Docker images
 
 - Docker image is now shipped in *plain PHP* and *FrankenPHP* (worker mode) flavors: https://hub.docker.com/r/ambroisemaupate/intervention-request/tags
-    - `latest`, `develop`, `7.0.1`, etc are built with PHP + Nginx + cron
-    - `frankenphp`, `frankenphp-develop`, `frankenphp-7.0.1`, etc are built with FrankenPHP (worker mode) + Caddy (no cron)
+    - `latest`, `develop`, `7.0.2`, etc are built with PHP + Nginx + cron
+    - `frankenphp`, `frankenphp-develop`, `frankenphp-7.0.2`, etc are built with FrankenPHP (worker mode) + Caddy (no cron)
 - Docker images are based on PHP 8.4
 - PHP and FrankenPHP images are built so there should be no difference in configuration (except for Caddy volumes):
 ```yaml
 services:
     intervention:
-        image: ambroisemaupate/intervention-request:frankenphp-7.0.1
-#        image: ambroisemaupate/intervention-request:7.0.1
+        image: ambroisemaupate/intervention-request:frankenphp-7.0.2
+#        image: ambroisemaupate/intervention-request:7.0.2
         volumes:
             - image_cache:/app/public/assets
             - image_storage:/app/public/images:ro
