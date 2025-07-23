@@ -36,7 +36,7 @@ final class ImageEncoder implements ImageEncoderInterface
         $data = $this->encode($image, $path, $quality, $progressive);
 
         try {
-            $filesystem->dumpFile($path, $data);
+            $filesystem->dumpFile($path, $data->toFilePointer());
         } catch (IOException $e) {
             throw new NotWritableException("Can't write image data to path ({$path}): ".$e->getMessage(), previous: $e);
         }
