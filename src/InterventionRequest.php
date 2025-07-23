@@ -19,6 +19,7 @@ use AM\InterventionRequest\Listener\QualitySubscriber;
 use AM\InterventionRequest\Listener\ResponseHeadersListener;
 use AM\InterventionRequest\Listener\StreamNoProcessListener;
 use AM\InterventionRequest\Listener\StripExifListener;
+use AM\InterventionRequest\Listener\TraceListener;
 use AM\InterventionRequest\Listener\WatermarkListener;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Psr\Log\LoggerInterface;
@@ -79,7 +80,8 @@ class InterventionRequest
             $this->fileResolver,
         ));
         $this->addSubscriber(new StripExifListener());
-        $this->addSubscriber(new ResponseHeadersListener($this->configuration));
+        $this->addSubscriber(new TraceListener($this->debug));
+        $this->addSubscriber(new ResponseHeadersListener($this->configuration, $this->debug));
         $this->addSubscriber(new QualitySubscriber($this->configuration->getDefaultQuality()));
         $this->addSubscriber(new ProgressiveSubscriber(false));
         $this->addSubscriber(new FileCache(
@@ -136,7 +138,7 @@ class InterventionRequest
                 new Processor\CropResizedProcessor(),
                 new Processor\FitProcessor(),
                 new Processor\CropProcessor(),
-                new Processor\HotspotProcessor($this->debug),
+                new Processor\HotspotProcessor(),
                 new Processor\FlipProcessor(), // Flip must be AFTER crop/fit
                 new Processor\WidenProcessor(),
                 new Processor\HeightenProcessor(),

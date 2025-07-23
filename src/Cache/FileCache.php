@@ -221,6 +221,10 @@ class FileCache implements EventSubscriberInterface
             $cacheParams['heic'] = false;
             $extension = $nativeImage->getExtension();
         }
+        if (true === $request->attributes->get('trace', false)) {
+            $cacheParams['trace'] = 1;
+        }
+
         $cacheHash = hash('sha1', serialize($cacheParams).$fileMd5);
 
         return $this->cachePath.

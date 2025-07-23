@@ -22,6 +22,7 @@ supervisord.pid
 public/assets
 public/cache
 public/dev.php
+public/croptest.html
 public/images
 tests/temp
 

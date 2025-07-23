@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ResponseHeadersListener implements EventSubscriberInterface
 {
-    public function __construct(private Configuration $configuration)
+    public function __construct(private Configuration $configuration, private bool $debug = false)
     {
     }
 
@@ -25,10 +25,13 @@ final readonly class ResponseHeadersListener implements EventSubscriberInterface
     {
         $response = $event->getResponse();
 
-        if ($response->isCacheable()) {
+        if (!$this->debug && $response->isCacheable()) {
             $response->setPublic();
             $response->setMaxAge($this->configuration->getResponseTtl());
             $response->setSharedMaxAge($this->configuration->getResponseTtl());
+        } else {
+            $response->setPrivate();
+            $response->setMaxAge(0);
         }
         $response->setCharset('UTF-8');
         $response->headers->set(
@@ -43,6 +46,10 @@ final readonly class ResponseHeadersListener implements EventSubscriberInterface
             'access-control-allow-origin',
             '*'
         );
+
+        if ($this->debug) {
+            $response->headers->set('X-Debug', '1');
+        }
 
         $event->setResponse($response);
     }
