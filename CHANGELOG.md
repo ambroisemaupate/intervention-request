@@ -2,6 +2,12 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [7.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.0...v7.0.1) - 2025-07-23
+
+### Bug Fixes
+
+- **(ImageEncoder)** update ImageEncoder to use resource for filesystem dump - ([7822a87](https://github.com/ambroisemaupate/intervention-request/commit/7822a874c6f6d3f6390ccbcf0c3d45cb4783e56f)) - Ambroise Maupate
+
 ## [7.0.0](https://github.com/ambroisemaupate/intervention-request/compare/v6.0.3...v7.0.0) - 2025-07-23
 
 ### ⚠ Breaking changes
