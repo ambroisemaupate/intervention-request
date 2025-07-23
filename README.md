@@ -86,8 +86,8 @@ _AWS_ adapter only.
 version: '3'
 services:
     intervention:
-        image: ambroisemaupate/intervention-request:7.0.1
-        #image: ambroisemaupate/intervention-request:frankenphp-7.0.1
+        image: ambroisemaupate/intervention-request:7.0.2
+        #image: ambroisemaupate/intervention-request:frankenphp-7.0.2
         volumes:
             - cache:/app/public/assets
             ## If using local storage file system

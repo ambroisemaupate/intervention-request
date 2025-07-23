@@ -2,6 +2,12 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [7.0.2](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.1...v7.0.2) - 2025-07-23
+
+### Bug Fixes
+
+- **(composer)** update symfony/filesystem version constraint to >=7.1 to use `Filesystem::readFile` - ([49a0d46](https://github.com/ambroisemaupate/intervention-request/commit/49a0d4604ea007d906cd3fb8f50e55e32cef0faf)) - Ambroise Maupate
+
 ## [7.0.1](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.0...v7.0.1) - 2025-07-23
 
 ### Bug Fixes
