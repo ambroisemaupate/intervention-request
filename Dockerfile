@@ -54,7 +54,7 @@ adduser --home /home/php --shell /bin/bash --uid ${GID} --gecos php --ingroup ph
 echo "php ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/php
 
 # App
-install --verbose --owner php --group php --mode 0755 --directory /app
+install --verbose --owner php --group php --mode 0755 --directory /app/public/images /app/public/assets
 
 /usr/bin/crontab -u php /crontab.txt
 chown -R php:php /app
@@ -201,7 +201,7 @@ adduser --home /home/php --shell /bin/bash --uid ${GID} --gecos php --ingroup ph
 echo "php ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/php
 
 # App
-install --verbose --owner php --group php --mode 0755 --directory /app
+install --verbose --owner php --group php --mode 0755 --directory /app/public/images /app/public/assets
 
 /usr/bin/crontab -u php /crontab.txt
 chown -R php:php /app
