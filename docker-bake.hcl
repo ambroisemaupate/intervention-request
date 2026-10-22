@@ -1,5 +1,5 @@
 variable "TAG" {
-    default = "4.1.1"
+    default = "4.1.2"
 }
 
 variable "IMAGE" {

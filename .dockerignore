@@ -1,5 +1,5 @@
 !vendor
-!composer.lock
+composer.lock
 !bin/intervention
 
 web/cache
@@ -11,6 +11,7 @@ public/assets
 .editorconfig
 .idea
 .travis.yml
+.phpactor.json
 Makefile
 README.md
 docker-compose.yml

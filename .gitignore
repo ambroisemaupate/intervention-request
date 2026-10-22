@@ -114,3 +114,4 @@ project_env.sh
 .phpcs-cache
 /compose.override.yml
 .php-cs-fixer.cache
+.phpactor.json
