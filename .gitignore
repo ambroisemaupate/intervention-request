@@ -2,6 +2,7 @@
 web/cache
 web/local
 web/assets
+public/assets
 
 ### Composer ###
 composer.phar
@@ -112,3 +113,4 @@ report.txt
 project_env.sh
 .phpcs-cache
 /compose.override.yml
+.php-cs-fixer.cache

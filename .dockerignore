@@ -6,6 +6,7 @@ web/cache
 web/assets
 web/images
 web/dev.php
+public/assets
 .git
 .editorconfig
 .idea
@@ -13,6 +14,8 @@ web/dev.php
 Makefile
 README.md
 docker-compose.yml
+.php-cs-fixer.cache
+.phpcs-cache
 compose.yml
 compose.override.yml
 phpstan.neon
