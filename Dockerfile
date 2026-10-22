@@ -1,13 +1,13 @@
 ARG UID=1000
 ARG GID=${UID}
 
-ARG PHP_VERSION=8.4.10
+ARG PHP_VERSION=8.5.12
 
 #######
 # PHP #
 #######
 
-FROM php:${PHP_VERSION}-fpm-bookworm AS php
+FROM php:${PHP_VERSION}-fpm-trixie AS php
 
 LABEL org.opencontainers.image.authors="ambroise@rezo-zero.com"
 
@@ -152,7 +152,7 @@ EXPOSE 80
 # FrankenPHP #
 ##############
 
-FROM dunglas/frankenphp:php${PHP_VERSION}-bookworm AS frankenphp
+FROM dunglas/frankenphp:php${PHP_VERSION}-trixie AS frankenphp
 
 LABEL org.opencontainers.image.authors="ambroise@rezo-zero.com"
 

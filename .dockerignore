@@ -9,6 +9,7 @@
 CHANGELOG.md
 Makefile
 README.md
+UPGRADE.md
 cliff.toml
 compose.override.yml
 compose.override.yml.dist
