@@ -2,6 +2,12 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [7.0.4](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.3...v7.0.4) - 2026-10-22
+
+### Bug Fixes
+
+- **(infra, k8s)** fixed Dockerfile creating /app/public/images /app/public/assets sub-folders - ([1dd19c7](https://github.com/ambroisemaupate/intervention-request/commit/1dd19c735aa436e398b20fde1ce8f8d7ad04f348)) - Ambroise Maupate
+
 ## [7.0.3](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.2...v7.0.3) - 2026-10-22
 
 ### Bug Fixes
