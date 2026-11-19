@@ -61,4 +61,29 @@ class ImageHotspotFunctionalTest extends InterventionRequestTestCase
         $this->assertEquals($expectedMd5, $actualMd5);
         $this->assertEquals(1, $response->headers->get('X-IR-First-Gen'));
     }
+
+    public function testAreaWithoutCrop(): void
+    {
+        // https://github.com/ambroisemaupate/intervention-request/issues/35
+        [$width, $height] = (array) getimagesize(dirname(__DIR__, 2).'/public/images/rhino.webp');
+        $response = $this->interventionRequest->handleRequest(
+            $this->generateRequest('http://localhost/assets/q75-d0:0:0:0.25:1:0.75/rhino.webp')
+        );
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(
+            [$width, (int) round($height * 0.75 - $height * 0.25)],
+            array_slice((array) getimagesizefromstring((string) $response->getContent()), 0, 2)
+        );
+    }
+
+    public function testPointWithoutCropKeepsImage(): void
+    {
+        $size = array_slice((array) getimagesize(dirname(__DIR__, 2).'/public/images/rhino.webp'), 0, 2);
+        $response = $this->interventionRequest->handleRequest(
+            $this->generateRequest('http://localhost/assets/d0.3x0.7/rhino.webp')
+        );
+
+        $this->assertSame($size, array_slice((array) getimagesizefromstring((string) $response->getContent()), 0, 2));
+    }
 }

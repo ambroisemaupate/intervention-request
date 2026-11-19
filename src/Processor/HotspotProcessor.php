@@ -19,7 +19,8 @@ final readonly class HotspotProcessor implements Processor
         $crop = $this->validateDimensions($request, 'crop');
         $hotspot = $this->validateNormalizedHotspot($request, 'hotspot');
 
-        if (null !== $hotspot && null !== $crop) {
+        // Without crop ratio, only a hotspot area (not a single point) has something to crop
+        if (null !== $hotspot && (null !== $crop || !$hotspot->isFullArea())) {
             // If hotspot defines a new image area, we need to calculate the crop offset
             $rectInit = new Vector(
                 $image->width() * $hotspot->topLeft->getX(),
@@ -30,8 +31,10 @@ final readonly class HotspotProcessor implements Processor
                 ($image->height() * $hotspot->bottomRight->getY()) - $rectInit->getY(),
             );
 
-            // Get width and height with ratio
-            $croppedSize = $this->getCroppedWidthHeight($rectSize->getRoundedX(), $rectSize->getRoundedY(), $crop);
+            // Get width and height with ratio, or the whole hotspot area without crop ratio
+            $croppedSize = null !== $crop
+                ? $this->getCroppedWidthHeight($rectSize->getRoundedX(), $rectSize->getRoundedY(), $crop)
+                : $rectSize;
             $center = new Vector(
                 $rectInit->getX() + $hotspot->center->getX() * $rectSize->getX(),
                 $rectInit->getY() + $hotspot->center->getY() * $rectSize->getY()
