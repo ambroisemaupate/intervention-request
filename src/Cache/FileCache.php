@@ -166,7 +166,7 @@ class FileCache implements EventSubscriberInterface
                 [
                     'Content-Type' => $cacheFile->getMimeType(),
                     'Content-Disposition' => 'filename="'.$nativeImage->getRequestedFile()->getFilename().'"',
-                    'Last-Modified' => $cacheFile->getMTime(),
+                    'Last-Modified' => gmdate('D, d M Y H:i:s', (int) $cacheFile->getMTime()).' GMT',
                     'X-IR-Cached' => '1',
                     'X-IR-First-Gen' => (int) $firstGen,
                 ]
