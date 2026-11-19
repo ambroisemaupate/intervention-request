@@ -135,7 +135,7 @@ class FileCache implements EventSubscriberInterface
 
             if (
                 (false !== $mtime_original_file)
-                && (false !== $mtime_cached_file && \is_numeric($mtime_cached_file))
+                && (false !== $mtime_cached_file)
                 && ($mtime_cached_file < $mtime_original_file)
             ) {
                 $this->filesystem->remove($cacheFilePath);
