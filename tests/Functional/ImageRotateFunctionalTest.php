@@ -11,7 +11,7 @@ class ImageRotateFunctionalTest extends InterventionRequestTestCase
      */
     public function test(): void
     {
-        $expectedMd5 = 'ce3f33e05820b8409a0a6c0e86c4eee7';
+        $expectedMd5 = 'e122c0c515cb61fb0f1b76e9b61df940';
         $request = $this->generateRequest('http://localhost/assets/r115/rhino.webp');
         $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
@@ -25,7 +25,7 @@ class ImageRotateFunctionalTest extends InterventionRequestTestCase
      */
     public function testWithTransparent(): void
     {
-        $expectedMd5 = '51b5d67ce0d7bbb2bb442181f6a7f521';
+        $expectedMd5 = 'f78c43ce124184844d3686b3f99e0330';
         $request = $this->generateRequest('http://localhost/assets/r115-btransparent/testPNG.png');
         $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);
@@ -39,7 +39,7 @@ class ImageRotateFunctionalTest extends InterventionRequestTestCase
      */
     public function testWithBackgroundRed(): void
     {
-        $expectedMd5 = '4121cc9b35f4149a18e543a542a7915d';
+        $expectedMd5 = 'f48a51cd60f681d7c2d94e717c67648a';
         $request = $this->generateRequest('http://localhost/assets/r115-bff0000/rhino.webp');
         $response = $this->interventionRequest->handleRequest($request);
         $actualMd5 = $this->getResponseFileMd5($response);

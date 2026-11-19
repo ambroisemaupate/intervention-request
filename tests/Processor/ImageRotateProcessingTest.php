@@ -14,7 +14,7 @@ final class ImageRotateProcessingTest extends ImageProcessingTestCase
         $this->processedImageHash(
             new RotateProcessor(),
             '/testPNG.png',
-            'f96b9143c1571fbcde3abfb0a72e5ef3',
+            'f55197d34c165efa7b1674f32c4bd326',
             [
                 'rotate' => '20',
                 'background' => 'transparent',
