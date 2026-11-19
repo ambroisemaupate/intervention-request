@@ -2,6 +2,7 @@ ARG UID=1000
 ARG GID=${UID}
 
 ARG PHP_VERSION=8.5.12
+ARG COMPOSER_VERSION=2.11.2
 
 #######
 # PHP #
@@ -13,8 +14,7 @@ LABEL org.opencontainers.image.authors="ambroise@rezo-zero.com"
 
 ARG UID
 ARG GID
-
-ARG COMPOSER_VERSION=2.8.2
+ARG COMPOSER_VERSION
 
 ENV IR_GC_PROBABILITY=400
 ENV IR_GC_TTL=604800
@@ -158,8 +158,7 @@ LABEL org.opencontainers.image.authors="ambroise@rezo-zero.com"
 
 ARG UID
 ARG GID
-
-ARG COMPOSER_VERSION=2.8.2
+ARG COMPOSER_VERSION
 
 ENV SERVER_NAME=":80"
 ENV FRANKENPHP_CONFIG="worker /app/public/index.php"
