@@ -49,21 +49,64 @@ final class StreamNoProcessListener implements EventSubscriberInterface
             $this->fileResolver->assertRequestedFilePath($requestEvent->getRequest()->get('image'))
         );
 
-        $response = new StreamedResponse(function () use ($nativeImage, $filesystem) {
+        $path = $nativeImage->getPathname();
+        $size = $filesystem->fileSize($path);
+        $start = 0;
+        $end = $size - 1;
+        $status = Response::HTTP_OK;
+
+        // ponytail: single byte range only; multi-range requests get the whole file (allowed by RFC 9110)
+        $range = $requestEvent->getRequest()->headers->get('Range');
+        if (null !== $range && 1 === preg_match('/^bytes=(\d*)-(\d*)$/', trim($range), $matches) && '' !== $matches[1].$matches[2]) {
+            if ('' === $matches[1]) {
+                $start = max(0, $size - (int) $matches[2]);
+            } else {
+                $start = (int) $matches[1];
+                if ('' !== $matches[2]) {
+                    $end = min((int) $matches[2], $size - 1);
+                }
+            }
+            if ($start > $end) {
+                $requestEvent->setResponse(new Response(null, Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE, [
+                    'Content-Range' => 'bytes */'.$size,
+                ]));
+
+                return;
+            }
+            $status = Response::HTTP_PARTIAL_CONTENT;
+        }
+        $length = $end - $start + 1;
+
+        $response = new StreamedResponse(function () use ($path, $filesystem, $start, $length) {
             $outputStream = fopen('php://output', 'wb');
             if (false === $outputStream) {
                 throw new \RuntimeException('Could not open php://output');
             }
-            stream_copy_to_stream(
-                $filesystem->readStream($nativeImage->getPathname()),
-                $outputStream
-            );
-        }, Response::HTTP_OK, [
-            'Content-Type' => $filesystem->mimeType($nativeImage->getPathname()),
-            'Last-Modified' => $filesystem->lastModified($nativeImage->getPathname()),
+            $inputStream = $filesystem->readStream($path);
+            if ($start > 0 && 0 !== fseek($inputStream, $start)) {
+                // Non-seekable stream (remote storage): skip bytes by reading them
+                $skip = $start;
+                while ($skip > 0 && !feof($inputStream)) {
+                    $chunk = fread($inputStream, min(8192, $skip));
+                    if (false === $chunk) {
+                        break;
+                    }
+                    $skip -= strlen($chunk);
+                }
+            }
+            stream_copy_to_stream($inputStream, $outputStream, $length);
+            fclose($inputStream);
+        }, $status, [
+            'Content-Type' => $filesystem->mimeType($path),
+            'Content-Length' => (string) $length,
+            'Accept-Ranges' => 'bytes',
             'Content-Disposition' => 'filename="'.$nativeImage->getFilename().'"',
             'X-Direct-Stream' => '1',
         ]);
+        if (Response::HTTP_PARTIAL_CONTENT === $status) {
+            $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $size));
+        }
+        $response->setLastModified(new \DateTimeImmutable('@'.$filesystem->lastModified($path)));
         $response->setPublic();
         $requestEvent->setResponse($response);
     }
