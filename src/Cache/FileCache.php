@@ -74,9 +74,9 @@ class FileCache implements EventSubscriberInterface
 
         if (mt_rand(1, $this->gcProbability) <= 1) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

@@ -106,9 +106,9 @@ final class GarbageCollector
         ) {
             // If the file is more than 1 day old, something probably went wrong and we should run again anyway
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

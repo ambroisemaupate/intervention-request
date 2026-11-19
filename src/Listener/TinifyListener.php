@@ -63,7 +63,7 @@ final readonly class TinifyListener implements ImageFileEventSubscriberInterface
     /**
      * @param string $localPath
      */
-    protected function overrideImageFile($localPath, \Tinify\Source $source): void
+    private function overrideImageFile($localPath, \Tinify\Source $source): void
     {
         $source->toFile($localPath);
     }
