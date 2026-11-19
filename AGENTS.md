@@ -39,7 +39,8 @@ Everything is wired through a Symfony `EventDispatcher` built inside `Interventi
 
 - `tests/Processor`: one processor applied to an image from `public/images`, asserted by **md5 of the GD output**. Upgrading `intervention/image` or GD can legitimately change hashes.
 - `tests/Functional`: full `InterventionRequest` with short URLs (`/assets/...`), asserting the response content md5.
-- Both write into `tests/temp/` and clean it in `tearDown`.
+- `tests/Listener`: listeners called directly (e.g. `StreamNoProcessListener` Range handling over a local Flysystem adapter).
+- Processor and Functional tests write into `tests/temp/` and clean it in `tearDown`.
 
 ## Releases
 
