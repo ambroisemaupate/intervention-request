@@ -32,7 +32,8 @@ final class StreamNoProcessListener implements EventSubscriberInterface
 
     public function onRequest(RequestEvent $requestEvent): void
     {
-        $hasNoProcess = $requestEvent->getRequest()->query->get('no_process', false);
+        $request = $requestEvent->getRequest();
+        $hasNoProcess = $request->query->get('no_process', false);
 
         if (!$hasNoProcess) {
             return;
@@ -41,12 +42,12 @@ final class StreamNoProcessListener implements EventSubscriberInterface
             return;
         }
 
-        $requestEvent->getRequest()->attributes->set('no_process', true);
-        $requestEvent->getRequest()->attributes->set(self::ATTRIBUTE, true);
+        $request->attributes->set('no_process', true);
+        $request->attributes->set(self::ATTRIBUTE, true);
 
         $filesystem = $this->fileResolver->getFilesystem();
         $nativeImage = $this->fileResolver->resolveFile(
-            $this->fileResolver->assertRequestedFilePath($requestEvent->getRequest()->get('image'))
+            $this->fileResolver->assertRequestedFilePath($request->get('image'))
         );
 
         $path = $nativeImage->getPathname();
@@ -54,10 +55,22 @@ final class StreamNoProcessListener implements EventSubscriberInterface
         $start = 0;
         $end = $size - 1;
         $status = Response::HTTP_OK;
+        $lastModified = new \DateTimeImmutable('@'.$filesystem->lastModified($path));
 
         // ponytail: single byte range only; multi-range requests get the whole file (allowed by RFC 9110)
-        $range = $requestEvent->getRequest()->headers->get('Range');
-        if (null !== $range && 1 === preg_match('/^bytes=(\d*)-(\d*)$/', trim($range), $matches) && '' !== $matches[1].$matches[2]) {
+        $range = $request->isMethod('GET') ? $request->headers->get('Range') : null;
+        // RFC 9110 13.1.5: a stale If-Range validator means the client wants the whole file
+        $ifRange = $request->headers->get('If-Range');
+        if (null !== $ifRange && $ifRange !== $lastModified->format('D, d M Y H:i:s').' GMT') {
+            $range = null;
+        }
+        if (
+            null !== $range
+            && 1 === preg_match('/^bytes=(\d*)-(\d*)$/', trim($range), $matches)
+            && '' !== $matches[1].$matches[2]
+            // RFC 9110 14.1.1: last-pos < first-pos is invalid, ignore the Range
+            && ('' === $matches[1] || '' === $matches[2] || (int) $matches[2] >= (int) $matches[1])
+        ) {
             if ('' === $matches[1]) {
                 $start = max(0, $size - (int) $matches[2]);
             } else {
@@ -83,12 +96,14 @@ final class StreamNoProcessListener implements EventSubscriberInterface
                 throw new \RuntimeException('Could not open php://output');
             }
             $inputStream = $filesystem->readStream($path);
-            if ($start > 0 && 0 !== fseek($inputStream, $start)) {
+            if ($start > 0 && stream_get_meta_data($inputStream)['seekable']) {
+                fseek($inputStream, $start);
+            } elseif ($start > 0) {
                 // Non-seekable stream (remote storage): skip bytes by reading them
                 $skip = $start;
                 while ($skip > 0 && !feof($inputStream)) {
                     $chunk = fread($inputStream, min(8192, $skip));
-                    if (false === $chunk) {
+                    if (false === $chunk || '' === $chunk) {
                         break;
                     }
                     $skip -= strlen($chunk);
@@ -106,7 +121,7 @@ final class StreamNoProcessListener implements EventSubscriberInterface
         if (Response::HTTP_PARTIAL_CONTENT === $status) {
             $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $size));
         }
-        $response->setLastModified(new \DateTimeImmutable('@'.$filesystem->lastModified($path)));
+        $response->setLastModified($lastModified);
         $response->setPublic();
         $requestEvent->setResponse($response);
     }

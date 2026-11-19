@@ -18,7 +18,7 @@ class StreamNoProcessListenerTest extends InterventionRequestTestCase
 {
     private const FILE = 'test.avif';
 
-    private function stream(?string $range): Response
+    private function stream(?string $range, string $method = 'GET', ?string $ifRange = null): Response
     {
         $imagesPath = dirname(__DIR__, 2).'/public/images';
         $listener = new StreamNoProcessListener(new FlysystemFileResolver(
@@ -26,9 +26,12 @@ class StreamNoProcessListenerTest extends InterventionRequestTestCase
             new NullLogger(),
             sys_get_temp_dir(),
         ));
-        $request = Request::create('/?image='.self::FILE.'&no_process=1');
+        $request = Request::create('/?image='.self::FILE.'&no_process=1', $method);
         if (null !== $range) {
             $request->headers->set('Range', $range);
+        }
+        if (null !== $ifRange) {
+            $request->headers->set('If-Range', $ifRange);
         }
         $event = new RequestEvent($request, $this->interventionRequest);
         $listener->onRequest($event);
@@ -72,10 +75,28 @@ class StreamNoProcessListenerTest extends InterventionRequestTestCase
         $response = $this->stream('bytes=0-');
         $this->assertSame(206, $response->getStatusCode());
         $this->assertSame((string) $size, $response->headers->get('Content-Length'));
+        $this->assertSame($content, $this->body($response));
 
         $response = $this->stream('bytes=-5');
         $this->assertSame('bytes '.($size - 5).'-'.($size - 1).'/'.$size, $response->headers->get('Content-Range'));
         $this->assertSame(substr($content, -5), $this->body($response));
+    }
+
+    public function testIgnoredRange(): void
+    {
+        // last-pos < first-pos is invalid, not unsatisfiable
+        $this->assertSame(200, $this->stream('bytes=20-10')->getStatusCode());
+        // Range only applies to GET
+        $this->assertSame(200, $this->stream('bytes=10-19', 'HEAD')->getStatusCode());
+        // stale If-Range validator
+        $this->assertSame(200, $this->stream('bytes=10-19', 'GET', 'Mon, 01 Jan 2001 00:00:00 GMT')->getStatusCode());
+    }
+
+    public function testMatchingIfRange(): void
+    {
+        $lastModified = (string) $this->stream(null)->headers->get('Last-Modified');
+
+        $this->assertSame(206, $this->stream('bytes=10-19', 'GET', $lastModified)->getStatusCode());
     }
 
     public function testUnsatisfiableRange(): void
