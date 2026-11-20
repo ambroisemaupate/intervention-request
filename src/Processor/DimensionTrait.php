@@ -64,11 +64,14 @@ trait DimensionTrait
         }
 
         if (1 === preg_match('#^(0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)[:;x](0(?:\.\d+)?|1(?:\.0+)?)$#', $data, $hotspot)) {
-            return new Hotspot(
-                new Vector($hotspot[1], $hotspot[2]),
-                new Vector($hotspot[3], $hotspot[4]),
-                new Vector($hotspot[5], $hotspot[6]),
-            );
+            $topLeft = new Vector($hotspot[3], $hotspot[4]);
+            $bottomRight = new Vector($hotspot[5], $hotspot[6]);
+            // Reject empty or inverted areas, they would crop to zero or negative size
+            if ($topLeft->getX() >= $bottomRight->getX() || $topLeft->getY() >= $bottomRight->getY()) {
+                return null;
+            }
+
+            return new Hotspot(new Vector($hotspot[1], $hotspot[2]), $topLeft, $bottomRight);
         }
 
         return null;

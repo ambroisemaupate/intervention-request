@@ -18,26 +18,19 @@ jobs:
     static-analysis-tests:
         runs-on: ubuntu-latest
         strategy:
+            fail-fast: false
             matrix:
                 php-version: ['8.2', '8.3', '8.4', '8.5']
         steps:
-            - uses: shivammathur/setup-php@v2
-              with:
-                  php-version: ${{ matrix.php-version }}
-            - uses: actions/checkout@v3
-            - name: Cache Composer packages
-              id: composer-cache
-              uses: actions/cache@v3
-              with:
-                  path: vendor
-                  key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-php-${{ matrix.php-version }}-
+            - uses: actions/checkout@v4
+            # Image hashes in tests depend on GD/libjpeg builds: run in the same image as `make test`
+            - name: Build php-dev image
+              run: docker build --target php-dev --build-arg PHP_VERSION=${{ matrix.php-version }} -t intervention-test .
             - name: Install Dependencies
-              run: composer install --no-scripts --no-ansi --no-interaction --no-progress
+              run: docker run --rm -v "$PWD:/app" intervention-test composer install --no-scripts --no-ansi --no-interaction --no-progress
             - name: Run unit tests
-              run: php -d "memory_limit=-1" vendor/bin/phpunit tests/
+              run: docker run --rm -v "$PWD:/app" intervention-test php -d memory_limit=-1 vendor/bin/phpunit tests/
             - name: Run PHP CS Fixer
-              run: PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer check --ansi -vvv
+              run: docker run --rm -v "$PWD:/app" -e PHP_CS_FIXER_IGNORE_ENV=1 intervention-test vendor/bin/php-cs-fixer check --ansi -vvv
             - name: Run PHPStan
-              run: vendor/bin/phpstan analyse --no-progress -c phpstan.neon
+              run: docker run --rm -v "$PWD:/app" intervention-test php -d memory_limit=-1 vendor/bin/phpstan analyse --no-progress -c phpstan.neon

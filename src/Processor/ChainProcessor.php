@@ -26,7 +26,7 @@ final readonly class ChainProcessor
     ) {
     }
 
-    protected function makeImage(File $nativeFile): ImageInterface
+    private function makeImage(File $nativeFile): ImageInterface
     {
         // create an image manager instance with favored driver
         $manager = new ImageManager($this->configuration->getDriver());

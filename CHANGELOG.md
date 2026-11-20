@@ -2,6 +2,35 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [7.0.5](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.4...v7.0.5) - 2026-11-20
+
+### Bug Fixes
+
+- **(cache)** send Last-Modified as an HTTP date - ([74bc5e7](https://github.com/ambroisemaupate/intervention-request/commit/74bc5e7f83515d124c85720aee553743c00c7076)) - Ambroise Maupate
+- **(cache)** drop redundant is_numeric check on mtime - ([d487432](https://github.com/ambroisemaupate/intervention-request/commit/d48743267acc470de743992394026a9d05b38389)) - Ambroise Maupate
+- **(hotspot)** crop to hotspot area when no crop ratio is given ([#37](https://github.com/ambroisemaupate/intervention-request/issues/37)) - ([548da32](https://github.com/ambroisemaupate/intervention-request/commit/548da3286a24c58b5a27882f6c7b9ca9f68c3895)) - Ambroise Maupate
+- **(stream)** honour If-Range and ignore invalid or non-GET Range requests - ([57d17dd](https://github.com/ambroisemaupate/intervention-request/commit/57d17ddd091a5da64d8fe259f621762e470b18b5)) - Ambroise Maupate
+- Range support on no_process streams, PHP 8.5.13 ([#36](https://github.com/ambroisemaupate/intervention-request/issues/36)) - ([f9a33a3](https://github.com/ambroisemaupate/intervention-request/commit/f9a33a3e251026fdb8f9200cba7e41a5da5e363d)) - Ambroise Maupate
+
+### CI/CD
+
+- run tests in php-dev Docker image so image hashes match - ([55b3c40](https://github.com/ambroisemaupate/intervention-request/commit/55b3c4088c1c82306dcb5c61aa74af812c1b57fb)) - Ambroise Maupate
+- drop vendor cache keyed on untracked composer.lock - ([5aeb30a](https://github.com/ambroisemaupate/intervention-request/commit/5aeb30a0d4bf38e902ba1653e9752abfc8f6bb15)) - Ambroise Maupate
+
+### Documentation
+
+- add AGENTS.md with agent guidance and CLAUDE.md pointer - ([11aebd7](https://github.com/ambroisemaupate/intervention-request/commit/11aebd7b660e0c86ebe92a8d7518c4fa2c8c8a2b)) - Ambroise Maupate
+- document Listener tests in AGENTS.md - ([bc81824](https://github.com/ambroisemaupate/intervention-request/commit/bc81824dcf9cec8b7db2f6dec15756e8e57e411b)) - Ambroise Maupate
+
+### Styling
+
+- apply PHP CS Fixer 3.95 rules - ([3c96c7d](https://github.com/ambroisemaupate/intervention-request/commit/3c96c7d9746e3a2e91eedf356fb002aadb0dd59b)) - Ambroise Maupate
+
+### Testing
+
+- update rotate hashes for current Intervention Image and GD - ([fd766c8](https://github.com/ambroisemaupate/intervention-request/commit/fd766c8e46ed5dc7c24fd3529977e0740b321060)) - Ambroise Maupate
+- expect PHP 8.5 libgd rotate hashes only on PHP >= 8.5 - ([196da7d](https://github.com/ambroisemaupate/intervention-request/commit/196da7d4e00e39606532c6201ff957bb76289f06)) - Ambroise Maupate
+
 ## [7.0.4](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.3...v7.0.4) - 2026-10-22
 
 ### Bug Fixes
