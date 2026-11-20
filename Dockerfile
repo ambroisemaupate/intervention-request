@@ -36,7 +36,6 @@ COPY --link docker/crontab.txt /crontab.txt
 
 RUN <<EOF
 apt-get --quiet update
-apt-get --quiet --yes --purge --autoremove upgrade
 # Packages - System
 apt-get --quiet --yes --no-install-recommends --verbose-versions install \
     less \
@@ -44,14 +43,12 @@ apt-get --quiet --yes --no-install-recommends --verbose-versions install \
     cron \
     pngquant \
     supervisor \
-    jpegoptim \
-    sudo
+    jpegoptim
 rm -rf /var/lib/apt/lists/*
 
 # User
-addgroup --gid ${UID} php
-adduser --home /home/php --shell /bin/bash --uid ${GID} --gecos php --ingroup php --disabled-password php
-echo "php ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/php
+addgroup --gid ${GID} php
+adduser --home /home/php --shell /bin/bash --uid ${UID} --gecos php --ingroup php --disabled-password php
 
 # App
 install --verbose --owner php --group php --mode 0755 --directory /app/public/images /app/public/assets
@@ -182,7 +179,6 @@ COPY --link docker/crontab.txt /crontab.txt
 
 RUN <<EOF
 apt-get --quiet update
-apt-get --quiet --yes --purge --autoremove upgrade
 # Packages - System
 apt-get --quiet --yes --no-install-recommends --verbose-versions install \
     less \
@@ -190,14 +186,12 @@ apt-get --quiet --yes --no-install-recommends --verbose-versions install \
     cron \
     pngquant \
     supervisor \
-    jpegoptim \
-    sudo
+    jpegoptim
 rm -rf /var/lib/apt/lists/*
 
 # User
-addgroup --gid ${UID} php
-adduser --home /home/php --shell /bin/bash --uid ${GID} --gecos php --ingroup php --disabled-password php
-echo "php ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/php
+addgroup --gid ${GID} php
+adduser --home /home/php --shell /bin/bash --uid ${UID} --gecos php --ingroup php --disabled-password php
 
 # App
 install --verbose --owner php --group php --mode 0755 --directory /app/public/images /app/public/assets

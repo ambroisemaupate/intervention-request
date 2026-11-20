@@ -7,7 +7,7 @@ test:
 
 bake:
 	docker run --privileged --rm tonistiigi/binfmt --install all
-	docker buildx bake --push intervention
+	docker buildx bake --pull --push intervention
 
 test-functional:
 	docker compose run --rm --entrypoint= intervention php -d "memory_limit=-1" vendor/bin/phpunit tests/Functional
