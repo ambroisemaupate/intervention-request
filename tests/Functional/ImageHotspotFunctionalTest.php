@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace AM\InterventionRequest\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class ImageHotspotFunctionalTest extends InterventionRequestTestCase
 {
     /**
@@ -62,28 +64,63 @@ class ImageHotspotFunctionalTest extends InterventionRequestTestCase
         $this->assertEquals(1, $response->headers->get('X-IR-First-Gen'));
     }
 
+    /**
+     * rhino.webp is 2500x1667: area 0.25 to 0.75 is rows 417 to 1250.
+     *
+     * @see https://github.com/ambroisemaupate/intervention-request/issues/35
+     *
+     * @throws \Exception
+     */
     public function testAreaWithoutCrop(): void
     {
-        // https://github.com/ambroisemaupate/intervention-request/issues/35
-        [$width, $height] = (array) getimagesize(dirname(__DIR__, 2).'/public/images/rhino.webp');
-        $response = $this->interventionRequest->handleRequest(
-            $this->generateRequest('http://localhost/assets/q75-d0:0:0:0.25:1:0.75/rhino.webp')
-        );
+        $expectedMd5 = '50698fb13af5fa1127e44e35490dcee5';
+        $request = $this->generateRequest('http://localhost/assets/q75-d0x0x0x0.25x1x0.75/rhino.webp');
+        $response = $this->interventionRequest->handleRequest($request);
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame(
-            [$width, (int) round($height * 0.75 - $height * 0.25)],
-            array_slice((array) getimagesizefromstring((string) $response->getContent()), 0, 2)
-        );
+        $this->assertSame([2500, 833], $this->getResponseImageSize($response));
+        $this->assertEquals($expectedMd5, $this->getResponseFileMd5($response));
+        $this->assertEquals(1, $response->headers->get('X-IR-First-Gen'));
     }
 
-    public function testPointWithoutCropKeepsImage(): void
+    /**
+     * @return iterable<string, array{string, array{int, int}}>
+     */
+    public static function sizeProvider(): iterable
     {
-        $size = array_slice((array) getimagesize(dirname(__DIR__, 2).'/public/images/rhino.webp'), 0, 2);
-        $response = $this->interventionRequest->handleRequest(
-            $this->generateRequest('http://localhost/assets/d0.3x0.7/rhino.webp')
-        );
+        // rhino.webp is 2500x1667
+        yield 'point alone keeps image' => ['d0.3x0.7', [2500, 1667]];
+        yield 'explicit full area keeps image' => ['d0.5x0.5x0x0x1x1', [2500, 1667]];
+        yield 'empty area is ignored' => ['d0.5x0.5x0.5x0.5x0.5x0.5', [2500, 1667]];
+        yield 'inverted area is ignored' => ['d0.5x0.5x0.75x0.75x0.25x0.25', [2500, 1667]];
+        yield 'left half' => ['d0x0x0x0x0.5x1', [1250, 1667]];
+        // 0.5px start would round up with size and overflow the image by 1px (black column)
+        yield 'half-pixel start does not overflow' => ['d0x0x0.0002x0x1x1', [2499, 1667]];
+        // center point is ignored without crop
+        yield 'center does not move area' => ['d1x1x0x0.25x1x0.75', [2500, 833]];
+        // fit runs before hotspot: area is ignored
+        yield 'fit ignores area' => ['f100x100-d0x0x0x0.25x1x0.75', [100, 100]];
+        // rotate runs before hotspot: area is relative to the rotated 1667x2500 image
+        yield 'rotate then area' => ['r90-d0x0x0x0x1x0.5', [1667, 1250]];
+        // width/height run after hotspot: area 2500x833 is resized
+        yield 'area then width' => ['d0x0x0x0.25x1x0.75-w500', [500, 167]];
+        yield 'area then height' => ['d0x0x0.25x0x0.75x1-h400', [300, 400]];
+        // crop ratio is applied inside the area (1250x834)
+        yield 'area with square crop' => ['d0.5x0.5x0.25x0.25x0.75x0.75-c1x1', [834, 834]];
+        yield 'area with wide crop' => ['d0.5x0.5x0x0x0.5x1-c2x1', [1250, 625]];
+    }
 
-        $this->assertSame($size, array_slice((array) getimagesizefromstring((string) $response->getContent()), 0, 2));
+    /**
+     * @param array{int, int} $expectedSize
+     *
+     * @throws \Exception
+     */
+    #[DataProvider('sizeProvider')]
+    public function testHotspotSize(string $shortcuts, array $expectedSize): void
+    {
+        $request = $this->generateRequest('http://localhost/assets/'.$shortcuts.'/rhino.webp');
+        $response = $this->interventionRequest->handleRequest($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame($expectedSize, $this->getResponseImageSize($response));
     }
 }
