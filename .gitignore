@@ -119,3 +119,4 @@ project_env.sh
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 /tests/temp/
+.phpactor.json

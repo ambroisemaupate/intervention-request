@@ -12,6 +12,9 @@ vendor
 AGENTS.md
 CLAUDE.md
 
+# Local env overrides may hold secrets (.env defaults are loaded at runtime)
+.env.*
+
 # Docs and release tooling
 CHANGELOG.md
 README.md
