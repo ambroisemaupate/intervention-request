@@ -2,6 +2,12 @@
 
 All notable changes to *Intervention Request* will be documented in this file.
 
+## [7.0.6](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.5...v7.0.6) - 2026-11-20
+
+### Bug Fixes
+
+- **(docker)** improve Dockerfile - ([7ff752d](https://github.com/ambroisemaupate/intervention-request/commit/7ff752d73e6c09c83d6e448b9937783aa6bfb816)) - Ambroise Maupate
+
 ## [7.0.5](https://github.com/ambroisemaupate/intervention-request/compare/v7.0.4...v7.0.5) - 2026-11-20
 
 ### Bug Fixes
