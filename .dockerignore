@@ -1,32 +1,43 @@
-!composer.lock
-!bin/intervention
+# Installed in the image by composer
+vendor
 
-.editorconfig
+# VCS, CI, IDE, agents
 .git
 .github
 .idea
-.travis.yml
+.claude
+.gitignore
+.dockerignore
+.editorconfig
+AGENTS.md
+CLAUDE.md
+
+# Local env overrides may hold secrets (.env defaults are loaded at runtime)
+.env.*
+
+# Docs and release tooling
 CHANGELOG.md
-Makefile
 README.md
 UPGRADE.md
 cliff.toml
-compose.override.yml
-compose.override.yml.dist
-compose.yml
-phpcs.xml.dist
-phpstan.neon
-project_env.sh
-report.txt
-router.php
-supervisord.pid
-public/assets
-public/cache
-public/dev.php
-public/croptest.html
-public/images
-tests/temp
 
+# Build and dev tooling
+Dockerfile
+docker-bake.hcl
+Makefile
+compose*.yml
+compose*.yml.dist
+router.php
+report.txt
+supervisord.pid
+phpstan.neon
 .php-cs-fixer.cache
 .php-cs-fixer.dist.php
-docker-bake.hcl
+
+# Tests and runtime data (images and assets are volumes)
+tests
+public/assets
+public/cache
+public/images
+public/dev.php
+public/test.html

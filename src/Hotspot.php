@@ -13,6 +13,15 @@ final readonly class Hotspot
     ) {
     }
 
+    /**
+     * Strict float comparison is safe: coordinates come from parsed literals, never from arithmetic.
+     */
+    public function isFullArea(): bool
+    {
+        return 0.0 === $this->topLeft->getX() && 0.0 === $this->topLeft->getY()
+            && 1.0 === $this->bottomRight->getX() && 1.0 === $this->bottomRight->getY();
+    }
+
     public static function point(Vector $center): self
     {
         return new self(

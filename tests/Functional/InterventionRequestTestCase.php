@@ -86,4 +86,15 @@ class InterventionRequestTestCase extends TestCase
     {
         return md5($response->getContent() ?: '');
     }
+
+    /**
+     * @return array{int, int} width and height
+     */
+    protected function getResponseImageSize(Response $response): array
+    {
+        $size = getimagesizefromstring($response->getContent() ?: '');
+        $this->assertNotFalse($size);
+
+        return [$size[0], $size[1]];
+    }
 }

@@ -78,7 +78,7 @@ final class KrakenListener implements ImageFileEventSubscriberInterface
     /**
      * @param non-empty-string $krakedUrl
      */
-    protected function overrideImageFile(string $localPath, string $krakedUrl): void
+    private function overrideImageFile(string $localPath, string $krakedUrl): void
     {
         /**
          * Initialize the cURL session.

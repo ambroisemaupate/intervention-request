@@ -74,9 +74,9 @@ class ShortUrlExpander
             )
         ) {
             return $matches;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
